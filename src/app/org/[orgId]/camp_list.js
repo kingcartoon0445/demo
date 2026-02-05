@@ -23,7 +23,7 @@ export default function CampList() {
         return true;
     });
     let tab = menuList.findIndex(
-        (e) => e.path == (pathname.split("/")[4] ?? "")
+        (e) => e.path == (pathname.split("/")[4] ?? ""),
     );
     return (
         <div className="flex flex-col gap-3 p-4  overflow-y-auto">
@@ -33,7 +33,7 @@ export default function CampList() {
                     href={`/org/${pathname.split("/")[2]}/campaigns/${e.path}`}
                     className={cn(
                         ` bg-bg2 rounded-xl p-3 flex items-center gap-2 cursor-pointer hover:bg-bg2/60 transition-all`,
-                        i == tab && "bg-[#E3DFFF] hover:bg-[#E3DFFF]/80"
+                        i == tab && "bg-[#E3DFFF] hover:bg-[#E3DFFF]/80",
                     )}
                 >
                     <div className="w-[42px] h-[42px] rounded-full bg-white flex items-center justify-center text-primary text-xl">
@@ -42,7 +42,7 @@ export default function CampList() {
                     <div
                         className={cn(
                             "text-title text-sm font-medium",
-                            i == tab && "text-primary"
+                            i == tab && "text-primary",
                         )}
                     >
                         {e.label}

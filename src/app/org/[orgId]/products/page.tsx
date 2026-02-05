@@ -1,5 +1,6 @@
 "use client";
 
+import { GlassTabs } from "@/components/common/GlassTabs";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import {
@@ -27,6 +28,8 @@ import CategoryManagementModal from "@/components/products/CategoryManagementMod
 import ColumnConfigModal from "@/components/products/ColumnConfigModal";
 import CreateOrUpdateProductModal from "@/components/products/CreateOrUpdateProductModal";
 import ImportProductModal from "@/components/products/ImportProductModal";
+import { ProductCard } from "@/components/products/ProductCard";
+import { Glass } from "@/components/Glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -45,15 +48,19 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@radix-ui/react-popover";
+} from "@/components/ui/popover";
 import { format } from "date-fns";
 import {
     ChevronLeft,
     ChevronRight,
     Filter,
     FolderOpen,
+    LayoutGrid,
+    LayoutList,
+    Plus,
     Search,
     Settings,
+    X,
 } from "lucide-react";
 import { createColumns } from "./columns";
 
@@ -120,7 +127,26 @@ interface ColumnLabels {
     [key: string]: string;
 }
 
-// Create a memoized filter component
+// Price range filter options
+const PRICE_RANGES = [
+    { label: "Tất cả", value: "all", min: 0, max: Infinity },
+    { label: "< 2 Tỷ", value: "lt2", min: 0, max: 2_000_000_000 },
+    {
+        label: "2 - 5 Tỷ",
+        value: "2to5",
+        min: 2_000_000_000,
+        max: 5_000_000_000,
+    },
+    {
+        label: "5 - 10 Tỷ",
+        value: "5to10",
+        min: 5_000_000_000,
+        max: 10_000_000_000,
+    },
+    { label: "> 10 Tỷ", value: "gt10", min: 10_000_000_000, max: Infinity },
+];
+
+// Create a memoized filter component using Sheet
 const FilterComponent = memo(
     ({
         searchTerm,
@@ -145,6 +171,7 @@ const FilterComponent = memo(
     }: FilterComponentProps) => {
         const { t } = useLanguage();
         const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+        const [priceRange, setPriceRange] = useState("all");
 
         // Use the existing useDebounce hook to debounce the search term
         const debouncedSearchTerm = useDebounce(localSearchTerm, 300);
@@ -165,41 +192,39 @@ const FilterComponent = memo(
         return (
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                 <PopoverTrigger asChild>
-                    <TooltipProvider>
-                        <Tooltip content={t("common.filter")}>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    className="flex items-center gap-2"
-                                    variant="outline"
-                                >
-                                    <Filter className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <Button
+                        variant="outline"
+                        className="rounded-lg flex items-center gap-2 border-gray-200"
+                    >
+                        <Filter className="h-4 w-4" />
+                        Bộ lọc
+                    </Button>
                 </PopoverTrigger>
-                <PopoverContent className="z-1">
-                    <div className="col-span-1 space-y-4 border rounded-lg p-4 bg-white z-50">
-                        <h2 className="font-semibold text-lg mb-4">Bộ lọc</h2>
+                <PopoverContent
+                    className="w-[340px] p-0 rounded-xl shadow-lg border-0"
+                    align="end"
+                    sideOffset={8}
+                >
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-4 pb-3 border-b border-gray-100">
+                        <h3 className="text-base font-semibold text-gray-900">
+                            Bộ lọc nâng cao
+                        </h3>
+                        <button
+                            onClick={() => setIsPopoverOpen(false)}
+                            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            <X className="h-4 w-4 text-gray-500" />
+                        </button>
+                    </div>
 
+                    {/* Filter Content */}
+                    <div className="p-4 space-y-5">
+                        {/* Category Filter */}
                         <div className="space-y-2">
-                            <Label htmlFor="search">Tìm kiếm</Label>
-                            <div className="relative">
-                                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="search"
-                                    placeholder="Tên hoặc mã sản phẩm..."
-                                    className="pl-8"
-                                    value={localSearchTerm}
-                                    onChange={(e) =>
-                                        setLocalSearchTerm(e.target.value)
-                                    }
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2 w-full">
-                            <Label htmlFor="category">Danh mục</Label>
+                            <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                DANH MỤC
+                            </Label>
                             <Select
                                 value={categoryId}
                                 onValueChange={(value) => {
@@ -207,7 +232,7 @@ const FilterComponent = memo(
                                     setPendingFilterChanges(true);
                                 }}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full border-gray-200 rounded-lg h-10">
                                     <SelectValue placeholder="Tất cả danh mục" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -225,94 +250,62 @@ const FilterComponent = memo(
                                             >
                                                 {category.name}
                                             </SelectItem>
-                                        )
+                                        ),
                                     )}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <div className="space-y-2 w-full">
-                            <Label htmlFor="status">Trạng thái</Label>
-                            <Select
-                                value={status}
-                                onValueChange={(value) => {
-                                    setStatus(value);
-                                    setPendingFilterChanges(true);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Tất cả trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">
-                                        Tất cả trạng thái
-                                    </SelectItem>
-                                    <SelectItem value="1">Đang bán</SelectItem>
-                                    <SelectItem value="0">Ngừng bán</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
+                        {/* Price Range Filter */}
                         <div className="space-y-2">
-                            <Label>Thời gian</Label>
-                            <TimeDropdown
-                                date={dateRange}
-                                dateSelect={dateSelect}
-                                setDate={(
-                                    value: { from: Date; to: Date } | null
-                                ) => {
-                                    setDateRange(value);
-                                    setPendingFilterChanges(true);
-                                }}
-                                setDateSelect={(value: string | null) => {
-                                    setDateSelect(value);
-                                    setPendingFilterChanges(true);
-                                }}
-                                className="w-full"
-                            />
+                            <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                MỨC GIÁ
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {PRICE_RANGES.map((range) => (
+                                    <button
+                                        key={range.value}
+                                        type="button"
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium border transition-all ${
+                                            priceRange === range.value
+                                                ? "bg-indigo-600 text-white border-indigo-600"
+                                                : "bg-white text-gray-700 border-gray-200 hover:border-indigo-300"
+                                        }`}
+                                        onClick={() => {
+                                            setPriceRange(range.value);
+                                            setPendingFilterChanges(true);
+                                        }}
+                                    >
+                                        {range.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
+                    </div>
 
-                        <div className="space-y-2 w-full">
-                            <Label htmlFor="pageSize">Số lượng hiển thị</Label>
-                            <Select
-                                value={pageSize.toString()}
-                                onValueChange={(value) => {
-                                    setPageSize(Number(value));
-                                    setPendingFilterChanges(true);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="10" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="20">20</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                    <SelectItem value="100">100</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="pt-2 flex space-x-2">
-                            <Button
-                                onClick={handleApplyFilters}
-                                variant="default"
-                            >
-                                Áp dụng
-                            </Button>
-                            <Button
-                                onClick={handleResetFilters}
-                                variant="outline"
-                                className="flex-1"
-                            >
-                                Đặt lại
-                            </Button>
-                        </div>
+                    {/* Action Buttons */}
+                    <div className="p-4 pt-3 border-t border-gray-100 flex gap-2">
+                        <Button
+                            onClick={handleResetFilters}
+                            variant="outline"
+                            className="flex-1 h-10 rounded-lg border-gray-200"
+                        >
+                            Xóa bộ lọc
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                handleApplyFilters();
+                                setIsPopoverOpen(false);
+                            }}
+                            className="flex-1 h-10 rounded-lg bg-indigo-600 hover:bg-indigo-700"
+                        >
+                            Áp dụng
+                        </Button>
                     </div>
                 </PopoverContent>
             </Popover>
         );
-    }
+    },
 );
 
 FilterComponent.displayName = "FilterComponent";
@@ -322,14 +315,20 @@ const MemoizedDataTable = memo<{
     columns: any[];
     data: Product[];
     isLoading?: boolean;
-}>(({ columns, data, isLoading }) => {
+    onRowClick?: (row: Product) => void;
+}>(({ columns, data, isLoading, onRowClick }) => {
     return (
-        <DataTable
-            columns={columns}
-            data={data}
-            isLoading={isLoading}
-            emptyMessage="Không tìm thấy sản phẩm nào"
-        />
+        <div className="bg-white rounded-2xl shadow-sm border-none overflow-hidden">
+            <DataTable
+                columns={columns}
+                data={data}
+                isLoading={isLoading}
+                onRowClick={onRowClick}
+                emptyMessage="Không tìm thấy sản phẩm nào"
+                rowClassName="h-16 hover:shadow-lg transition-all duration-200 bg-white border-b border-gray-100 last:border-none hover:z-10 relative hover:border-transparent"
+                headerClassName="bg-transparent text-gray-500 font-medium border-b border-gray-100"
+            />
+        </div>
     );
 });
 
@@ -348,10 +347,13 @@ export default function ProductsPage() {
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [shouldFetch, setShouldFetch] = useState(false);
     const [filterKey, setFilterKey] = useState(Date.now());
+    const [editingProduct, setEditingProduct] = useState<Product | undefined>(
+        undefined,
+    );
     // Filter states
     const [searchTerm, setSearchTerm] = useState("");
     const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | null>(
-        null
+        null,
     );
     const [dateSelect, setDateSelect] = useState<string | null>(null);
     const [status, setStatus] = useState<string>("all");
@@ -362,6 +364,9 @@ export default function ProductsPage() {
     // Track if filters need to be applied
     const [pendingFilterChanges, setPendingFilterChanges] = useState(false);
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+    // View mode state: 'grid' or 'list'
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
     const {
         data: userColumnConfig,
@@ -394,12 +399,11 @@ export default function ProductsPage() {
 
     // State quản lý ẩn/hiện cột và label
     const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(
-        defaultColumnVisibility
+        defaultColumnVisibility,
     );
     const [columnLabels, setColumnLabels] =
         useState<ColumnLabels>(defaultColumnLabels);
 
-    // State để track column config modal
     const [isColumnConfigModalOpen, setIsColumnConfigModalOpen] =
         useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -460,7 +464,7 @@ export default function ProductsPage() {
             const cleanParams = Object.fromEntries(
                 Object.entries(exportParams)
                     .filter(([_, value]) => value !== undefined)
-                    .map(([key, value]) => [key, String(value)])
+                    .map(([key, value]) => [key, String(value)]),
             );
 
             // Call exportProduct API function
@@ -469,7 +473,7 @@ export default function ProductsPage() {
             // Response should be a blob now due to responseType: 'blob'
             if (!(response instanceof Blob)) {
                 throw new Error(
-                    "Invalid response format from export API - expected blob"
+                    "Invalid response format from export API - expected blob",
                 );
             }
 
@@ -540,7 +544,7 @@ export default function ProductsPage() {
                     const key =
                         col.columnKey === "image" ? "images" : col.columnKey;
                     orderMap[key] = col.order ?? index;
-                }
+                },
             );
             return orderMap;
         }
@@ -586,7 +590,7 @@ export default function ProductsPage() {
             }),
             isManage: true,
         }),
-        [appliedFilters, currentPage, pageSize]
+        [appliedFilters, currentPage, pageSize],
     );
 
     const searchParams = useSearchParams();
@@ -605,7 +609,7 @@ export default function ProductsPage() {
             });
             router.replace(`?${params.toString()}`, { scroll: false });
         },
-        [router]
+        [router],
     );
 
     // Khi mount, đọc param để khởi tạo state filter
@@ -627,7 +631,7 @@ export default function ProductsPage() {
     const { data, isLoading, refetch } = useGetProducts(
         orgId,
         queryParams,
-        shouldFetch
+        shouldFetch,
     );
     const products = data?.data || [];
     const pagination = data?.pagination;
@@ -767,13 +771,13 @@ export default function ProductsPage() {
             categoryId,
             updateUrlParams,
             pageSize,
-        ]
+        ],
     );
 
     // Memoize columnLabels string to prevent unnecessary re-renders
     const columnLabelsString = useMemo(
         () => JSON.stringify(columnLabels),
-        [columnLabels]
+        [columnLabels],
     );
 
     // Memoize columns to prevent unnecessary recalculations
@@ -787,7 +791,7 @@ export default function ProductsPage() {
                 orgId,
                 t,
                 columnLabels,
-                columnOrderMap
+                columnOrderMap,
             ),
         [
             sortBy,
@@ -798,7 +802,7 @@ export default function ProductsPage() {
             t,
             columnLabelsString,
             columnOrderMap,
-        ]
+        ],
     );
 
     // Lọc và sắp xếp columns theo columnVisibility và order
@@ -865,6 +869,7 @@ export default function ProductsPage() {
 
     const handleCreateModalClose = () => {
         setIsCreateModalOpen(false);
+        setEditingProduct(undefined);
         refetch(); // Refresh the product list after creating a new product
     };
 
@@ -891,7 +896,7 @@ export default function ProductsPage() {
                 >
                     1
                 </PaginationLink>
-            </PaginationItem>
+            </PaginationItem>,
         );
 
         // Show ellipsis if needed
@@ -899,7 +904,7 @@ export default function ProductsPage() {
             items.push(
                 <PaginationItem key="ellipsis-1">
                     <PaginationEllipsis />
-                </PaginationItem>
+                </PaginationItem>,
             );
         }
 
@@ -918,7 +923,7 @@ export default function ProductsPage() {
                     >
                         {i}
                     </PaginationLink>
-                </PaginationItem>
+                </PaginationItem>,
             );
         }
 
@@ -927,7 +932,7 @@ export default function ProductsPage() {
             items.push(
                 <PaginationItem key="ellipsis-2">
                     <PaginationEllipsis />
-                </PaginationItem>
+                </PaginationItem>,
             );
         }
 
@@ -941,7 +946,7 @@ export default function ProductsPage() {
                     >
                         {totalPages}
                     </PaginationLink>
-                </PaginationItem>
+                </PaginationItem>,
             );
         }
 
@@ -949,179 +954,308 @@ export default function ProductsPage() {
     };
 
     return (
-        <div className="p-2">
-            <div className="flex justify-end items-center mb-2">
-                <div className="flex space-x-2">
-                    <AddProductDropdown
-                        setIsOpen={setIsCreateModalOpen}
-                        onExport={handleExportProducts}
-                        onImport={() => setIsImportModalOpen(true)}
-                    />
-                    <FilterComponent
-                        key={filterKey}
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        dateRange={dateRange}
-                        setDateRange={setDateRange}
-                        dateSelect={dateSelect}
-                        setDateSelect={setDateSelect}
-                        status={status}
-                        setStatus={setStatus}
-                        categoryId={categoryId}
-                        setCategoryId={setCategoryId}
-                        pageSize={pageSize}
-                        setPageSize={setPageSize}
-                        categories={categories}
-                        pendingFilterChanges={pendingFilterChanges}
-                        setPendingFilterChanges={setPendingFilterChanges}
-                        handleApplyFilters={handleApplyFilters}
-                        handleResetFilters={handleResetFilters}
-                        isPopoverOpen={isPopoverOpen}
-                        setIsPopoverOpen={setIsPopoverOpen}
-                    />
-                    <TooltipProvider>
-                        <Tooltip content={t("common.category")}>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    onClick={() => setIsCategoryModalOpen(true)}
-                                    className="flex items-center gap-2"
-                                    variant="outline"
-                                >
-                                    <FolderOpen className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                        </Tooltip>
-                    </TooltipProvider>
-                    <TooltipProvider>
-                        <Tooltip content={t("common.columnConfig")}>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className=""
-                                    onClick={() =>
-                                        setIsColumnConfigModalOpen(true)
-                                    }
-                                >
-                                    <Settings className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-            </div>
+        <Glass intensity="high" className="rounded-2xl">
+            <div className="space-y-4">
+                {/* Page Header */}
+                <div className="rounded-t-lg p-6 pb-4">
+                    {/* Top Row: Title + Actions */}
+                    <div className="flex items-start justify-between gap-4">
+                        {/* Left: Title and Subtitle */}
+                        <div>
+                            <h1 className="text-xl font-bold text-gray-900">
+                                Quản lý Sản phẩm
+                            </h1>
+                            <p className="text-sm text-gray-500">
+                                Danh sách sản phẩm và dịch vụ
+                            </p>
+                        </div>
 
-            <div className="grid grid-cols-1 gap-6 mb-6">
-                <div className="col-span-1">
-                    <ScrollArea className="w-full h-[75vh] overflow-y-auto overflow-x-auto">
-                        <div className="min-w-[900px]">
-                            <MemoizedDataTable
-                                columns={visibleColumns}
-                                data={products}
-                                isLoading={isLoading}
+                        {/* Right: View Toggle + Add Button */}
+                        <div className="flex items-center gap-3">
+                            {/* View Toggle */}
+                            {/* View Toggle */}
+                            <GlassTabs
+                                activeTab={viewMode}
+                                onChange={(id) =>
+                                    setViewMode(id as "grid" | "list")
+                                }
+                                size="sm"
+                                tabs={[
+                                    {
+                                        id: "grid",
+                                        icon: (
+                                            <LayoutGrid className="h-4 w-4" />
+                                        ),
+                                    },
+                                    {
+                                        id: "list",
+                                        icon: (
+                                            <LayoutList className="h-4 w-4" />
+                                        ),
+                                    },
+                                ]}
+                            />
+
+                            {/* Add New Button */}
+                            <Button
+                                onClick={() => {
+                                    setEditingProduct(undefined);
+                                    setIsCreateModalOpen(true);
+                                }}
+                                className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-4"
+                            >
+                                <Plus className="h-4 w-4 mr-1.5" />
+                                Thêm mới
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Bottom Row: Search + Filter */}
+                    <div className="flex items-center justify-between gap-4 mt-4">
+                        {/* Search Input */}
+                        <div className="relative rounded-lg flex-1 max-w-xs">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                                placeholder="Tìm kiếm sản phẩm..."
+                                className="pl-9 bg-white/70 border-gray-200 rounded-lg"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setPendingFilterChanges(true);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleApplyFilters();
+                                    }
+                                }}
                             />
                         </div>
-                    </ScrollArea>
 
-                    {totalItems > 0 && (
-                        <div className="flex items-center justify-between mt-2">
-                            <div className="text-sm text-gray-500">
-                                Hiển thị {(currentPage - 1) * pageSize + 1} đến{" "}
-                                {Math.min(currentPage * pageSize, totalItems)}{" "}
-                                trong tổng số {totalItems} giao dịch
-                            </div>
-                            {totalPages > 1 && (
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            setCurrentPage(currentPage - 1)
-                                        }
-                                        disabled={currentPage === 1}
-                                    >
-                                        <ChevronLeft className="h-4 w-4" />
-                                        Trước
-                                    </Button>
-                                    <div className="text-sm">
-                                        Trang {currentPage} / {totalPages}
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            setCurrentPage(currentPage + 1)
-                                        }
-                                        disabled={currentPage >= totalPages}
-                                    >
-                                        Tiếp
-                                        <ChevronRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                        {/* Right Actions */}
+                        <div className="flex items-center gap-2">
+                            {/* Category Management */}
+                            <TooltipProvider>
+                                <Tooltip content={t("common.category")}>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={() =>
+                                                setIsCategoryModalOpen(true)
+                                            }
+                                            variant="outline"
+                                            size="icon"
+                                            className="border-gray-200"
+                                        >
+                                            <FolderOpen className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                </Tooltip>
+                            </TooltipProvider>
+
+                            {/* Column Config (only for list view) */}
+                            {viewMode === "list" && (
+                                <TooltipProvider>
+                                    <Tooltip content={t("common.columnConfig")}>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="rounded-lg border-gray-200"
+                                                onClick={() =>
+                                                    setIsColumnConfigModalOpen(
+                                                        true,
+                                                    )
+                                                }
+                                            >
+                                                <Settings className="h-4 w-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                    </Tooltip>
+                                </TooltipProvider>
                             )}
+
+                            {/* Filter Dropdown */}
+                            <FilterComponent
+                                key={filterKey}
+                                searchTerm={searchTerm}
+                                setSearchTerm={setSearchTerm}
+                                dateRange={dateRange}
+                                setDateRange={setDateRange}
+                                dateSelect={dateSelect}
+                                setDateSelect={setDateSelect}
+                                status={status}
+                                setStatus={setStatus}
+                                categoryId={categoryId}
+                                setCategoryId={setCategoryId}
+                                pageSize={pageSize}
+                                setPageSize={setPageSize}
+                                categories={categories}
+                                pendingFilterChanges={pendingFilterChanges}
+                                setPendingFilterChanges={
+                                    setPendingFilterChanges
+                                }
+                                handleApplyFilters={handleApplyFilters}
+                                handleResetFilters={handleResetFilters}
+                                isPopoverOpen={isPopoverOpen}
+                                setIsPopoverOpen={setIsPopoverOpen}
+                            />
                         </div>
-                    )}
+                    </div>
                 </div>
-            </div>
-
-            {/* Create Product Modal */}
-            <CreateOrUpdateProductModal
-                isOpen={isCreateModalOpen}
-                onClose={handleCreateModalClose}
-                orgId={orgId}
-            />
-
-            {/* Category Management Modal */}
-            <CategoryManagementModal
-                isOpen={isCategoryModalOpen}
-                onClose={handleCategoryModalClose}
-                orgId={orgId}
-            />
-
-            {/* Column Configuration Modal */}
-            <ColumnConfigModal
-                isOpen={isColumnConfigModalOpen}
-                onClose={() => setIsColumnConfigModalOpen(false)}
-                onSave={handleColumnConfigSave}
-                currentConfig={
-                    userColumnConfig?.data?.columns?.map(
-                        (col: ColumnConfig) => ({
-                            columnKey: col.columnKey,
-                            label: col.label,
-                            visible: col.visible,
-                            order: col.order,
-                        })
-                    ) ||
-                    Object.keys(columnVisibility)
+                {/* Main Content */}
+                {viewMode === "list" ? (
+                    /* List View */
+                    <div className="px-6 pb-4">
+                        <ScrollArea className="w-full h-[70vh] overflow-y-auto overflow-x-auto">
+                            <div className="min-w-[900px]">
+                                <MemoizedDataTable
+                                    columns={visibleColumns}
+                                    data={products}
+                                    isLoading={isLoading}
+                                    onRowClick={(product) =>
+                                        handleProductClick(product)
+                                    }
+                                />
+                            </div>
+                        </ScrollArea>
+                    </div>
+                ) : (
+                    /* Grid View */
+                    <ScrollArea className="w-full h-[75vh] overflow-y-auto">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center h-64">
+                                <Loading />
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                                <FolderOpen className="h-12 w-12 mb-4 text-gray-300" />
+                                <p>Không tìm thấy sản phẩm nào</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-2">
+                                {products.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        orgId={orgId}
+                                        onClick={(p) => handleProductClick(p)}
+                                        onEdit={(p) => {
+                                            setEditingProduct(p);
+                                            setIsCreateModalOpen(true);
+                                        }}
+                                        onDelete={(p) => {
+                                            // TODO: Implement delete confirmation
+                                            console.log(
+                                                "Delete product:",
+                                                p.id,
+                                            );
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </ScrollArea>
+                )}
+                {/* Pagination */}
+                {totalItems > 0 && (
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                        <div className="text-sm text-gray-500">
+                            Hiển thị {(currentPage - 1) * pageSize + 1} đến{" "}
+                            {Math.min(currentPage * pageSize, totalItems)} trong
+                            tổng số {totalItems} sản phẩm
+                        </div>
+                        {totalPages > 1 && (
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setCurrentPage(currentPage - 1)
+                                    }
+                                    disabled={currentPage === 1}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                    Trước
+                                </Button>
+                                <div className="text-sm px-3 py-1 bg-gray-100 rounded">
+                                    Trang {currentPage} / {totalPages}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setCurrentPage(currentPage + 1)
+                                    }
+                                    disabled={currentPage >= totalPages}
+                                >
+                                    Tiếp
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                )}
+                {/* </Glass> */}
+                {/* Create Product Modal */}
+                <CreateOrUpdateProductModal
+                    isOpen={isCreateModalOpen}
+                    onClose={handleCreateModalClose}
+                    orgId={orgId}
+                    product={editingProduct}
+                />
+                {/* Category Management Modal */}
+                <CategoryManagementModal
+                    isOpen={isCategoryModalOpen}
+                    onClose={handleCategoryModalClose}
+                    orgId={orgId}
+                />
+                {/* Column Configuration Modal */}
+                <ColumnConfigModal
+                    isOpen={isColumnConfigModalOpen}
+                    onClose={() => setIsColumnConfigModalOpen(false)}
+                    onSave={handleColumnConfigSave}
+                    currentConfig={
+                        userColumnConfig?.data?.columns?.map(
+                            (col: ColumnConfig) => ({
+                                columnKey: col.columnKey,
+                                label: col.label,
+                                visible: col.visible,
+                                order: col.order,
+                            }),
+                        ) ||
+                        Object.keys(columnVisibility)
+                            .map((key) => ({
+                                columnKey: key === "images" ? "image" : key,
+                                label:
+                                    columnLabels[key as keyof ColumnLabels] ||
+                                    key,
+                                visible:
+                                    columnVisibility[
+                                        key as keyof ColumnVisibility
+                                    ],
+                            }))
+                            .filter((col) => col.columnKey !== "actions")
+                    }
+                    defaultConfig={Object.keys(defaultColumnVisibility)
                         .map((key) => ({
                             columnKey: key === "images" ? "image" : key,
                             label:
-                                columnLabels[key as keyof ColumnLabels] || key,
+                                defaultColumnLabels[
+                                    key as keyof ColumnLabels
+                                ] || key,
                             visible:
-                                columnVisibility[key as keyof ColumnVisibility],
+                                defaultColumnVisibility[
+                                    key as keyof ColumnVisibility
+                                ],
                         }))
-                        .filter((col) => col.columnKey !== "actions")
-                }
-                defaultConfig={Object.keys(defaultColumnVisibility)
-                    .map((key) => ({
-                        columnKey: key === "images" ? "image" : key,
-                        label:
-                            defaultColumnLabels[key as keyof ColumnLabels] ||
-                            key,
-                        visible:
-                            defaultColumnVisibility[
-                                key as keyof ColumnVisibility
-                            ],
-                    }))
-                    .filter((col) => col.columnKey !== "actions")}
-            />
-
-            {/* Import Product Modal */}
-            <ImportProductModal
-                isOpen={isImportModalOpen}
-                onClose={() => setIsImportModalOpen(false)}
-                onImport={handleImportProducts}
-                isLoading={createMultipleProductsMutation.isPending}
-            />
-        </div>
+                        .filter((col) => col.columnKey !== "actions")}
+                />
+                <ImportProductModal
+                    isOpen={isImportModalOpen}
+                    onClose={() => setIsImportModalOpen(false)}
+                    onImport={handleImportProducts}
+                    isLoading={createMultipleProductsMutation.isPending}
+                />
+            </div>
+        </Glass>
     );
 }

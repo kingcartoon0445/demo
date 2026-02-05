@@ -12,7 +12,7 @@ interface MultiSelectContextType {
 }
 
 const MultiSelectContext = createContext<MultiSelectContextType | undefined>(
-    undefined
+    undefined,
 );
 
 export function MultiSelectProvider({
@@ -67,10 +67,16 @@ export function MultiSelectProvider({
 
 export function useMultiSelect() {
     const context = useContext(MultiSelectContext);
+    // Return default values if no provider exists (makes it optional)
     if (context === undefined) {
-        throw new Error(
-            "useMultiSelect must be used within a MultiSelectProvider"
-        );
+        return {
+            isMultiSelectMode: false,
+            selectedItems: new Set<string>(),
+            setIsMultiSelectMode: () => {},
+            setSelectedItems: () => {},
+            toggleSelection: () => {},
+            clearSelection: () => {},
+        };
     }
     return context;
 }

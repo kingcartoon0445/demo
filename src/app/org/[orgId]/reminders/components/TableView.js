@@ -153,7 +153,7 @@ export default function TableView({
 }) {
     // State cho việc lọc theo loại lịch hẹn - mặc định chọn tất cả
     const [selectedScheduleTypes, setSelectedScheduleTypes] = useState(
-        scheduleTypes.map((type) => type.id)
+        scheduleTypes.map((type) => type.id),
     );
 
     // Lấy danh sách workspace để map tên
@@ -162,7 +162,7 @@ export default function TableView({
     // Hàm để lấy tên workspace từ WorkspaceId
     const getWorkspaceName = (workspaceId) => {
         const workspace = workspaceList.find(
-            (ws) => ws.id === workspaceId || ws.Id === workspaceId
+            (ws) => ws.id === workspaceId || ws.Id === workspaceId,
         );
         return workspace ? workspace.name || workspace.Name : "N/A";
     };
@@ -198,7 +198,7 @@ export default function TableView({
 
     // Lọc reminders theo loại được chọn
     const filteredReminders = reminders.filter((reminder) =>
-        selectedScheduleTypes.includes(reminder.SchedulesType || "reminder")
+        selectedScheduleTypes.includes(reminder.SchedulesType || "reminder"),
     );
 
     // Sắp xếp danh sách nhắc hẹn đã được lọc
@@ -214,7 +214,7 @@ export default function TableView({
                     const reminder = row.original;
                     const scheduleType =
                         scheduleTypes.find(
-                            (t) => t.id === reminder.SchedulesType
+                            (t) => t.id === reminder.SchedulesType,
                         ) || scheduleTypes.find((t) => t.id === "reminder");
                     const isDone = reminder.IsDone || reminder.isDone || false;
                     const isOverdue =
@@ -260,7 +260,7 @@ export default function TableView({
                 cell: ({ row }) => {
                     const reminder = row.original;
                     const contact = tableViewUtils.parseContact(
-                        reminder.Contact
+                        reminder.Contact,
                     );
                     const isDone = reminder.IsDone || reminder.isDone || false;
                     const isOverdue =
@@ -324,7 +324,8 @@ export default function TableView({
                                 }`}
                             >
                                 {getWorkspaceName(
-                                    reminder.WorkspaceId || reminder.workspaceId
+                                    reminder.WorkspaceId ||
+                                        reminder.workspaceId,
                                 )}
                             </div>
                         </div>
@@ -389,7 +390,7 @@ export default function TableView({
                                 >
                                     {tableViewUtils.formatDateTimeRange(
                                         reminder.StartTime,
-                                        reminder.EndTime
+                                        reminder.EndTime,
                                     )}
                                 </div>
                             </div>
@@ -463,8 +464,8 @@ export default function TableView({
                     const statusText = isDone
                         ? "Hoàn thành"
                         : isOverdue
-                        ? "Quá hạn"
-                        : "Chờ xử lý";
+                          ? "Quá hạn"
+                          : "Chờ xử lý";
 
                     return (
                         <div className="w-[120px] min-w-[120px]">
@@ -477,8 +478,8 @@ export default function TableView({
                                         isDone
                                             ? "text-green-600"
                                             : isOverdue
-                                            ? "text-red-500 font-medium"
-                                            : "text-blue-600"
+                                              ? "text-red-500 font-medium"
+                                              : "text-blue-600"
                                     }`}
                                 >
                                     {statusText}
@@ -522,7 +523,7 @@ export default function TableView({
                             <div className="flex items-center w-full">
                                 <div
                                     className={`w-3 h-3 rounded-full mr-2 flex-shrink-0 ${getPriorityColor(
-                                        priority
+                                        priority,
                                     )}`}
                                 ></div>
                                 <span
@@ -530,8 +531,8 @@ export default function TableView({
                                         priority === 2
                                             ? "text-red-700 font-medium"
                                             : priority === 1
-                                            ? "text-amber-700"
-                                            : "text-gray-700"
+                                              ? "text-amber-700"
+                                              : "text-gray-700"
                                     }`}
                                 >
                                     {getPriorityText(priority)}
@@ -557,14 +558,14 @@ export default function TableView({
                 ),
             },
         ],
-        [parseContact, getWorkspaceName, onEdit, onDelete, handleToggleDone]
+        [parseContact, getWorkspaceName, onEdit, onDelete, handleToggleDone],
     );
 
     return (
-        <div className="bg-white rounded-lg flex flex-col h-full">
+        <div className="rounded-lg flex flex-col h-full">
             {/* Filter and Search */}
             <div className="flex-shrink-0 pb-4 border-gray-200">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between h-12 gap-4">
                     <div className="flex-shrink-0">
                         <ScheduleTypeFilter
                             onFilterChange={handleFilterChange}
@@ -572,23 +573,22 @@ export default function TableView({
                     </div>
 
                     {/* Search */}
-                    <div className="relative max-w-xs min-w-0 flex-shrink">
+                    <div className="relative max-w-xs min-w-0 mr-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm nhắc hẹn..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                     </div>
                 </div>
             </div>
 
-            {/* Custom Table */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden bg-white rounded-2xl shadow-sm border-none">
                 <div
-                    className="h-full border border-gray-200 rounded-lg"
+                    className="h-full rounded-lg"
                     style={{
                         overflowX: "auto",
                         overflowY: "auto",
@@ -601,35 +601,35 @@ export default function TableView({
                             className="w-full"
                             style={{ tableLayout: "fixed" }}
                         >
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                            <thead className="bg-white border-b border-gray-100 sticky top-0 z-10">
                                 <tr>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Nội dung
                                     </th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Khách hàng
                                     </th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Nhóm làm việc
                                     </th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Mô tả
                                     </th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Thời gian
                                     </th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Trạng thái
                                     </th>
-                                    <th className="text-left py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-left py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Độ ưu tiên
                                     </th>
-                                    <th className="text-center py-3 px-4 text-sm font-medium text-foreground tracking-wider ">
+                                    <th className="text-center py-4 px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Thao tác
                                     </th>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
+                            </thead>                                
+                            <tbody className="divide-y divide-gray-100">
                                 {sortedReminders.length === 0 ? (
                                     <EmptyReminderState colSpan={8} />
                                 ) : (
@@ -638,10 +638,10 @@ export default function TableView({
                                             scheduleTypes.find(
                                                 (t) =>
                                                     t.id ===
-                                                    reminder.SchedulesType
+                                                    reminder.SchedulesType,
                                             ) ||
                                             scheduleTypes.find(
-                                                (t) => t.id === "reminder"
+                                                (t) => t.id === "reminder",
                                             );
                                         const isDone =
                                             reminder.IsDone ||
@@ -650,12 +650,12 @@ export default function TableView({
                                         const isOverdue =
                                             !isDone && reminder.EndTime
                                                 ? tableViewUtils.isOverdue(
-                                                      reminder.EndTime
+                                                      reminder.EndTime,
                                                   )
                                                 : false;
                                         const contact =
                                             tableViewUtils.parseContact(
-                                                reminder.Contact
+                                                reminder.Contact,
                                             );
                                         const priority =
                                             reminder.Priority ||
@@ -664,9 +664,9 @@ export default function TableView({
                                         return (
                                             <tr
                                                 key={reminder.Id || index}
-                                                className="hover:bg-gray-50"
+                                                className="h-16 hover:shadow-lg transition-all duration-200 bg-white border-b border-gray-100 last:border-none hover:z-10 relative hover:border-transparent "
                                             >
-                                                <td className="py-4 px-4 w-[220px]">
+                                                <td className="py-3 px-3 w-[200px]">
                                                     <div className="flex items-center gap-3">
                                                         <div
                                                             className={`flex-shrink-0 ${
@@ -695,7 +695,7 @@ export default function TableView({
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4 w-[200px]">
+                                                <td className="py-3 px-3 w-[180px]">
                                                     <div className="flex items-center gap-3 w-full">
                                                         <Avatar
                                                             name={
@@ -731,7 +731,7 @@ export default function TableView({
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4 w-[150px]">
+                                                <td className="py-3 px-3 w-[140px]">
                                                     <div
                                                         className={`text-sm font-medium truncate ${
                                                             isDone
@@ -745,11 +745,11 @@ export default function TableView({
                                                     >
                                                         {getWorkspaceName(
                                                             reminder.WorkspaceId ||
-                                                                reminder.workspaceId
+                                                                reminder.workspaceId,
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4 w-[200px]">
+                                                <td className="py-3 px-3 w-[180px]">
                                                     {reminder.Content && (
                                                         <div
                                                             className={`text-sm text-gray-600 overflow-hidden ${
@@ -776,7 +776,7 @@ export default function TableView({
                                                         </div>
                                                     )}
                                                 </td>
-                                                <td className="py-4 px-4 w-[180px]">
+                                                <td className="py-3 px-3 w-[160px]">
                                                     <div className="text-sm">
                                                         <div
                                                             className={`text-gray-900 font-medium text-xs ${
@@ -787,12 +787,12 @@ export default function TableView({
                                                         >
                                                             {tableViewUtils.formatDateTimeRange(
                                                                 reminder.StartTime,
-                                                                reminder.EndTime
+                                                                reminder.EndTime,
                                                             )}
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4 w-[120px]">
+                                                <td className="py-3 px-3 w-[110px]">
                                                     <div className="flex items-center w-full">
                                                         <div className="flex-shrink-0 mr-1.5">
                                                             {isDone ? (
@@ -850,28 +850,28 @@ export default function TableView({
                                                                 isDone
                                                                     ? "text-green-600"
                                                                     : isOverdue
-                                                                    ? "text-red-500 font-medium"
-                                                                    : "text-blue-600"
+                                                                      ? "text-red-500 font-medium"
+                                                                      : "text-blue-600"
                                                             }`}
                                                         >
                                                             {isDone
                                                                 ? "Hoàn thành"
                                                                 : isOverdue
-                                                                ? "Quá hạn"
-                                                                : "Chờ xử lý"}
+                                                                  ? "Quá hạn"
+                                                                  : "Chờ xử lý"}
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4 w-[120px]">
+                                                <td className="py-3 px-3 w-[110px]">
                                                     <div className="flex items-center w-full">
                                                         <div
                                                             className={`w-3 h-3 rounded-full mr-2 flex-shrink-0 ${
                                                                 priority === 2
                                                                     ? "bg-red-500"
                                                                     : priority ===
-                                                                      1
-                                                                    ? "bg-amber-500"
-                                                                    : "bg-gray-500"
+                                                                        1
+                                                                      ? "bg-amber-500"
+                                                                      : "bg-gray-500"
                                                             }`}
                                                         ></div>
                                                         <span
@@ -879,20 +879,20 @@ export default function TableView({
                                                                 priority === 2
                                                                     ? "text-red-700 font-medium"
                                                                     : priority ===
-                                                                      1
-                                                                    ? "text-amber-700"
-                                                                    : "text-gray-700"
+                                                                        1
+                                                                      ? "text-amber-700"
+                                                                      : "text-gray-700"
                                                             }`}
                                                         >
                                                             {priority === 2
                                                                 ? "Cao"
                                                                 : priority === 1
-                                                                ? "Trung bình"
-                                                                : "Thấp"}
+                                                                  ? "Trung bình"
+                                                                  : "Thấp"}
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4 w-[120px] text-center">
+                                                <td className="py-3 px-3 w-[100px] text-center">
                                                     <ReminderActions
                                                         reminder={reminder}
                                                         onEdit={onEdit}

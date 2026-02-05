@@ -33,9 +33,10 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     variant = "default",
 }) => {
     const { t } = useLanguage();
-    const handleConfirm = () => {
+    const handleConfirm = (e: React.MouseEvent) => {
+        // e.preventDefault();
         onConfirm();
-        onClose();
+        // onClose is called by onOpenChange when the dialog closes via Trigger
     };
 
     return (

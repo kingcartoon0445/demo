@@ -60,7 +60,7 @@ export function ReportCard6({ reportData, isLoading: externalLoading }) {
                         ([rating, count]) => ({
                             name: ratingNames[parseInt(rating)],
                             value: count,
-                        })
+                        }),
                     );
 
                     return transformedData;
@@ -88,7 +88,7 @@ export function ReportCard6({ reportData, isLoading: externalLoading }) {
 
     if (isLoading) {
         return (
-            <Card className="w-full min-h-[300px] p-4">
+            <Card className="w-full min-h-[300px] p-4 border-none shadow-none !bg-transparent">
                 <Skeleton className="w-full h-full rounded-xl" />
             </Card>
         );
@@ -96,7 +96,7 @@ export function ReportCard6({ reportData, isLoading: externalLoading }) {
 
     if (!chartData || chartData.length === 0 || totalCustomers === 0) {
         return (
-            <Card className="w-full min-h-[300px] p-4">
+            <Card className="w-full min-h-[300px] p-4 border-none shadow-none !bg-transparent">
                 <div className="flex items-center justify-center h-full">
                     <div>Không có dữ liệu đánh giá</div>
                 </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { CustomerAlertDialog } from "@/components/CustomerAlertDialog";
+import { Glass } from "@/components/Glass";
+import { GlassTabs } from "@/components/common/GlassTabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Calendar, List, PlusIcon } from "lucide-react";
@@ -89,7 +91,10 @@ export default function RemindersPage({ params }) {
     }
 
     return (
-        <div className="h-screen bg-white flex flex-col overflow-hidden p-3">
+        <Glass
+            intensity="high"
+            className="h-screen flex flex-col overflow-hidden p-3 rounded-2xl"
+        >
             <div className="flex-shrink-0 w-full max-w-[100vw]">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
@@ -104,40 +109,28 @@ export default function RemindersPage({ params }) {
 
                     <div className="flex items-center gap-3 flex-shrink-0">
                         {/* View Toggle */}
-                        <div className="flex bg-white rounded-md border border-gray-200 p-0.5">
-                            <button
-                                onClick={() => setViewMode("table")}
-                                className={cn(
-                                    "flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md whitespace-nowrap",
-                                    viewMode === "table"
-                                        ? "bg-gray-100 text-gray-900"
-                                        : "text-gray-600 hover:bg-gray-50"
-                                )}
-                            >
-                                <List className="h-3.5 w-3.5 flex-shrink-0" />
-                                <span className="hidden sm:inline">
-                                    Danh sách
-                                </span>
-                            </button>
-                            <button
-                                onClick={() => setViewMode("calendar")}
-                                className={cn(
-                                    "flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md whitespace-nowrap",
-                                    viewMode === "calendar"
-                                        ? "bg-gray-100 text-gray-900"
-                                        : "text-gray-600 hover:bg-gray-50"
-                                )}
-                            >
-                                <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
-                                <span className="hidden sm:inline">Lịch</span>
-                            </button>
-                        </div>
+                        <GlassTabs
+                            tabs={[
+                                {
+                                    id: "table",
+                                    label: "Danh sách",
+                                    icon: <List className="h-4 w-4" />,
+                                },
+                                {
+                                    id: "calendar",
+                                    label: "Lịch",
+                                    icon: <Calendar className="h-4 w-4" />,
+                                },
+                            ]}
+                            activeTab={viewMode}
+                            onChange={setViewMode}
+                        />
 
                         <Button
                             onClick={handleAddNew}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-1.5 whitespace-nowrap flex-shrink-0"
+                            className="h-9 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-1.5 whitespace-nowrap flex-shrink-0"
                         >
-                            <PlusIcon className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                            <PlusIcon className="h-3.5 w-3.5 mr-1.5" />
                             <span className="hidden sm:inline">Thêm mới</span>
                             <span className="sm:hidden">Thêm</span>
                         </Button>
@@ -201,6 +194,6 @@ export default function RemindersPage({ params }) {
                 subtitle="Bạn có chắc chắn muốn xóa nhắc hẹn này? Hành động này không thể hoàn tác."
                 onSubmit={handleDeleteConfirm}
             />
-        </div>
+        </Glass>
     );
 }

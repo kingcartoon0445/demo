@@ -98,6 +98,7 @@ export const CreateFromGGSheetDialog = ({ open, setOpen }) => {
                     toast.success(
                         "Đã thêm thành công. Hệ thống đang tiến hành xử lý, vui lòng chờ trong giây lát.",
                     );
+
                     queryClient.invalidateQueries({
                         queryKey: ["infinite-leads-body-filter", orgId],
                     });

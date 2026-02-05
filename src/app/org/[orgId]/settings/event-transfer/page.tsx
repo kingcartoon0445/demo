@@ -1,5 +1,6 @@
 "use client";
 
+import { Glass } from "@/components/Glass";
 import React, { useState, useEffect } from "react";
 import { MdInfo } from "react-icons/md";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -90,7 +91,7 @@ export default function EventTransferPage() {
                     data?.message ||
                         (isUpdate
                             ? "Cập nhật Dataset thất bại"
-                            : "Thêm mới Dataset thất bại")
+                            : "Thêm mới Dataset thất bại"),
                 );
                 return;
             }
@@ -101,7 +102,7 @@ export default function EventTransferPage() {
             toast.success(
                 isUpdate
                     ? "Cập nhật Dataset thành công"
-                    : "Thêm mới Dataset thành công"
+                    : "Thêm mới Dataset thành công",
             );
         },
         onError: (error: any, variables) => {
@@ -111,7 +112,7 @@ export default function EventTransferPage() {
                 error?.response?.data?.message ||
                     (isUpdate
                         ? "Cập nhật Dataset thất bại"
-                        : "Thêm mới Dataset thất bại")
+                        : "Thêm mới Dataset thất bại"),
             );
         },
     });
@@ -179,7 +180,7 @@ export default function EventTransferPage() {
         useState<string[]>([]);
     const [crmFields, setCrmFields] = useState<any[]>([]);
     const [expandedWorkspaces, setExpandedWorkspaces] = useState<Set<string>>(
-        new Set()
+        new Set(),
     );
 
     const [mappingType, setMappingType] = useState<"lead" | "deal">("lead");
@@ -296,10 +297,10 @@ export default function EventTransferPage() {
 
         // Determine selected types based on existing workspaces
         const hasLead = dataset.workspaces?.some(
-            (ws) => ws.category === "LEAD"
+            (ws) => ws.category === "LEAD",
         );
         const hasDeal = dataset.workspaces?.some(
-            (ws) => ws.category === "DEAL"
+            (ws) => ws.category === "DEAL",
         );
         setIsLeadSelected(!!hasLead);
         setIsDealSelected(!!hasDeal);
@@ -309,8 +310,8 @@ export default function EventTransferPage() {
             new Set(
                 dataset.workspaces
                     ?.filter((ws) => ws.category === "DEAL")
-                    .map((ws) => ws.workspaceId) || []
-            )
+                    .map((ws) => ws.workspaceId) || [],
+            ),
         );
         setDialogSelectedWorkspaceIds(dealWorkspaces);
 
@@ -423,7 +424,7 @@ export default function EventTransferPage() {
     const handleDeleteEventMapping = (
         id: string,
         datasetId: string,
-        workspaceId: string
+        workspaceId: string,
     ) => {
         setDeleteMappingData({ id, datasetId, workspaceId });
         setIsDeleteAlertOpen(true);
@@ -437,7 +438,7 @@ export default function EventTransferPage() {
                 orgId,
                 deleteMappingData.id,
                 deleteMappingData.workspaceId,
-                deleteMappingData.datasetId
+                deleteMappingData.datasetId,
             )) as any;
             if (res?.code === 0) {
                 queryClient.invalidateQueries({
@@ -489,7 +490,7 @@ export default function EventTransferPage() {
                 res = await resetEvents(
                     orgId,
                     bulkActionData.datasetId,
-                    bulkActionData.workspaceId
+                    bulkActionData.workspaceId,
                 );
             } else if (bulkActionData.type === "delete_workspace") {
                 res = await deleteWorkspaceMutation.mutateAsync({
@@ -522,8 +523,8 @@ export default function EventTransferPage() {
                     bulkActionData.type === "reset"
                         ? "Reset sự kiện thành công"
                         : bulkActionData.type === "delete_workspace"
-                        ? "Xóa không gian làm việc thành công"
-                        : "Xóa tất cả sự kiện thành công"
+                          ? "Xóa không gian làm việc thành công"
+                          : "Xóa tất cả sự kiện thành công",
                 );
                 setIsBulkActionAlertOpen(false);
             } else {
@@ -531,8 +532,8 @@ export default function EventTransferPage() {
                     bulkActionData.type === "reset"
                         ? "Reset sự kiện thất bại"
                         : bulkActionData.type === "delete_workspace"
-                        ? "Xóa không gian làm việc thất bại"
-                        : "Xóa tất cả sự kiện thất bại"
+                          ? "Xóa không gian làm việc thất bại"
+                          : "Xóa tất cả sự kiện thất bại",
                 );
             }
         } catch (error) {
@@ -544,43 +545,48 @@ export default function EventTransferPage() {
     };
 
     return (
-        <div className="h-full bg-gray-50 overflow-y-auto">
-            <div className="w-full py-6 flex flex-col gap-8 px-48">
-                <EventTransferHeader
-                    onAddEvent={() => setIsEventMappingDialogOpen(true)}
-                />
-
-                <div className="flex flex-col gap-6">
-                    <DatasetList
-                        datasets={datasets}
-                        onOpenAddDialog={handleOpenAddDialog}
-                        onOpenEditDialog={handleOpenEditDialog}
-                        onDeleteDataset={handleDeleteDataset}
-                        onUpdateStatus={(id, status) => {
-                            updateDatasetStatusMutation.mutate({
-                                id,
-                                body: { status },
-                            });
-                        }}
-                        onDeleteEvent={handleDeleteEventMapping}
-                        onResetEvents={handleResetEvents}
-                        onToggleLead={(datasetId, currentState) =>
-                            toggleLeadMutation.mutate({
-                                datasetId,
-                                isActive: currentState === 1 ? 0 : 1,
-                            })
-                        }
-                        onToggleDeal={(datasetId, currentState) =>
-                            toggleDealMutation.mutate({
-                                datasetId,
-                                isActive: currentState === 1 ? 0 : 1,
-                            })
-                        }
-                        onDeleteAllEvents={handleDeleteAllEvents}
-                        onDeleteWorkspace={handleDeleteWorkspace}
+        <div className="h-full">
+            <Glass
+                intensity="high"
+                className="h-full rounded-2xl overflow-y-auto"
+            >
+                <div className="w-full py-6 flex flex-col gap-8 px-12">
+                    <EventTransferHeader
+                        onAddEvent={() => setIsEventMappingDialogOpen(true)}
                     />
+
+                    <div className="flex flex-col gap-6">
+                        <DatasetList
+                            datasets={datasets}
+                            onOpenAddDialog={handleOpenAddDialog}
+                            onOpenEditDialog={handleOpenEditDialog}
+                            onDeleteDataset={handleDeleteDataset}
+                            onUpdateStatus={(id, status) => {
+                                updateDatasetStatusMutation.mutate({
+                                    id,
+                                    body: { status },
+                                });
+                            }}
+                            onDeleteEvent={handleDeleteEventMapping}
+                            onResetEvents={handleResetEvents}
+                            onToggleLead={(datasetId, currentState) =>
+                                toggleLeadMutation.mutate({
+                                    datasetId,
+                                    isActive: currentState === 1 ? 0 : 1,
+                                })
+                            }
+                            onToggleDeal={(datasetId, currentState) =>
+                                toggleDealMutation.mutate({
+                                    datasetId,
+                                    isActive: currentState === 1 ? 0 : 1,
+                                })
+                            }
+                            onDeleteAllEvents={handleDeleteAllEvents}
+                            onDeleteWorkspace={handleDeleteWorkspace}
+                        />
+                    </div>
                 </div>
-            </div>
+            </Glass>
 
             <AddDatasetDialog
                 isOpen={isAddDatasetDialogOpen}
@@ -642,15 +648,15 @@ export default function EventTransferPage() {
                     bulkActionData?.type === "reset"
                         ? "Reset sự kiện mặc định"
                         : bulkActionData?.type === "delete_workspace"
-                        ? "Xóa không gian làm việc"
-                        : "Xóa tất cả sự kiện"
+                          ? "Xóa không gian làm việc"
+                          : "Xóa tất cả sự kiện"
                 }
                 subtitle={
                     bulkActionData?.type === "reset"
                         ? "Hành động này sẽ khôi phục các sự kiện về trạng thái mặc định. Bạn có chắc chắn muốn tiếp tục?"
                         : bulkActionData?.type === "delete_workspace"
-                        ? "Bạn có chắc chắn muốn xóa không gian làm việc này không? Hành động này sẽ xóa tất cả cấu hình liên quan và không thể hoàn tác."
-                        : "Bạn có chắc chắn muốn xóa TẤT CẢ sự kiện trong workspace này không? Hành động này không thể hoàn tác."
+                          ? "Bạn có chắc chắn muốn xóa không gian làm việc này không? Hành động này sẽ xóa tất cả cấu hình liên quan và không thể hoàn tác."
+                          : "Bạn có chắc chắn muốn xóa TẤT CẢ sự kiện trong workspace này không? Hành động này không thể hoàn tác."
                 }
                 onSubmit={handleConfirmBulkAction}
                 isSubmitting={isBulkActionSubmitting}
@@ -658,8 +664,8 @@ export default function EventTransferPage() {
                     bulkActionData?.type === "reset"
                         ? "Reset"
                         : bulkActionData?.type === "delete_workspace"
-                        ? "Xóa Workspace"
-                        : "Xóa tất cả"
+                          ? "Xóa Workspace"
+                          : "Xóa tất cả"
                 }
             />
         </div>

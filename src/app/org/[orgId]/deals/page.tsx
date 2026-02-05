@@ -2168,7 +2168,7 @@ export default function DealsPage() {
     };
 
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col rounded-lg bg-gradient-to-br from-[#F4EAFB] via-white to-[#F4EAFB]">
             <DealHeader
                 orgId={orgId as string}
                 totalDeals={totalDealsCount}
@@ -2255,7 +2255,6 @@ export default function DealsPage() {
                 }}
                 onAddNewDeal={() => setIsAddNewDealOpen(true)}
             />
-
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 {viewMode === "kanban" ? (
                     <div className="flex-1 min-h-0 overflow-auto">

@@ -1,6 +1,5 @@
-"use client";
-
 import React from "react";
+
 import {
     Inbox,
     Send,
@@ -255,7 +254,7 @@ export function EmailSidebar({
                             value={selectedConfigId}
                             onValueChange={(value) => onConfigSelect?.(value)}
                         >
-                            <SelectTrigger className="flex-1 bg-white border-gray-200 text-gray-700 max-w-[246px] min-w-0">
+                            <SelectTrigger className="flex-1 bg-white border-0 shadow-sm text-gray-700 max-w-[246px] min-w-0 rounded-lg h-10">
                                 <SelectValue placeholder="Chọn tài khoản">
                                     {selectedConfig
                                         ? selectedConfig.emailAddress ||
@@ -322,7 +321,7 @@ export function EmailSidebar({
                     <h3 className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
                         {t("mail.folders")}
                     </h3>
-                    <nav className="space-y-0.5 px-2">
+                    <nav className="space-y-2 px-2">
                         {foldersList.map((folder) => {
                             const isActive =
                                 !isSettingsOpen && activeFolder === folder.id;
@@ -331,23 +330,42 @@ export function EmailSidebar({
                                     key={folder.name}
                                     onClick={() => onFolderSelect?.(folder.id)}
                                     className={cn(
-                                        "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors text-sm group",
+                                        "w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all text-sm group",
                                         isActive
-                                            ? "bg-sidebar-accent/60 dark:bg-sidebar-accent/20"
-                                            : "text-[#646A73] hover:bg-muted",
+                                            ? "bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-gray-100/50"
+                                            : "bg-transparent hover:bg-white/40",
                                     )}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <folder.icon
-                                            className={cn("h-5 w-5 shrink-0")}
-                                        />
-                                        <span>{folder.name}</span>
+                                        <div
+                                            className={cn(
+                                                "p-2 rounded-lg transition-colors flex items-center justify-center",
+                                                isActive
+                                                    ? "bg-indigo-50 text-indigo-600"
+                                                    : "bg-gray-100 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-600",
+                                            )}
+                                        >
+                                            <folder.icon
+                                                className={cn(
+                                                    "h-4 w-4 shrink-0",
+                                                )}
+                                            />
+                                        </div>
+                                        <span
+                                            className={cn(
+                                                "font-semibold",
+                                                isActive
+                                                    ? "text-gray-900"
+                                                    : "text-gray-600 group-hover:text-gray-900",
+                                            )}
+                                        >
+                                            {folder.name}
+                                        </span>
                                     </div>
                                     {folder.count > 0 && (
                                         <span
                                             className={cn(
-                                                "text-xs px-2 py-0.5 rounded-full",
-                                                "bg-[#5c46e6] text-white",
+                                                "text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shrink-0 bg-indigo-600 text-white",
                                             )}
                                         >
                                             {folder.count}
@@ -363,16 +381,16 @@ export function EmailSidebar({
                                 onClick={() =>
                                     setShowMoreFolders(!showMoreFolders)
                                 }
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#646A73] hover:bg-muted rounded-md transition-colors mt-1"
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors mt-2 mx-1"
                             >
                                 {showMoreFolders ? (
                                     <>
-                                        <ChevronUp className="h-5 w-5 shrink-0" />
+                                        <ChevronUp className="h-4 w-4 shrink-0" />
                                         <span>{t("mail.showLess")}</span>
                                     </>
                                 ) : (
                                     <>
-                                        <ChevronDown className="h-5 w-5 shrink-0" />
+                                        <ChevronDown className="h-4 w-4 shrink-0" />
                                         <span>{t("mail.showMore")}</span>
                                     </>
                                 )}
@@ -381,7 +399,7 @@ export function EmailSidebar({
                         {customFolders.length > 0 && (
                             <>
                                 {showMoreFolders && (
-                                    <div className="mt-1 space-y-0.5">
+                                    <div className="mt-1 space-y-2">
                                         {customFolders.map((folder: any) => {
                                             const isActive =
                                                 !isSettingsOpen &&
@@ -395,19 +413,35 @@ export function EmailSidebar({
                                                         )
                                                     }
                                                     className={cn(
-                                                        "w-full flex items-center justify-between px-3 py-2 rounded-md transition-colors text-sm group",
+                                                        "w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all text-sm group",
                                                         isActive
-                                                            ? "bg-sidebar-accent/60 dark:bg-sidebar-accent/20"
-                                                            : "text-[#646A73] hover:bg-muted",
+                                                            ? "bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-gray-100/50"
+                                                            : "bg-transparent hover:bg-white/40",
                                                     )}
                                                 >
                                                     <div className="flex items-center gap-3">
-                                                        <FolderIcon
+                                                        <div
                                                             className={cn(
-                                                                "h-5 w-5 shrink-0",
+                                                                "p-2 rounded-lg transition-colors flex items-center justify-center",
+                                                                isActive
+                                                                    ? "bg-indigo-50 text-indigo-600"
+                                                                    : "bg-gray-100 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-600",
                                                             )}
-                                                        />
-                                                        <span>
+                                                        >
+                                                            <FolderIcon
+                                                                className={cn(
+                                                                    "h-4 w-4 shrink-0",
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        <span
+                                                            className={cn(
+                                                                "font-semibold",
+                                                                isActive
+                                                                    ? "text-gray-900"
+                                                                    : "text-gray-600 group-hover:text-gray-900",
+                                                            )}
+                                                        >
                                                             {folder.displayName ||
                                                                 folder.name}
                                                         </span>
@@ -417,10 +451,10 @@ export function EmailSidebar({
                                                             0) && (
                                                         <span
                                                             className={cn(
-                                                                "text-xs px-2 py-0.5 rounded-full",
+                                                                "text-xs font-bold px-2 py-1 rounded-lg",
                                                                 isActive
-                                                                    ? "bg-[#5c46e6] text-white"
-                                                                    : "text-gray-400 font-medium",
+                                                                    ? "bg-gray-100 text-gray-900"
+                                                                    : "bg-gray-100/50 text-gray-500 group-hover:bg-gray-200",
                                                             )}
                                                         >
                                                             {folder.unreadCount ||
@@ -549,7 +583,7 @@ export function EmailSidebar({
                         className={cn(
                             "flex items-center gap-3 transition-colors w-full px-3 py-2 rounded-lg group",
                             isSettingsOpen
-                                ? "bg-gray-100 text-gray-900"
+                                ? "bg-white text-gray-900"
                                 : "text-gray-500 hover:text-gray-900 hover:bg-gray-100",
                         )}
                     >

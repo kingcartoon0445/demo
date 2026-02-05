@@ -69,57 +69,8 @@ export default function RequestList({
     }, [showSearch]);
 
     return (
-        <>
-            {/* Header with Add + Search */}
-            <div className="border-b border-gray-200/60 p-2 flex items-center">
-                {/* Search input w/ animation */}
-                <div
-                    className="relative transition-all duration-300"
-                    style={{
-                        width: showSearch ? 220 : 0,
-                        marginRight: showSearch ? "8px" : "0px",
-                    }}
-                >
-                    {showSearch && (
-                        <>
-                            <Input
-                                ref={inputRef}
-                                placeholder="Tìm kiếm yêu cầu..."
-                                className="pl-9 pr-8 border-gray-300 h-9"
-                                value={searchQuery}
-                                onChange={(e) => onSearchChange(e.target.value)}
-                            />
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            <X
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 cursor-pointer"
-                                onClick={() => {
-                                    onSearchChange("");
-                                    setShowSearch(false);
-                                }}
-                            />
-                        </>
-                    )}
-                </div>
-
-                {/* Search icon */}
-                {!showSearch && (
-                    <Tooltip content="Tìm kiếm">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="text-gray-600 hover:text-gray-800 mr-2"
-                            onClick={() => setShowSearch(true)}
-                        >
-                            <Search className="w-5 h-5" />
-                        </Button>
-                    </Tooltip>
-                )}
-
-                {/* No add button for requests */}
-            </div>
-
-            {/* Request List */}
-            <ScrollArea className="flex-1 overflow-y-auto">
+        <ScrollArea className="flex-1 overflow-y-auto">
+            <div className="pb-4">
                 {requests.length === 0 ? (
                     <div className="p-8 text-center text-gray-500">
                         {searchQuery
@@ -130,24 +81,29 @@ export default function RequestList({
                     requests.map((request) => (
                         <div
                             key={request.id}
-                            className={`p-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
+                            className={`p-4 border-b border-gray-100 cursor-pointer transition-all duration-200 relative group last:border-0 ${
                                 selectedRequestId === request.id
-                                    ? "bg-blue-50 border-l-4 border-l-blue-600"
-                                    : ""
+                                    ? "bg-blue-50/50"
+                                    : "hover:bg-gray-50/50 bg-transparent"
                             }`}
                             onClick={() => onRequestSelect(request.id)}
                         >
+                            {/* Active Indicator Line */}
+                            {selectedRequestId === request.id && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-r"></div>
+                            )}
+
                             <div className="flex items-center space-x-3">
                                 <div className="relative">
                                     <Avatar
                                         name={getFirstAndLastWord(
-                                            request.profile?.fullName
+                                            request.profile?.fullName,
                                         )}
                                         size="40"
                                         round={true}
                                         src={
                                             getAvatarUrl(
-                                                request.profile?.avatar || ""
+                                                request.profile?.avatar || "",
                                             ) || undefined
                                         }
                                     />
@@ -161,7 +117,7 @@ export default function RequestList({
                                     <p className="text-xs text-gray-500 truncate">
                                         {getTypeOfEmployeeLabel(
                                             request.typeOfEmployee,
-                                            t
+                                            t,
                                         )}
                                     </p>
                                     <p className="text-xs text-gray-400 truncate">
@@ -169,7 +125,7 @@ export default function RequestList({
                                     </p>
                                     <p className="text-xs text-gray-400 truncate">
                                         {new Date(
-                                            request.createdDate
+                                            request.createdDate,
                                         ).toLocaleDateString("vi-VN")}
                                     </p>
                                 </div>
@@ -177,7 +133,7 @@ export default function RequestList({
                         </div>
                     ))
                 )}
-            </ScrollArea>
-        </>
+            </div>
+        </ScrollArea>
     );
 }

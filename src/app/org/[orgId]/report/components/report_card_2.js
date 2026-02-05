@@ -92,7 +92,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                             {workspaceCategoryData &&
                                 workspaceCategoryData[workspace] &&
                                 Object.entries(
-                                    workspaceCategoryData[workspace]
+                                    workspaceCategoryData[workspace],
                                 ).map(([category, categoryCount], catIndex) => (
                                     <p
                                         key={`${workspace}-${category}`}
@@ -107,7 +107,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                                     </p>
                                 ))}
                         </div>
-                    )
+                    ),
                 )}
             </div>
         );
@@ -142,7 +142,7 @@ export function ReportCard2({
         const parsedDate = parse(
             dateTimeStr,
             "yyyy-MM-dd HH:mm:ss",
-            new Date()
+            new Date(),
         );
 
         if (!isValid(parsedDate)) return null;
@@ -293,8 +293,8 @@ export function ReportCard2({
                         timeOption === "day"
                             ? "dd/MM/yyyy"
                             : timeOption === "month"
-                            ? "MM/yyyy"
-                            : "yyyy";
+                              ? "MM/yyyy"
+                              : "yyyy";
 
                     const dateA = parse(a.date, parseFormat, new Date());
                     const dateB = parse(b.date, parseFormat, new Date());
@@ -307,7 +307,7 @@ export function ReportCard2({
                 setData(
                     chartData.length > 0
                         ? chartData
-                        : generateSampleTimeData(timeOption)
+                        : generateSampleTimeData(timeOption),
                 );
                 setIsLoading(false);
             } catch (error) {
@@ -324,7 +324,7 @@ export function ReportCard2({
     }, [reportData, externalLoading, timeOption]);
 
     return (
-        <Card className="w-full h-full p-4 min-h-[300px]">
+        <Card className="w-full h-full p-4 min-h-[300px] border-none shadow-none !bg-transparent">
             <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-medium">

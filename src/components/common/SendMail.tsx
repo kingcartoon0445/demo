@@ -128,12 +128,12 @@ export default function SendMail({
                         orgId,
                         selectedTemplateId,
                         propProvider,
-                        refId
+                        refId,
                     )) as any;
                 } else {
                     res = (await getEmailTemplateDetail(
                         orgId,
-                        selectedTemplateId
+                        selectedTemplateId,
                     )) as any;
                 }
 
@@ -162,7 +162,7 @@ export default function SendMail({
                 setLoading(true);
                 const res = (await getEmailDetail(
                     orgId,
-                    selectedConfigId
+                    selectedConfigId,
                 )) as any;
                 if (res?.code === 0 && res?.content) {
                     // Chỉ update editor nếu có body trong config
@@ -246,7 +246,7 @@ export default function SendMail({
                 }
                 if (response.generated_email.body) {
                     const htmlContent = convertNewlinesToHtml(
-                        response.generated_email.body
+                        response.generated_email.body,
                     );
                     setEditorContent(htmlContent);
                     setEditorKey((prev) => prev + 1);
@@ -259,7 +259,7 @@ export default function SendMail({
         } catch (error: any) {
             console.error("Lỗi khi generate email:", error);
             toast.error(
-                error?.response?.data?.message || "Có lỗi xảy ra khi tạo email"
+                error?.response?.data?.message || "Có lỗi xảy ra khi tạo email",
             );
         } finally {
             setIsGenerating(false);
@@ -379,7 +379,7 @@ export default function SendMail({
             } else {
                 toast.error(
                     response?.message ||
-                        "Không thể gửi email. Vui lòng thử lại."
+                        "Không thể gửi email. Vui lòng thử lại.",
                 );
             }
         } catch (error: any) {
@@ -387,7 +387,7 @@ export default function SendMail({
             toast.error(
                 error?.response?.data?.message ||
                     error?.message ||
-                    "Có lỗi xảy ra khi gửi email"
+                    "Có lỗi xảy ra khi gửi email",
             );
         } finally {
             setIsSending(false);
@@ -459,7 +459,7 @@ export default function SendMail({
 
             <div className="flex justify-end">
                 <Button
-                    className=""
+                    className="rounded-lg"
                     disabled={
                         !selectedConfigId || !toEmail || !subject || isSending
                     }

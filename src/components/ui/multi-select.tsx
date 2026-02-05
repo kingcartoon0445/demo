@@ -302,7 +302,7 @@ export const MultiSelect = React.memo(function MultiSelect({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className={`w-full justify-between !items-start ${selected.length > 0 ? "!h-auto" : ""} ${
+                    className={`w-full justify-between min-h-10 !h-auto items-center py-2 ${
                         buttonClassName || ""
                     }`}
                     onClick={() => setOpen(!open)}
@@ -376,9 +376,7 @@ export const MultiSelect = React.memo(function MultiSelect({
                     </div>
 
                     {!hideChevron && (
-                        <ChevronsUpDown
-                            className={`h-4 w-4 shrink-0 opacity-50 ${selected.length > 0 ? "mt-2 ml-2" : ""} `}
-                        />
+                        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
                     )}
                 </Button>
             </PopoverTrigger>

@@ -39,7 +39,7 @@ export default function CustomerFilter() {
         to: filter.to || endOfDay(new Date()),
     });
     const [dateSelected, setDateSelected] = useState<string>(
-        filter.dateSelected || "-30"
+        filter.dateSelected || "-30",
     );
 
     // State for active tab
@@ -47,16 +47,16 @@ export default function CustomerFilter() {
 
     // State for filter values - khởi tạo từ global state
     const [selectedTags, setSelectedTags] = useState<string[]>(
-        filter.tagSelected || []
+        filter.tagSelected || [],
     );
     const [selectedCategories, setSelectedCategories] = useState<string[]>(
-        filter.categorySelected || []
+        filter.categorySelected || [],
     );
     const [selectedUtmSources, setSelectedUtmSources] = useState<string[]>(
-        filter.sourceSelected || []
+        filter.sourceSelected || [],
     );
     const [selectedAssignees, setSelectedAssignees] = useState<string[]>(
-        filter.assignTo || []
+        filter.assignTo || [],
     );
 
     // State for system filters - khởi tạo từ global state
@@ -238,7 +238,7 @@ export default function CustomerFilter() {
             setSelectedSystemFilters((prev) => [...prev, value]);
         } else {
             setSelectedSystemFilters((prev) =>
-                prev.filter((item) => item !== value)
+                prev.filter((item) => item !== value),
             );
         }
     };
@@ -298,13 +298,13 @@ export default function CustomerFilter() {
                 const customConditions = selectedSystemFilters.map(
                     (filterValue) => {
                         const filterOption = systemFilterOptions.find(
-                            (option) => option.value === filterValue
+                            (option) => option.value === filterValue,
                         );
                         return {
                             field: filterOption?.field,
                             operator: filterOption?.operator,
                         };
-                    }
+                    },
                 );
                 filterBody.customConditions = customConditions;
             }
@@ -360,13 +360,13 @@ export default function CustomerFilter() {
                 const customConditions = selectedSystemFilters.map(
                     (filterValue) => {
                         const filterOption = systemFilterOptions.find(
-                            (option) => option.value === filterValue
+                            (option) => option.value === filterValue,
                         );
                         return {
                             field: filterOption?.field,
                             operator: filterOption?.operator,
                         };
-                    }
+                    },
                 );
                 filterBody.customConditions = customConditions;
             }
@@ -456,15 +456,17 @@ export default function CustomerFilter() {
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    variant={hasActiveFilters() ? "default" : "outline"}
+                    variant="ghost"
                     size="sm"
-                    className={`text-sm font-normal ${
-                        hasActiveFilters() ? "text-white" : "text-[#646A73]"
+                    className={`h-10 px-4 rounded-lg shadow-sm text-sm font-normal transition-all ${
+                        hasActiveFilters()
+                            ? "bg-indigo-600  hover:bg-indigo-700 text-white"
+                            : "bg-white hover:bg-gray-50 text-gray-600 border-0"
                     }`}
                 >
                     <FilterListIcon
-                        className={`size-4 ${
-                            hasActiveFilters() ? "text-white" : "text-[#646A73]"
+                        className={`size-4 mr-1.5 ${
+                            hasActiveFilters() ? "text-white" : "text-gray-500"
                         }`}
                     />
                     Bộ lọc
@@ -558,13 +560,13 @@ export default function CustomerFilter() {
                                     <Button
                                         variant="outline"
                                         onClick={clearFilters}
-                                        className="text-sm"
+                                        className="text-sm rounded-lg"
                                     >
                                         Xóa bộ lọc
                                     </Button>
                                     <Button
                                         onClick={applyFilter}
-                                        className="bg-primary text-white text-sm"
+                                        className="bg-primary text-white text-sm rounded-lg"
                                     >
                                         Áp dụng
                                     </Button>
@@ -590,12 +592,12 @@ export default function CustomerFilter() {
                                         <Checkbox
                                             id={option.value}
                                             checked={selectedSystemFilters.includes(
-                                                option.value
+                                                option.value,
                                             )}
                                             onCheckedChange={(checked) =>
                                                 handleSystemFilterChange(
                                                     option.value,
-                                                    checked as boolean
+                                                    checked as boolean,
                                                 )
                                             }
                                         />
@@ -611,13 +613,13 @@ export default function CustomerFilter() {
                                     <Button
                                         variant="outline"
                                         onClick={clearFilters}
-                                        className="text-sm"
+                                        className="text-sm rounded-lg"
                                     >
                                         Xóa bộ lọc
                                     </Button>
                                     <Button
                                         onClick={applyFilter}
-                                        className="bg-primary text-white text-sm"
+                                        className="bg-primary text-white text-sm rounded-lg"
                                     >
                                         Áp dụng
                                     </Button>

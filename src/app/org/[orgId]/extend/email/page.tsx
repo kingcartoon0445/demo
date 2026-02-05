@@ -3,6 +3,7 @@
 import TemplateGalleryModal from "@/components/editors/TemplateGalleryModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GlassTabs } from "@/components/common/GlassTabs";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -17,6 +18,7 @@ import {
     updateStatusEmailTemplate,
 } from "@/api/email";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Glass } from "@/components/Glass";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -115,7 +117,7 @@ export default function EmailPage() {
     // Modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingConfig, setEditingConfig] = useState<EmailConfig | null>(
-        null
+        null,
     );
     const [modalMode, setModalMode] = useState<"create" | "edit">("create");
 
@@ -127,26 +129,26 @@ export default function EmailPage() {
     const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
     const filteredTemplates = templateList.filter((t) =>
         [t.name, t.subject].some((v) =>
-            v?.toLowerCase().includes(templateSearch.toLowerCase())
-        )
+            v?.toLowerCase().includes(templateSearch.toLowerCase()),
+        ),
     );
     const templateTotal = filteredTemplates.length;
     const templateTotalPages = Math.max(
         1,
-        Math.ceil(templateTotal / templateLimit)
+        Math.ceil(templateTotal / templateLimit),
     );
     const templatePageData = filteredTemplates.slice(
         (templatePage - 1) * templateLimit,
-        templatePage * templateLimit
+        templatePage * templateLimit,
     );
 
     // Template modal
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [templateMode, setTemplateMode] = useState<"create" | "edit">(
-        "create"
+        "create",
     );
     const [editingTemplate, setEditingTemplate] = useState<TemplateItem | null>(
-        null
+        null,
     );
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
@@ -198,7 +200,7 @@ export default function EmailPage() {
             setTotalPages(
                 Number(totalPagesFromApi) ||
                     Math.ceil((Number(totalFromApi) || 0) / limit) ||
-                    1
+                    1,
             );
         } catch (error) {
             console.error("Error fetching email configs:", error);
@@ -276,9 +278,9 @@ export default function EmailPage() {
                     createdAt: item.createdDate,
                     updatedAt: item.lastModifiedDate,
                     enabled: Boolean(
-                        item.status ?? item.enabled ?? item.active ?? false
+                        item.status ?? item.enabled ?? item.active ?? false,
                     ),
-                })
+                }),
             );
             setTemplateList(templates);
         } catch (error) {
@@ -316,7 +318,7 @@ export default function EmailPage() {
         return () => {
             document.removeEventListener(
                 "visibilitychange",
-                handleVisibilityChange
+                handleVisibilityChange,
             );
             window.removeEventListener("focus", handleFocus);
         };
@@ -400,8 +402,8 @@ export default function EmailPage() {
                     // Optimistic update
                     setTemplateList((prevList) =>
                         prevList.map((t) =>
-                            t.id === item.id ? { ...t, enabled: checked } : t
-                        )
+                            t.id === item.id ? { ...t, enabled: checked } : t,
+                        ),
                     );
                     try {
                         await updateStatusEmailTemplate(orgId, item.id, {
@@ -414,8 +416,8 @@ export default function EmailPage() {
                         // Revert on error
                         setTemplateList((prevList) =>
                             prevList.map((t) =>
-                                t.id === item.id ? { ...t, enabled: prev } : t
-                            )
+                                t.id === item.id ? { ...t, enabled: prev } : t,
+                            ),
                         );
                     }
                 };
@@ -540,7 +542,7 @@ export default function EmailPage() {
         });
 
         router.push(
-            `/org/${orgId}/extend/email/template/update?${params.toString()}`
+            `/org/${orgId}/extend/email/template/update?${params.toString()}`,
         );
     };
     const onEditWithCKEditor = (item: TemplateItem) => {
@@ -551,7 +553,7 @@ export default function EmailPage() {
         });
 
         router.push(
-            `/org/${orgId}/extend/email/template/edit?${params.toString()}`
+            `/org/${orgId}/extend/email/template/edit?${params.toString()}`,
         );
     };
     const onDeleteTemplate = async (id: string) => {
@@ -596,8 +598,8 @@ export default function EmailPage() {
                               html: data.html,
                               json: data.json,
                           }
-                        : t
-                )
+                        : t,
+                ),
             );
             toast.success("Cập nhật mẫu thành công");
         }
@@ -640,7 +642,7 @@ export default function EmailPage() {
                     setIsSimpleTemplateModalOpen(false);
                     setEditingSimpleTemplate(null);
                     router.push(
-                        `/org/${orgId}/extend/email/template/update?id=${newTemplateId}`
+                        `/org/${orgId}/extend/email/template/update?id=${newTemplateId}`,
                     );
                     return;
                 }
@@ -671,18 +673,34 @@ export default function EmailPage() {
     return (
         <div className="space-y-6">
             <Tabs defaultValue="template" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="template">Mẫu</TabsTrigger>
-                    <TabsTrigger value="config">Cấu hình</TabsTrigger>
+                <TabsList className="bg-gray-100/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-1">
+                    <TabsTrigger
+                        value="template"
+                        className="rounded-xl px-4 py-2 text-sm font-semibold data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+                    >
+                        Mẫu
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="config"
+                        className="rounded-xl px-4 py-2 text-sm font-semibold data-[state=active]:bg-white data-[state=active]:text-indigo-700 data-[state=active]:shadow-sm"
+                    >
+                        Cấu hình
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="template" className="space-y-4">
-                    <Card>
+                    <Glass
+                        intensity="high"
+                        className="rounded-2xl overflow-hidden border border-white/40 shadow-xl px-4 py-6"
+                    >
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <CardTitle>Mẫu Email</CardTitle>
                                 <div className="flex items-center gap-4">
-                                    <Button onClick={onCreateTemplate}>
+                                    <Button
+                                        onClick={onCreateTemplate}
+                                        className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white"
+                                    >
                                         <Plus className="h-4 w-4 mr-2" />
                                         Thêm mẫu
                                     </Button>
@@ -693,17 +711,17 @@ export default function EmailPage() {
                             <div className="space-y-4">
                                 <div className="flex items-center space-x-2">
                                     <div className="relative flex-1 max-w-sm">
-                                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                         <Input
                                             placeholder="Tìm kiếm mẫu..."
                                             value={templateSearch}
                                             onChange={(e) => {
                                                 setTemplateSearch(
-                                                    e.target.value
+                                                    e.target.value,
                                                 );
                                                 setTemplatePage(1);
                                             }}
-                                            className="pl-8"
+                                            className="pl-9 h-10 bg-white border-0 shadow-sm rounded-lg focus:ring-2 focus:ring-indigo-100"
                                         />
                                     </div>
                                 </div>
@@ -725,7 +743,7 @@ export default function EmailPage() {
                                             đến{" "}
                                             {Math.min(
                                                 templatePage * templateLimit,
-                                                templateTotal
+                                                templateTotal,
                                             )}{" "}
                                             trong tổng số {templateTotal} mục
                                         </div>
@@ -735,7 +753,7 @@ export default function EmailPage() {
                                                 size="sm"
                                                 onClick={() =>
                                                     setTemplatePage((p) =>
-                                                        Math.max(1, p - 1)
+                                                        Math.max(1, p - 1),
                                                     )
                                                 }
                                                 disabled={templatePage === 1}
@@ -753,8 +771,8 @@ export default function EmailPage() {
                                                     setTemplatePage((p) =>
                                                         Math.min(
                                                             templateTotalPages,
-                                                            p + 1
-                                                        )
+                                                            p + 1,
+                                                        ),
                                                     )
                                                 }
                                                 disabled={
@@ -769,14 +787,20 @@ export default function EmailPage() {
                                 )}
                             </div>
                         </CardContent>
-                    </Card>
+                    </Glass>
                 </TabsContent>
                 <TabsContent value="config" className="space-y-4">
-                    <Card>
+                    <Glass
+                        intensity="high"
+                        className="rounded-2xl overflow-hidden border border-white/40 shadow-xl px-4 py-6"
+                    >
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <CardTitle>Cấu hình email</CardTitle>
-                                <Button onClick={handleCreate}>
+                                <Button
+                                    onClick={handleCreate}
+                                    className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white"
+                                >
                                     <Plus className="h-4 w-4 mr-2" />
                                     Thêm cấu hình
                                 </Button>
@@ -787,14 +811,14 @@ export default function EmailPage() {
                                 {/* Search */}
                                 <div className="flex items-center space-x-2">
                                     <div className="relative flex-1 max-w-sm">
-                                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                         <Input
                                             placeholder="Tìm kiếm cấu hình..."
                                             value={searchText}
                                             onChange={(e) =>
                                                 handleSearch(e.target.value)
                                             }
-                                            className="pl-8"
+                                            className="pl-9 h-10 bg-white border-0 shadow-sm rounded-lg focus:ring-2 focus:ring-indigo-100"
                                         />
                                     </div>
                                 </div>
@@ -815,7 +839,7 @@ export default function EmailPage() {
                                             {(currentPage - 1) * limit + 1} đến{" "}
                                             {Math.min(
                                                 currentPage * limit,
-                                                totalItems
+                                                totalItems,
                                             )}{" "}
                                             trong tổng số {totalItems} mục
                                         </div>
@@ -825,7 +849,7 @@ export default function EmailPage() {
                                                 size="sm"
                                                 onClick={() =>
                                                     handlePageChange(
-                                                        currentPage - 1
+                                                        currentPage - 1,
                                                     )
                                                 }
                                                 disabled={currentPage === 1}
@@ -841,7 +865,7 @@ export default function EmailPage() {
                                                 size="sm"
                                                 onClick={() =>
                                                     handlePageChange(
-                                                        currentPage + 1
+                                                        currentPage + 1,
                                                     )
                                                 }
                                                 disabled={
@@ -855,7 +879,7 @@ export default function EmailPage() {
                                 )}
                             </div>
                         </CardContent>
-                    </Card>
+                    </Glass>
                 </TabsContent>
             </Tabs>
 
@@ -921,7 +945,7 @@ export default function EmailPage() {
 
                         if (!newTemplateId) {
                             throw new Error(
-                                "Không lấy được ID template vừa tạo"
+                                "Không lấy được ID template vừa tạo",
                             );
                         }
 
@@ -932,20 +956,20 @@ export default function EmailPage() {
                                 newTemplateId,
                                 {
                                     body: item.html,
-                                }
+                                },
                             );
                         }
 
                         await loadTemplates();
                         setIsGalleryOpen(false);
                         router.push(
-                            `/org/${orgId}/extend/email/template/update?id=${newTemplateId}`
+                            `/org/${orgId}/extend/email/template/update?id=${newTemplateId}`,
                         );
                         toast.success("Đã tạo template từ mẫu");
                     } catch (error) {
                         console.error(
                             "Error creating template from sample:",
-                            error
+                            error,
                         );
                         toast.error("Không thể tạo template từ mẫu");
                     }

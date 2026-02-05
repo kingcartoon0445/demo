@@ -6,19 +6,19 @@ import ConversationTimeline from "@/components/conversation/ConversationTimeline
 import AddCustomerDropdown from "@/components/leads/AddCustomerDropdown";
 import AddCustomerModal from "@/components/leads/AddCustomerModal";
 import CustomerDetail from "@/components/leads/CustomerDetail";
-import CustomerList from "@/components/leads/CustomerList";
 import { CustomerTimeline } from "@/components/leads/CustomerTimeline";
 import { BiArchiveIn } from "react-icons/bi";
 
 import LeadsLayout from "@/components/leads/LeadsLayout";
+import { CreateFromGGSheetDialog } from "@/components/leads/CreateFromGGSheetDialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { Glass } from "@/components/Glass";
 import { type Conversation } from "@/hooks/useConversation";
 import { useLeadDetailApi } from "@/hooks/useCustomerDetail";
 import { ApiResponseSingle, Lead } from "@/lib/interface";
 
 import { getDetailConversation } from "@/api/conversation";
-import ArchivedCustomerList from "@/components/leads/ArchivedCustomerList";
 import { ConvertToDealPopup } from "@/components/leads/ConvertToDealPopup";
 import LeadsFilter from "@/components/leads/LeadsFilter";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,8 @@ import { SearchIcon, XIcon } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { CreateFromGGSheetDialog } from "@/components/leads/CreateFromGGSheetDialog";
+
+import { MdOutlineInbox } from "react-icons/md";
 
 const SearchBox = React.memo(function SearchBox({
     initialValue,
@@ -273,22 +274,37 @@ export default function CustomersPage() {
         router.push(
             `/org/${orgId}/leads?source=${selectedSource}&cid=${conversation.id}`,
         );
+        setSelectedConversation(conversation);
+        setSelectedCustomer(null);
+        // // Cập nhật URL mà không gây điều hướng lại (tránh giật)
+        // if (typeof window !== "undefined") {
+        //     const url = new URL(window.location.href);
+        //     url.searchParams.set("source", selectedSource);
+        //     url.searchParams.set("cid", conversation.id);
+        //     window.history.replaceState(null, "", url.toString());
+        // }
     };
 
     const handleSourceSelect = (source: string) => {
         setSelectedSource(source);
         if (source === "messenger") {
-            setViewMode("conversations");
             setConversationProvider("FACEBOOK");
+            setViewMode("customers"); // Giữ viewMode là customers để giữ LeadsLayout
+            // Clear selectedCustomer khi chuyển sang messenger
+            setSelectedCustomer(null);
         } else if (source === "zalo") {
-            setViewMode("conversations");
             setConversationProvider("ZALO");
+            setViewMode("customers"); // Giữ viewMode là customers để giữ LeadsLayout
+            // Clear selectedCustomer khi chuyển sang zalo
+            setSelectedCustomer(null);
         } else if (source === "config-messenger") {
             setViewMode("config-messenger");
         } else if (source === "config-zalo") {
             setViewMode("config-zalo");
         } else {
             setViewMode("customers");
+            // Clear selectedConversation khi chuyển sang source khác (chance, etc.)
+            setSelectedConversation(null);
         }
         setSelectedConversation(null);
 
@@ -415,9 +431,25 @@ export default function CustomersPage() {
                     selectedSource={selectedSource}
                     onSourceChange={handleSourceSelect}
                     orgId={orgId}
+                    viewMode={viewMode}
+                    selectedCustomer={selectedCustomer}
+                    onCustomerSelect={handleCustomerSelect}
+                    isArchiveMode={isArchiveMode}
+                    selectedCustomerId={selectedCustomerId}
+                    onTotalChange={setTotalCustomers}
+                    onAddCustomer={handleAddCustomer}
+                    conversationProvider={conversationProvider}
+                    selectedConversation={selectedConversation}
+                    onConversationSelect={handleConversationSelect}
+                    onTotalConversationsChange={setTotalConversations}
+                    totalCustomers={totalCustomers}
+                    onSearch={executeSearch}
+                    onImportCustomer={handleImportCustomer}
+                    searchText={currentFilter.filterBody?.searchText || ""}
                 >
-                    <div className="flex flex-col h-full overflow-hidden">
-                        <div className="bg-background border-b ">
+                    <div className="flex flex-col h-full overflow-hidden w-full">
+                        {/* Toolbar cũ - đã được tích hợp vào LeadsLayout, ẩn đi */}
+                        <div className="bg-background border-b flex-shrink-0 hidden">
                             {/* Toolbar */}
                             <div
                                 className={`flex items-center justify-between  text-sm ${
@@ -581,148 +613,198 @@ export default function CustomersPage() {
                                 )}
                             </div>
                         </div>
-                        <div className="flex h-full overflow-hidden">
+
+                        {/* Top Nav Bar */}
+
+                        {/* Main content areas */}
+                        <div className="flex-1 flex overflow-hidden gap-4 relative h-full w-full min-h-0">
                             {viewMode === "customers" ? (
                                 <>
-                                    <ScrollArea className="w-[30%] sm:w-80 border-r overflow-y-auto">
-                                        {isArchiveMode ? (
-                                            <ArchivedCustomerList
-                                                orgId={orgId}
-                                                onSelect={handleCustomerSelect}
-                                                onTotalChange={
-                                                    setTotalCustomers
-                                                }
-                                            />
-                                        ) : (
-                                            <CustomerList
-                                                orgId={orgId}
-                                                onSelect={handleCustomerSelect}
-                                                onTotalChange={
-                                                    setTotalCustomers
-                                                }
-                                                selectedCustomerId={
-                                                    selectedCustomerId
-                                                }
-                                            />
-                                        )}
-                                    </ScrollArea>
-
-                                    <div className="flex-1 w-[35%] sm:w-[35%] 2xl:w-full">
-                                        {selectedCustomer ? (
-                                            <CustomerTimeline
-                                                onShowCustomerDetail={
-                                                    handleOpenDetailPanel
-                                                }
-                                                customer={selectedCustomer}
-                                                orgId={orgId}
-                                                onSelectCustomer={
-                                                    setSelectedCustomer
-                                                }
-                                                isArchiveMode={isArchiveMode}
-                                            />
-                                        ) : (
-                                            <div className="flex items-center justify-center h-full">
-                                                <div className="flex flex-col items-center justify-center h-full">
-                                                    <span className="text-muted-foreground">
-                                                        {t(
-                                                            "common.selectCustomerToViewTimeline",
-                                                        )}
-                                                    </span>
-                                                </div>
+                                    {/* Hiển thị ConversationTimeline khi chọn conversation (messenger/zalo) */}
+                                    {(selectedSource === "messenger" ||
+                                        selectedSource === "zalo") &&
+                                    selectedConversation ? (
+                                        <>
+                                            {/* Panel 3: Conversation Timeline */}
+                                            <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden basis-[65%]">
+                                                <Glass
+                                                    className="h-full flex flex-col rounded-t-3xl rounded-b-none overflow-hidden border-white/40 min-h-0"
+                                                    intensity="medium"
+                                                >
+                                                    <ConversationTimeline
+                                                        conversation={
+                                                            selectedConversation
+                                                        }
+                                                        orgId={orgId}
+                                                    />
+                                                </Glass>
                                             </div>
-                                        )}
-                                    </div>
 
-                                    <div className="hidden 2xl:block w-80 2xl:overflow-y-hidden w-[30%]">
-                                        {selectedCustomer ? (
-                                            <CustomerDetail
-                                                customer={selectedCustomer}
-                                                orgId={orgId}
-                                                workspaceId={
-                                                    selectedCustomer?.workspaceId ||
-                                                    "default"
-                                                }
-                                                open={isDetailPanelOpen}
-                                                onOpenChange={(open) => {
-                                                    setIsDetailPanelOpen(open);
-                                                    if (!open) {
-                                                        setIsClosing(true);
-                                                        setTimeout(() => {
-                                                            setIsClosing(false);
-                                                        }, 300);
+                                            {/* Panel 4: Conversation Detail */}
+                                            {/* Panel 4: Conversation Detail - MOBLIE */}
+                                            {isDetailPanelOpen && (
+                                                <div className="xl:hidden">
+                                                    <ConversationDetailSheet
+                                                        conversation={
+                                                            selectedConversation
+                                                        }
+                                                        orgId={orgId}
+                                                        open={true}
+                                                        onOpenChange={(
+                                                            open,
+                                                        ) => {
+                                                            setIsDetailPanelOpen(
+                                                                open,
+                                                            );
+                                                            if (!open) {
+                                                                setIsClosing(
+                                                                    true,
+                                                                );
+                                                                setTimeout(
+                                                                    () => {
+                                                                        setIsClosing(
+                                                                            false,
+                                                                        );
+                                                                    },
+                                                                    300,
+                                                                );
+                                                            }
+                                                        }}
+                                                        onProviderChange={
+                                                            setSource
+                                                        }
+                                                        onOpenAddCustomerModal={() =>
+                                                            setIsAddModalOpen(
+                                                                true,
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* Panel 4: Conversation Detail - DESKTOP */}
+                                            <div className="hidden xl:block h-full min-h-0 overflow-hidden basis-[45%]">
+                                                <Glass
+                                                    className="h-full flex flex-col rounded-3xl overflow-hidden border-white/40 min-h-0"
+                                                    intensity="medium"
+                                                >
+                                                    <ConversationDetailSheet
+                                                        conversation={
+                                                            selectedConversation
+                                                        }
+                                                        orgId={orgId}
+                                                        open={false}
+                                                        onOpenChange={(
+                                                            open,
+                                                        ) => {
+                                                            setIsDetailPanelOpen(
+                                                                open,
+                                                            );
+                                                            if (!open) {
+                                                                setIsClosing(
+                                                                    true,
+                                                                );
+                                                                setTimeout(
+                                                                    () => {
+                                                                        setIsClosing(
+                                                                            false,
+                                                                        );
+                                                                    },
+                                                                    300,
+                                                                );
+                                                            }
+                                                        }}
+                                                        onProviderChange={
+                                                            setSource
+                                                        }
+                                                        onOpenAddCustomerModal={() =>
+                                                            setIsAddModalOpen(
+                                                                true,
+                                                            )
+                                                        }
+                                                    />
+                                                </Glass>
+                                            </div>
+                                        </>
+                                    ) : selectedCustomer ? (
+                                        <>
+                                            {/* Panel 3: Customer Timeline & notes */}
+                                            <div className="flex-1 flex flex-col min-w-0 min-h-0 basis-[65%]">
+                                                <Glass
+                                                    className="h-full w-full flex flex-col rounded-3xl overflow-hidden shadow-lg border-white/40"
+                                                    intensity="medium"
+                                                >
+                                                    <CustomerTimeline
+                                                        onShowCustomerDetail={
+                                                            handleOpenDetailPanel
+                                                        }
+                                                        customer={
+                                                            selectedCustomer
+                                                        }
+                                                        orgId={orgId}
+                                                        onSelectCustomer={
+                                                            setSelectedCustomer
+                                                        }
+                                                        isArchiveMode={
+                                                            isArchiveMode
+                                                        }
+                                                    />
+                                                </Glass>
+                                            </div>
+
+                                            {isDetailPanelOpen && (
+                                                <CustomerDetail
+                                                    customer={selectedCustomer}
+                                                    orgId={orgId}
+                                                    workspaceId={
+                                                        selectedCustomer?.workspaceId ||
+                                                        "default"
                                                     }
-                                                }}
-                                                onDeleteSuccess={() => {
-                                                    setSelectedCustomer(null);
-                                                }}
-                                                isArchiveMode={isArchiveMode}
-                                                onSelectCustomer={
-                                                    setSelectedCustomer
-                                                }
-                                                onProviderChange={setSource}
-                                                onOpenAddCustomerModal={() =>
-                                                    setIsAddModalOpen(true)
-                                                }
-                                            />
-                                        ) : (
-                                            <div className="flex items-center justify-center h-full">
-                                                <div className="flex flex-col items-center justify-center h-full">
-                                                    <span className="text-muted-foreground">
-                                                        {t(
-                                                            "common.selectCustomerToViewDetail",
-                                                        )}
-                                                    </span>
-                                                </div>
+                                                    open={true}
+                                                    onOpenChange={(open) => {
+                                                        setIsDetailPanelOpen(
+                                                            open,
+                                                        );
+                                                        if (!open) {
+                                                            setIsClosing(true);
+                                                            setTimeout(() => {
+                                                                setIsClosing(
+                                                                    false,
+                                                                );
+                                                            }, 300);
+                                                        }
+                                                    }}
+                                                    onDeleteSuccess={() => {
+                                                        setSelectedCustomer(
+                                                            null,
+                                                        );
+                                                    }}
+                                                    isArchiveMode={
+                                                        isArchiveMode
+                                                    }
+                                                    onSelectCustomer={
+                                                        setSelectedCustomer
+                                                    }
+                                                    onProviderChange={setSource}
+                                                    onOpenAddCustomerModal={() =>
+                                                        setIsAddModalOpen(true)
+                                                    }
+                                                />
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <span className="text-muted-foreground">
+                                                    {selectedSource ===
+                                                        "messenger" ||
+                                                    selectedSource === "zalo"
+                                                        ? "Chọn cuộc trò chuyện để xem"
+                                                        : t(
+                                                              "common.selectCustomerToViewTimeline",
+                                                          )}
+                                                </span>
                                             </div>
-                                        )}
-                                    </div>
-                                </>
-                            ) : viewMode === "conversations" ? (
-                                <>
-                                    <ScrollArea className="w-[30%] sm:w-80 border-r overflow-y-auto h-full bg-white">
-                                        <ConversationList
-                                            orgId={orgId}
-                                            workspaceId="default"
-                                            onConversationSelect={
-                                                handleConversationSelect
-                                            }
-                                            selectedConversation={
-                                                selectedConversation ||
-                                                undefined
-                                            }
-                                            defaultProvider={
-                                                conversationProvider
-                                            }
-                                            onTotalChange={
-                                                setTotalConversations
-                                            }
-                                        />
-                                    </ScrollArea>
-
-                                    <div className="flex-1 w-[35%]">
-                                        <ConversationTimeline
-                                            onShowConversationDetail={
-                                                handleOpenDetailPanel
-                                            }
-                                            conversation={selectedConversation}
-                                            orgId={orgId}
-                                        />
-                                    </div>
-
-                                    {selectedConversation && (
-                                        <div className="hidden 2xl:block w-80 overflow-y-auto border-l w-[30%]">
-                                            <ConversationDetailSheet
-                                                conversation={
-                                                    selectedConversation
-                                                }
-                                                orgId={orgId}
-                                                open={false}
-                                                onOpenChange={() => {}}
-                                                onProviderChange={setSource}
-                                                onOpenAddCustomerModal={
-                                                    handleAddCustomer
-                                                }
-                                            />
                                         </div>
                                     )}
                                 </>
@@ -731,30 +813,6 @@ export default function CustomersPage() {
                             ) : viewMode === "config-zalo" ? (
                                 <div>Zalo config</div>
                             ) : null}
-
-                            {selectedConversation &&
-                                viewMode === "conversations" && (
-                                    <div className="hidden">
-                                        <ConversationDetailSheet
-                                            conversation={selectedConversation}
-                                            orgId={orgId}
-                                            open={isDetailPanelOpen}
-                                            onOpenChange={(open) => {
-                                                setIsDetailPanelOpen(open);
-                                                if (!open) {
-                                                    setIsClosing(true);
-                                                    setTimeout(() => {
-                                                        setIsClosing(false);
-                                                    }, 300);
-                                                }
-                                            }}
-                                            onOpenAddCustomerModal={
-                                                handleAddCustomer
-                                            }
-                                            onProviderChange={setSource}
-                                        />
-                                    </div>
-                                )}
                         </div>
                     </div>
 
@@ -778,6 +836,14 @@ export default function CustomersPage() {
                                     ? selectedCustomer?.id
                                     : undefined
                             }
+                        />
+                    )}
+
+                    {/* Import Customer Modal */}
+                    {isImportModalOpen && (
+                        <CreateFromGGSheetDialog
+                            open={isImportModalOpen}
+                            setOpen={setIsImportModalOpen}
                         />
                     )}
 

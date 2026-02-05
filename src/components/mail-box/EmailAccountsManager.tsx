@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Tooltip, TooltipProvider } from "../ui/tooltip";
 
 import { Button } from "../ui/button";
@@ -231,7 +232,7 @@ function AccountCard({
         <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
             <div className="flex items-start justify-between mb-4 flex-1">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#5c46e6]/10 to-[#5c46e6]/5 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 bg-linear-to-br from-[#5c46e6]/10 to-[#5c46e6]/5 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
                         <Mail className="w-6 h-6 text-[#5c46e6]" />
                     </div>
                     <div>
@@ -253,14 +254,14 @@ function AccountCard({
             <div className="flex gap-3">
                 <button
                     onClick={onEdit}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all text-sm font-medium"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:shadow-md hover:border-gray-300 transition-all text-sm font-medium"
                 >
                     <Edit2 className="w-4 h-4" />
                     {t("mail.edit")}
                 </button>
                 <button
                     onClick={onDelete}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-red-100 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-200 transition-all text-sm font-medium"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-red-100 text-red-600 rounded-lg hover:shadow-md hover:border-red-200 transition-all text-sm font-medium"
                 >
                     <Trash2 className="w-4 h-4" />
                     {t("mail.delete")}
@@ -453,12 +454,21 @@ function AccountModal({
         }
     };
 
-    return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
+
+    if (!mounted) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white">
                     <div>
-                        <h2 className="text-lg leading-none font-semibold">
+                        <h2 className="text-xl font-bold text-gray-900">
                             {account
                                 ? t("mail.account.updateTitle")
                                 : t("mail.account.addTitle")}
@@ -499,7 +509,7 @@ function AccountModal({
                                             accountName: e.target.value,
                                         })
                                     }
-                                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm"
+                                    className="w-full px-3 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm"
                                     placeholder={t(
                                         "mail.account.displayNamePlaceholder",
                                     )}
@@ -530,7 +540,7 @@ function AccountModal({
                                             })
                                         }
                                         disabled={!!account}
-                                        className="w-full pl-10 pr-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                        className="w-full pl-10 pr-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                         placeholder={t(
                                             "mail.account.emailPlaceholder",
                                         )}
@@ -552,7 +562,7 @@ function AccountModal({
                                         })
                                     }
                                     disabled={!!account}
-                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     placeholder={t(
                                         "mail.account.usernamePlaceholder",
                                     )}
@@ -576,7 +586,7 @@ function AccountModal({
                                             password: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm"
+                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all text-sm"
                                     placeholder={
                                         account
                                             ? "••••••••"
@@ -607,7 +617,7 @@ function AccountModal({
                                             host: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
+                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
                                     placeholder="imap.gmail.com"
                                 />
                             </div>
@@ -627,7 +637,7 @@ function AccountModal({
                                             port: parseInt(e.target.value),
                                         })
                                     }
-                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
+                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
                                 />
                             </div>
 
@@ -644,7 +654,7 @@ function AccountModal({
                                             smtpServer: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
+                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
                                     placeholder="smtp.gmail.com"
                                 />
                             </div>
@@ -662,12 +672,12 @@ function AccountModal({
                                             smtpPort: parseInt(e.target.value),
                                         })
                                     }
-                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
+                                    className="w-full px-4 py-1.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#5c46e6]/20 focus:border-[#5c46e6] transition-all font-mono text-sm"
                                 />
                             </div>
 
                             <div className="col-span-1 md:col-span-2">
-                                <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors">
                                     <input
                                         type="checkbox"
                                         checked={formData.useSsl}
@@ -730,6 +740,7 @@ function AccountModal({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 }

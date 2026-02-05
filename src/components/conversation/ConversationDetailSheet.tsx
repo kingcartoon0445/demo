@@ -81,7 +81,7 @@ export default function ConversationDetailSheet({
                 const fetchLead = async () => {
                     const response = await getLeadDetail(
                         orgId || "",
-                        detailConversation.lead.id
+                        detailConversation.lead.id,
                     );
                     setLead(response.content);
                 };
@@ -91,7 +91,7 @@ export default function ConversationDetailSheet({
                 const fetchCustomer = async () => {
                     const response = await getCustomerDetail(
                         orgId || "",
-                        detailConversation.customer.id
+                        detailConversation.customer.id,
                     );
                     setCustomer(response.content);
                 };
@@ -102,7 +102,7 @@ export default function ConversationDetailSheet({
                     const fetchCustomer = async () => {
                         const response = await getCustomerDetail(
                             orgId || "",
-                            detailConversation.deal.customerId
+                            detailConversation.deal.customerId,
                         );
                         setCustomer(response.content);
                     };
@@ -112,7 +112,7 @@ export default function ConversationDetailSheet({
                     const fetchLead = async () => {
                         const response = await getLeadDetail(
                             orgId || "",
-                            detailConversation.deal.leadId
+                            detailConversation.deal.leadId,
                         );
                         setLead(response.content);
                     };
@@ -125,7 +125,7 @@ export default function ConversationDetailSheet({
                     const fetchCustomer = async () => {
                         const response = await getCustomerDetail(
                             orgId || "",
-                            detailConversation.deal.customerId
+                            detailConversation.deal.customerId,
                         );
                         setCustomer(response.content);
                     };
@@ -140,7 +140,7 @@ export default function ConversationDetailSheet({
             const fetchCustomer = async () => {
                 const response = await getCustomerDetail(
                     orgId || "",
-                    customer.id
+                    customer.id,
                 );
                 setCustomer(response.content);
             };
@@ -337,7 +337,7 @@ export default function ConversationDetailSheet({
                     </SheetContent>
                 </Sheet>
             ) : (
-                <div className="h-full bg-background overflow-y-auto">
+                <div className="h-full bg-transparent overflow-y-auto">
                     <div className="p-2">{renderContent()}</div>
                 </div>
             )}

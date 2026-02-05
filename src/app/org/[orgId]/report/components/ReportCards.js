@@ -8,6 +8,7 @@ import { ReportCard6 } from "./report_card_6";
 import PivotCard from "./pivot_card";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Glass } from "@/components/Glass";
 
 // Định nghĩa map cho các component báo cáo
 const CARD_COMPONENTS = {
@@ -130,7 +131,9 @@ export default function ReportCards({
                                     <Skeleton className="w-full h-full min-h-[300px] rounded-xl" />
                                 </div>
                             ) : (
-                                <CardComponent {...cardProps} />
+                                <div className="bg-white/50 backdrop-blur-xl border border-white/40 shadow-sm rounded-3xl h-full overflow-hidden transition-all duration-200 hover:bg-white/60">
+                                    <CardComponent {...cardProps} />
+                                </div>
                             )}
                         </div>
                     );

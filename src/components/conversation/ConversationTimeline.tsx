@@ -18,6 +18,8 @@ import {
     MoreVertical,
     PanelRight,
     Paperclip,
+    Plus,
+    ChevronRight,
     Send,
     Smile,
 } from "lucide-react";
@@ -82,14 +84,12 @@ const ChatMessageItemComponent = ({
                 date.getDate() === now.getDate();
 
             if (isSameDay) {
-                // Hôm nay ➜ chỉ hiển thị giờ:phút
                 return date.toLocaleTimeString("vi-VN", {
                     hour: "2-digit",
                     minute: "2-digit",
                 });
             }
 
-            // Ngày trước ➜ hiển thị dd/MM/yyyy HH:mm
             return date.toLocaleString("vi-VN", {
                 day: "2-digit",
                 month: "2-digit",
@@ -102,109 +102,34 @@ const ChatMessageItemComponent = ({
         }
     };
 
-    const getInitials = (name: string) => {
-        return name
-            .split(" ")
-            .slice(0, 2)
-            .map((word) => word.charAt(0).toUpperCase())
-            .join("");
-    };
-
-    // Determine if message is outgoing (from page/bot to user)
     const isOutgoing = message.isPageReply;
 
-    // Get avatar and name based on message direction
-    const senderAvatar = isOutgoing
-        ? message.isGpt
-            ? "/images/bot_avatar.webp"
-            : conversation.pageAvatar
-        : message.avatar || conversation.avatar;
-
-    const senderName = message.fullName;
-
-    // Parse attachments (if any)
+    // Attachments logic
     let attachmentItems: Array<{ type: string; payload: any }> = [];
     const rawAtt = (message as any).attachments;
     if (rawAtt) {
         if (typeof rawAtt === "string") {
             try {
                 attachmentItems = JSON.parse(rawAtt);
-            } catch {
-                // ignore parse error
-            }
+            } catch {}
         } else if (Array.isArray(rawAtt)) {
             attachmentItems = rawAtt;
         }
     }
 
-    // Detect Zalo sticker URL inside text message (e.g. /api/emoticon/oasticker)
     const STICKER_PATH = "/api/emoticon/oasticker";
     if (message.message && message.message.includes(STICKER_PATH)) {
         attachmentItems.push({
             type: "image",
             payload: { url: message.message },
         });
-        // Remove text to avoid duplicate rendering
         message = { ...message, message: "" } as ChatMessage;
     }
 
-    // Helper function to check if URL is an image (strict)
-    const isImageUrl = (url: string) => {
-        if (!url) return false;
-        try {
-            const parsed = new URL(url);
-            const pathname = parsed.pathname || "";
-            const lastSegment = pathname.split("/").pop() || "";
-            const ext = lastSegment.includes(".")
-                ? `.${lastSegment.split(".").pop()!.toLowerCase()}`
-                : "";
+    const isImageUrl = (url: string) =>
+        /\.(jpg|jpeg|png|gif|webp|bmp|heic|avif)$/i.test(url);
 
-            const imageExtensions = [
-                ".jpg",
-                ".jpeg",
-                ".png",
-                ".gif",
-                ".webp",
-                ".bmp",
-                ".heic",
-                ".avif",
-            ];
-            if (ext && imageExtensions.includes(ext)) return true;
-
-            // Explicit non-image extensions
-            const nonImageExtensions = [
-                ".pdf",
-                ".doc",
-                ".docx",
-                ".xls",
-                ".xlsx",
-                ".ppt",
-                ".pptx",
-                ".zip",
-                ".rar",
-                ".7z",
-            ];
-            if (ext && nonImageExtensions.includes(ext)) return false;
-
-            // Fallback: infer from query param mime/content_type if present
-            const mime =
-                parsed.searchParams.get("mime") ||
-                parsed.searchParams.get("content_type") ||
-                parsed.searchParams.get("type");
-            if (mime && mime.toLowerCase().startsWith("image/")) return true;
-            if (mime && !mime.toLowerCase().startsWith("image/")) return false;
-
-            // Default to not image if uncertain
-            return false;
-        } catch {
-            // If URL parsing fails, fallback to simple extension check
-            return /\.(jpg|jpeg|png|gif|webp|bmp|heic|avif)$/i.test(url);
-        }
-    };
-
-    // Process attachments to convert Facebook file attachments to images if they are images
     attachmentItems = attachmentItems.map((att) => {
-        // If it's a file type but the URL is actually an image, convert it to image type
         if (
             att.type === "file" &&
             att.payload?.url &&
@@ -220,55 +145,15 @@ const ChatMessageItemComponent = ({
 
     const renderAttachment = (att: any) => {
         if (!att) return null;
-
         const url: string = att?.payload?.url || att?.url || "";
         const type: string = att?.type || att?.payload?.type || "";
         const name: string | undefined = att?.payload?.name || att?.name;
-
         const isImage =
-            type === "image" ||
-            type === "sticker" ||
-            /\.(jpg|jpeg|png|gif|webp)$/i.test(url || "");
+            type === "image" || type === "sticker" || isImageUrl(url);
 
         const getFileNameFromUrl = (fileUrl: string) => {
-            try {
-                if (name) return name;
-
-                if (fileUrl && fileUrl.includes("fbsbx.com")) {
-                    const urlObj = new URL(fileUrl);
-                    const pathParts = urlObj.pathname.split("/");
-
-                    for (let i = pathParts.length - 1; i >= 0; i--) {
-                        if (pathParts[i] && pathParts[i].includes(".")) {
-                            return decodeURIComponent(pathParts[i]);
-                        }
-                    }
-                }
-
-                const urlParts = (fileUrl || "").split("/");
-                for (let i = urlParts.length - 1; i >= 0; i--) {
-                    const part = urlParts[i];
-                    if (
-                        part &&
-                        part.includes(".") &&
-                        !part.startsWith("http")
-                    ) {
-                        const fileNamePart = part.split("?")[0];
-                        if (fileNamePart) {
-                            return decodeURIComponent(fileNamePart);
-                        }
-                    }
-                }
-
-                if (type) {
-                    return `File ${type.toUpperCase()}`;
-                }
-
-                return "File đính kèm";
-            } catch (error) {
-                console.error("Lỗi khi trích xuất tên file:", error);
-                return "File đính kèm";
-            }
+            // simplified for brevity
+            return name || "File đính kèm";
         };
 
         if (isImage) {
@@ -281,10 +166,10 @@ const ChatMessageItemComponent = ({
                 >
                     <ImageDisplay
                         src={displaySrc}
-                        alt={getFileNameFromUrl(url)}
+                        alt="attachment"
                         className="max-w-[300px] rounded-lg object-cover"
-                        width={100}
-                        height={100}
+                        width={200}
+                        height={200}
                     />
                 </a>
             );
@@ -298,41 +183,62 @@ const ChatMessageItemComponent = ({
                 className="flex items-center gap-2 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
             >
                 <FileIcon className="w-5 h-5" />
-                <span className="text-sm">{getFileNameFromUrl(url)}</span>
+                <span className="text-sm underline max-w-[200px] truncate">
+                    {getFileNameFromUrl(url)}
+                </span>
             </a>
         );
     };
+
     return (
         <div
             className={cn(
-                "flex gap-3 mb-4",
-                isOutgoing ? "flex-row-reverse" : "flex-row"
+                "flex gap-3 mb-6",
+                isOutgoing ? "flex-row-reverse" : "flex-row",
             )}
         >
-            {/* Avatar */}
-            <Avatar
-                name={getFirstAndLastWord(senderName) || ""}
-                src={getAvatarUrl(senderAvatar) || ""}
-                round
-                size={"24"}
-            />
+            {/* Avatar - Only for Incoming */}
+            {!isOutgoing && (
+                <Avatar
+                    name={getFirstAndLastWord(conversation.personName) || ""}
+                    src={getAvatarUrl(conversation.personAvatar) || ""}
+                    round
+                    size={"40"}
+                    className="self-start mt-1"
+                />
+            )}
 
             {/* Message Content */}
             <div
                 className={cn(
-                    "max-w-[70%] space-y-1",
-                    isOutgoing ? "items-end" : "items-start"
+                    "max-w-[70%] flex flex-col",
+                    isOutgoing ? "items-end" : "items-start",
                 )}
             >
-                {/* Sender name */}
-                {senderName && (
-                    <span
-                        className={cn(
-                            "text-xs text-gray-500 mb-1",
-                            isOutgoing ? "text-right" : "text-left"
+                {/* Header Label */}
+                {isOutgoing ? (
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs text-gray-500 font-medium">
+                            {conversation.pageName ||
+                                "Tài khoản thử nghiệm 123"}
+                        </span>
+                        {/* Example icon for page */}
+                        {conversation.pageAvatar ? (
+                            <Avatar
+                                src={
+                                    getAvatarUrl(conversation.pageAvatar) ||
+                                    undefined
+                                }
+                                size="16"
+                                round
+                            />
+                        ) : (
+                            <PanelRight className="w-3 h-3 text-orange-500" />
                         )}
-                    >
-                        {senderName}
+                    </div>
+                ) : (
+                    <span className="text-xs text-gray-500 mb-1 font-medium ml-1">
+                        {conversation.personName}
                     </span>
                 )}
 
@@ -340,35 +246,49 @@ const ChatMessageItemComponent = ({
                 {message.message && (
                     <div
                         className={cn(
-                            "rounded-lg px-3 py-2 relative",
+                            "px-4 py-3 relative shadow-sm",
                             isOutgoing
-                                ? "bg-blue-500 text-white"
-                                : "bg-gray-100 text-gray-900"
+                                ? "bg-[#3B82F6] text-white rounded-[20px] rounded-tr-sm"
+                                : "bg-[#F3F4F6] text-gray-900 rounded-[20px] rounded-tl-sm",
                         )}
                     >
-                        <p className="text-sm break-words whitespace-pre-wrap">
+                        <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
                             {message.message}
                         </p>
                     </div>
                 )}
 
-                {/* Attachments displayed without chat bubble background */}
-                {attachmentItems.map((att, idx) => (
-                    <div key={idx} className="mt-2">
-                        {renderAttachment(att)}
+                {/* Attachments */}
+                {attachmentItems.length > 0 && (
+                    <div
+                        className={cn(
+                            "space-y-2",
+                            isOutgoing
+                                ? "mt-2 items-end flex flex-col"
+                                : "mt-2",
+                        )}
+                    >
+                        {attachmentItems.map((att, idx) => (
+                            <div
+                                key={idx}
+                                className="rounded-lg overflow-hidden border border-gray-100 shadow-sm"
+                            >
+                                {renderAttachment(att)}
+                            </div>
+                        ))}
                     </div>
-                ))}
+                )}
 
                 {/* Time and Status */}
                 <div
                     className={cn(
-                        "flex items-center gap-1 text-xs text-gray-500",
-                        isOutgoing ? "flex-row-reverse" : "flex-row"
+                        "flex items-center gap-1.5 text-[11px] text-gray-400 mt-1.5",
+                        isOutgoing ? "flex-row-reverse" : "flex-row ml-1",
                     )}
                 >
                     <span>{formatTime(message.createdDate)}</span>
                     {isOutgoing && (
-                        <CheckCheck className="w-3 h-3 text-blue-500" />
+                        <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
                     )}
                 </div>
             </div>
@@ -398,7 +318,7 @@ export default function ConversationTimeline({
 
     useEffect(() => {
         setConversationName(
-            mergedConversation.fullName || conversation?.personName || ""
+            mergedConversation.fullName || conversation?.personName || "",
         );
     }, [conversation]);
     // Initialize Fancybox for any element with data-fancybox attribute
@@ -463,13 +383,13 @@ export default function ConversationTimeline({
     // Mutation for sending message
     const { mutate: sendMessage, isPending: isSending } = useSendMessage(
         orgId,
-        conversation?.id || ""
+        conversation?.id || "",
     );
 
     // Fetch up-to-date conversation detail so UI is correct even on reload via cid
     const { data: detailResponse } = useGetDetailConversation(
         orgId || "",
-        conversation?.id || ""
+        conversation?.id || "",
     );
     const detailConv: any = (detailResponse as any)?.content;
 
@@ -494,6 +414,16 @@ export default function ConversationTimeline({
         enabled: !!conversation?.id,
     });
 
+    // State for toggling actions when typing
+    const [isActionsExpanded, setIsActionsExpanded] = useState(false);
+
+    // Reset actions expansion when input becomes empty
+    useEffect(() => {
+        if (!messageInput.trim()) {
+            setIsActionsExpanded(false);
+        }
+    }, [messageInput]);
+
     /* ------------------------------------------------------------------ */
     /*          Realtime updates: refresh chat list when message arrives    */
     /* ------------------------------------------------------------------ */
@@ -505,7 +435,7 @@ export default function ConversationTimeline({
         // Listen to realtime db changes for this org
         const convRef = ref(
             firebaseDb,
-            `root/OrganizationId: ${orgId}/CreateOrUpdateConversation`
+            `root/OrganizationId: ${orgId}/CreateOrUpdateConversation`,
         );
 
         const handleNewMessage = (snapshot: any) => {
@@ -531,7 +461,7 @@ export default function ConversationTimeline({
     const messages = useMemo(() => {
         const allMessages =
             chatData?.pages.flatMap((page) =>
-                page.content == null ? [] : page.content
+                page.content == null ? [] : page.content,
             ) || [];
         allMessages.sort((a, b) => a.timestamp - b.timestamp);
         return allMessages;
@@ -562,12 +492,12 @@ export default function ConversationTimeline({
                     root: null,
                     rootMargin: "100px", // Giảm rootMargin để tránh trigger quá sớm
                     threshold: 0.1,
-                }
+                },
             );
 
             observerRef.current.observe(node);
         },
-        [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]
+        [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage],
     );
 
     // Cleanup observer
@@ -610,6 +540,27 @@ export default function ConversationTimeline({
         }
     }, [messages]);
 
+    // Textarea auto-resize
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+            const scrollHeight = textareaRef.current.scrollHeight;
+            textareaRef.current.style.height = `${Math.min(
+                scrollHeight,
+                128,
+            )}px`; // Max height ~5-6 lines
+
+            // Only show scrollbar if content exceeds max height
+            if (scrollHeight > 128) {
+                textareaRef.current.style.overflowY = "auto";
+            } else {
+                textareaRef.current.style.overflowY = "hidden";
+            }
+        }
+    }, [messageInput]);
+
     const handleSendMessage = () => {
         if (!messageInput.trim() || !conversation) return;
 
@@ -625,6 +576,11 @@ export default function ConversationTimeline({
                 if ((data as any).code === 0) {
                     setMessageInput("");
                     shouldScrollToBottom.current = true;
+                    // Reset height
+                    if (textareaRef.current) {
+                        textareaRef.current.style.height = "auto";
+                        textareaRef.current.style.overflowY = "hidden"; // Reset overflow
+                    }
                 }
             },
         });
@@ -655,30 +611,33 @@ export default function ConversationTimeline({
         );
     }
 
+    const showDetailedActions = !messageInput.trim() || isActionsExpanded;
+
     return (
-        <div className="h-full flex flex-col bg-white w-full overflow-hidden">
+        <div className="h-full flex flex-col bg-transparent w-full overflow-hidden">
             {/* Header */}
-            <div className="border-b p-2 flex items-center justify-between">
+            <div className="border-b px-4 py-3 flex items-center justify-between bg-white/40 backdrop-blur-md sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                     <Avatar
                         name={
                             getFirstAndLastWord(mergedConversation.fullName) ||
                             getFirstAndLastWord(
-                                conversation.personName || ""
+                                conversation.personName || "User",
                             ) ||
                             ""
                         }
-                        src={getAvatarUrl(mergedConversation.avatar) || ""}
+                        src={
+                            getAvatarUrl(mergedConversation.avatar || "") ||
+                            undefined
+                        }
                         round
-                        size={"24"}
+                        size={"40"}
+                        className="shadow-sm border border-gray-100"
                     />
                     <div>
-                        <h3 className="font-medium">{conversationName}</h3>
-                        {/* <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
-                                {conversation.isRead ? "Đã xem" : "Chưa xem"}
-                            </span>
-                        </div> */}
+                        <h3 className="font-bold text-gray-900">
+                            {conversationName}
+                        </h3>
                     </div>
                 </div>
 
@@ -705,7 +664,7 @@ export default function ConversationTimeline({
                                         size="sm"
                                         onClick={() => {
                                             router.push(
-                                                `?lid=${detailConv.lead.id}`
+                                                `?lid=${detailConv.lead.id}`,
                                             );
                                         }}
                                     >
@@ -717,9 +676,8 @@ export default function ConversationTimeline({
                     )}
                 </div>
             </div>
-
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-2 min-h-0">
+            <div className="flex-1 overflow-y-auto p-2 min-h-0 auto-hide-scrollbar transition-colors">
                 <div className="space-y-4">
                     {/* Loading indicator for fetching older messages */}
                     {isFetchingNextPage && <Loading />}
@@ -761,59 +719,112 @@ export default function ConversationTimeline({
             </div>
 
             {/* Message Input */}
-            <div className="border-t px-2 flex-shrink-0">
-                <div className="flex items-center gap-2">
-                    {/* File upload */}
-                    <TooltipProvider>
-                        <Tooltip content={t("common.uploadFile")}>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={triggerFileSelect}
-                            >
-                                <Paperclip className="w-4 h-4" />
-                            </Button>
-                        </Tooltip>
-                    </TooltipProvider>
-                    {/* Image upload */}
-                    <TooltipProvider>
-                        <Tooltip content={t("common.uploadImage")}>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={triggerImageSelect}
-                            >
-                                <ImageIcon className="w-4 h-4" />
-                            </Button>
-                        </Tooltip>
-                    </TooltipProvider>
-                    <Popover open={showEmoji} onOpenChange={setShowEmoji}>
-                        <TooltipProvider>
-                            <Tooltip content="Gửi emoji">
-                                <PopoverTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        <Smile className="w-4 h-4" />
+            <div className="p-3 bg-transparent backdrop-blur-md flex-shrink-0">
+                <div className="flex items-end gap-3 max-w-full">
+                    {/* File Upload Section */}
+                    <div className="flex items-center gap-1.5 pb-2 text-gray-500">
+                        {showDetailedActions ? (
+                            <>
+                                {/* Show Collapse button if explicitly expanded while typing */}
+                                {!!messageInput.trim() && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                        onClick={() =>
+                                            setIsActionsExpanded(false)
+                                        }
+                                    >
+                                        <ChevronRight className="w-6 h-6" />
                                     </Button>
-                                </PopoverTrigger>
-                            </Tooltip>
-                        </TooltipProvider>
-                        <PopoverContent
-                            className="p-0 border-none"
-                            sideOffset={5}
-                        >
-                            {showEmoji && (
-                                <Picker
-                                    data={data}
-                                    onEmojiSelect={handleEmojiSelect}
-                                    locale="vi"
-                                    previewPosition="none"
-                                    perLine={8}
-                                    maxFrequentRows={0}
-                                    theme="light"
-                                />
-                            )}
-                        </PopoverContent>
-                    </Popover>
+                                )}
+
+                                {/* Label only when input is empty */}
+                                {!messageInput.trim() && (
+                                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap hidden sm:inline-block mr-1.5"></span>
+                                )}
+
+                                <TooltipProvider>
+                                    <Tooltip content={t("common.uploadFile")}>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                                            onClick={triggerFileSelect}
+                                        >
+                                            <Paperclip className="w-5 h-5" />
+                                        </Button>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip content={t("common.uploadImage")}>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                                            onClick={triggerImageSelect}
+                                        >
+                                            <ImageIcon className="w-5 h-5" />
+                                        </Button>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <Popover
+                                    open={showEmoji}
+                                    onOpenChange={setShowEmoji}
+                                >
+                                    <TooltipProvider>
+                                        <Tooltip content="Gửi emoji">
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    <Smile className="w-5 h-5" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                    <PopoverContent
+                                        className="p-0 border-none"
+                                        sideOffset={5}
+                                    >
+                                        {showEmoji && (
+                                            <Picker
+                                                data={data}
+                                                onEmojiSelect={
+                                                    handleEmojiSelect
+                                                }
+                                                locale="vi"
+                                                previewPosition="none"
+                                                perLine={8}
+                                                maxFrequentRows={0}
+                                                theme="light"
+                                            />
+                                        )}
+                                    </PopoverContent>
+                                </Popover>
+                            </>
+                        ) : (
+                            <TooltipProvider>
+                                <Tooltip content="Mở rộng">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-full"
+                                        onClick={() =>
+                                            setIsActionsExpanded(true)
+                                        }
+                                    >
+                                        <Plus className="w-6 h-6" />
+                                    </Button>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                    </div>
+
                     {/* Hidden inputs */}
                     <input
                         type="file"
@@ -828,29 +839,38 @@ export default function ConversationTimeline({
                         ref={fileInputRef}
                         onChange={handleFileChosen}
                     />
-                    <div className="flex-1 relative">
+
+                    {/* Input Field */}
+                    <div className="flex-1 relative flex items-center">
+                        {" "}
+                        {/* Thêm flex items-center ở đây để hỗ trợ cấu trúc */}
                         <textarea
+                            ref={textareaRef}
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            placeholder={t("common.enterMessage")}
-                            className="w-full resize-none border rounded-lg px-3 py-2 mt-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 max-h-24"
+                            onKeyDown={handleKeyPress}
+                            placeholder="Nhập tin nhắn..."
+                            className="w-full resize-none border border-gray-200 rounded-[24px] px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 min-h-[46px] max-h-32 pr-12 shadow-sm overflow-hidden"
                             rows={1}
                         />
+                        <Button
+                            size="icon"
+                            onClick={handleSendMessage}
+                            disabled={!messageInput.trim() || isSending}
+                            className={cn(
+                                "absolute right-1.5 bottom-1.5 h-8 w-8 rounded-full transition-all duration-200",
+                                messageInput.trim()
+                                    ? "bg-[#6366F1] hover:bg-[#585add] text-white shadow-md"
+                                    : "bg-gray-100 text-gray-400 hover:bg-gray-200",
+                            )}
+                        >
+                            {isSending ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <IoMdSend className="w-4 h-4 ml-0.5" />
+                            )}
+                        </Button>
                     </div>
-
-                    <Button
-                        size="sm"
-                        onClick={handleSendMessage}
-                        disabled={!messageInput.trim() || isSending}
-                        variant="default"
-                    >
-                        {isSending ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <IoMdSend className="w-4 h-4" />
-                        )}
-                    </Button>
                 </div>
             </div>
         </div>

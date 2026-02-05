@@ -24,7 +24,7 @@ export function CustomerTimeline({
     // Ensure detail is loaded when arriving via lid param (URL restore)
     const { data: leadDetail } = useLeadDetailApi(
         orgId || "",
-        customer?.id || ""
+        customer?.id || "",
     );
 
     // Cleanup observer khi component unmount
@@ -43,7 +43,7 @@ export function CustomerTimeline({
     };
 
     return (
-        <div className="bg-background border-r h-full flex flex-col w-full">
+        <div className="bg-transparent border-r h-full flex flex-col w-full">
             {/* Header */}
             {/* <div className="border-b p-2 2xl:hidden">
                 <div className="flex items-center justify-between">

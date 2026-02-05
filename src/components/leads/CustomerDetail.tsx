@@ -177,7 +177,7 @@ export default function CustomerDetail({
 
     const customerDetail = customerDetailResponse?.content;
     const [customerFromLead, setCustomerFromLead] = useState<Customer | null>(
-        null
+        null,
     );
     const handleConvertToDeal = (data: ConvertToDealData) => {
         // The actual API call is now handled inside the ConvertToDealPopup component
@@ -207,7 +207,7 @@ export default function CustomerDetail({
             const getCustomer = async () => {
                 const response = await getCustomerDetail(
                     orgId || "",
-                    customerDetail?.customer?.id
+                    customerDetail?.customer?.id,
                 );
                 setCustomerFromLead(response.content);
             };
@@ -289,7 +289,7 @@ export default function CustomerDetail({
 
     const updateLeadFieldMutation = useUpdateLeadField(
         orgId || "",
-        customer?.id || ""
+        customer?.id || "",
     );
 
     interface TitleEditorProps {
@@ -304,7 +304,7 @@ export default function CustomerDetail({
 
     const updateLeadAvatarMutation = useUpdateLeadAvatar(
         orgId || "",
-        customer?.id || ""
+        customer?.id || "",
     );
 
     const TitleEditor = memo(function TitleEditor({
@@ -397,7 +397,7 @@ export default function CustomerDetail({
     });
 
     const handleAvatarChange = async (
-        e: React.ChangeEvent<HTMLInputElement>
+        e: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -439,12 +439,12 @@ export default function CustomerDetail({
                                 name={
                                     getFirstAndLastWord(
                                         customerDetail?.fullName ||
-                                            customer.fullName
+                                            customer.fullName,
                                     ) || ""
                                 }
                                 src={
                                     getAvatarUrl(
-                                        customerDetail?.avatar || ""
+                                        customerDetail?.avatar || "",
                                     ) || ""
                                 }
                                 round

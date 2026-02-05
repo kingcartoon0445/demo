@@ -29,7 +29,7 @@ import {
     Users,
     LayoutGrid,
     Building2,
-    Ban
+    Ban,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -68,7 +68,7 @@ function TeamItem({
             <div
                 className={cn(
                     "group flex items-center justify-between py-2 px-3 rounded-md transition-colors border border-transparent hover:bg-muted/50 hover:border-gray-100",
-                    currentRole && "bg-blue-50/50 border-blue-100"
+                    currentRole && "bg-blue-50/50 border-blue-100",
                 )}
                 style={{ paddingLeft: `${level * 20 + 12}px` }}
             >
@@ -90,22 +90,25 @@ function TeamItem({
                                 )}
                             </button>
                         ) : (
-                            <div className="w-4" /> 
+                            <div className="w-4" />
                         )}
                     </div>
 
                     {/* Team Info */}
                     <div className="flex flex-col truncate">
-                        <span className={cn(
-                            "text-sm font-medium truncate",
-                            currentRole ? "text-blue-700" : "text-gray-700"
-                        )}>
+                        <span
+                            className={cn(
+                                "text-sm font-medium truncate",
+                                currentRole ? "text-blue-700" : "text-gray-700",
+                            )}
+                        >
                             {team.name}
                         </span>
                         <div className="flex items-center gap-2">
-                             {hasChildren && (
+                            {hasChildren && (
                                 <span className="text-[10px] text-gray-400">
-                                    {team.childs.length} {t("team.subteam").toLowerCase()}
+                                    {team.childs.length}{" "}
+                                    {t("team.subteam").toLowerCase()}
                                 </span>
                             )}
                         </div>
@@ -116,20 +119,25 @@ function TeamItem({
                 <div className="flex-shrink-0 ml-4">
                     <Select
                         value={currentRole || ""}
-                        onValueChange={(value) => onTeamRoleChange(team.id, value)}
+                        onValueChange={(value) =>
+                            onTeamRoleChange(team.id, value)
+                        }
                     >
-                        <SelectTrigger 
+                        <SelectTrigger
                             className={cn(
                                 "h-8 w-[130px] text-xs transition-all",
-                                currentRole 
-                                    ? "border-blue-200 bg-white text-blue-700 focus:ring-blue-100" 
-                                    : "text-gray-500 border-gray-200 hover:border-gray-300"
+                                currentRole
+                                    ? "border-blue-200 bg-white text-blue-700 focus:ring-blue-100"
+                                    : "text-gray-500 border-gray-200 hover:border-gray-300",
                             )}
                         >
                             <SelectValue placeholder={t("role.selectRole")} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="unassigned" className="text-gray-400 italic">
+                            <SelectItem
+                                value="unassigned"
+                                className="text-gray-400 italic"
+                            >
                                 {t("common.unassigned") || "Unassigned"}
                             </SelectItem>
                             {availableRoles.map((role) => (
@@ -187,18 +195,22 @@ export default function AssignResourcesModal({
     const queryClient = useQueryClient();
 
     // -- State --
-    const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
-    const [selectedPermissionGroup, setSelectedPermissionGroup] = useState<string>("");
+    const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<
+        string | null
+    >(null);
+    const [selectedPermissionGroup, setSelectedPermissionGroup] =
+        useState<string>("");
     const [teamRoles, setTeamRoles] = useState<Record<string, string>>({});
     const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
 
     // -- Data --
     const { data: pgResponse } = usePermissionGroups(orgId);
-    const permissionGroups: PermissionGroup[] = (pgResponse?.content ?? [])
-        .filter((g: PermissionGroup) => g.scope === "WORKSPACE");
+    const permissionGroups: PermissionGroup[] = (
+        pgResponse?.content ?? []
+    ).filter((g: PermissionGroup) => g.scope === "WORKSPACE");
 
     const selectedWorkspace = unJoinWorkspaces.find(
-        (w) => w.workspaceId === selectedWorkspaceId
+        (w) => w.workspaceId === selectedWorkspaceId,
     );
 
     // -- Helpers --
@@ -255,7 +267,6 @@ export default function AssignResourcesModal({
                 throw new Error("Workspace permission is required");
             }
 
-
             // 1. Grant Workspace Level Role
             await grantUserRolesMultiple(orgId, selectedMemberId, {
                 roles: [
@@ -267,22 +278,27 @@ export default function AssignResourcesModal({
             });
 
             // 2. Grant Team Level Roles (Optional)
-            const teamRolesList = Object.entries(teamRoles).map(([teamId, role]) => ({
-                teamId,
-                role,
-            }));
-            
+            const teamRolesList = Object.entries(teamRoles).map(
+                ([teamId, role]) => ({
+                    teamId,
+                    role,
+                }),
+            );
+
             if (teamRolesList.length > 0) {
                 await grantUserTeamRolesMultiple(
                     orgId,
                     selectedMemberId,
                     selectedWorkspaceId,
-                    { roles: teamRolesList }
+                    { roles: teamRolesList },
                 );
             }
         },
         onSuccess: () => {
-            toast.success(t("permission.grantSuccess") || "Permissions granted successfully");
+            toast.success(
+                t("permission.grantSuccess") ||
+                    "Permissions granted successfully",
+            );
             handleClose();
             queryClient.invalidateQueries({
                 queryKey: ["userWorkspaceRoles", orgId, selectedMemberId],
@@ -290,7 +306,10 @@ export default function AssignResourcesModal({
         },
         onError: (error: any) => {
             console.error("Error granting roles:", error);
-            const msg = error?.response?.data?.message || t("common.error") || "An error occurred";
+            const msg =
+                error?.response?.data?.message ||
+                t("common.error") ||
+                "An error occurred";
             toast.error(msg);
         },
     });
@@ -308,7 +327,10 @@ export default function AssignResourcesModal({
                     </DialogTitle>
                     {member && (
                         <p className="text-sm text-gray-500 mt-1">
-                            {t("member.assigningTo")} <span className="font-semibold text-gray-900">{member.fullName}</span>
+                            {t("member.assigningTo")}{" "}
+                            <span className="font-semibold text-gray-900">
+                                {member.fullName}
+                            </span>
                         </p>
                     )}
                 </DialogHeader>
@@ -318,10 +340,12 @@ export default function AssignResourcesModal({
                         {/* 1. Workspace Section */}
                         <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs">1</div>
+                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs">
+                                    1
+                                </div>
                                 {t("workspace.selectWorkspace")}
                             </div>
-                            
+
                             {unJoinWorkspaces.length === 0 ? (
                                 <div className="p-4 border border-dashed rounded-lg text-center text-sm text-gray-500 bg-gray-50">
                                     {t("workspace.noAvailableWorkspace")}
@@ -339,12 +363,21 @@ export default function AssignResourcesModal({
                                     <SelectTrigger className="w-full h-11 border-gray-200 focus:ring-blue-100 focus:border-blue-400">
                                         <div className="flex items-center gap-2">
                                             <Building2 className="h-4 w-4 text-gray-400" />
-                                            <SelectValue placeholder={t("workspace.selectWorkspacePlaceholder") || "Choose a workspace..."} />
+                                            <SelectValue
+                                                placeholder={
+                                                    t(
+                                                        "workspace.selectWorkspacePlaceholder",
+                                                    ) || "Choose a workspace..."
+                                                }
+                                            />
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {unJoinWorkspaces.map((ws) => (
-                                            <SelectItem key={ws.workspaceId} value={ws.workspaceId}>
+                                            <SelectItem
+                                                key={ws.workspaceId}
+                                                value={ws.workspaceId}
+                                            >
                                                 {ws.workspaceName}
                                             </SelectItem>
                                         ))}
@@ -357,8 +390,10 @@ export default function AssignResourcesModal({
                             <>
                                 {/* 2. Permission Group Section */}
                                 <div className="space-y-4">
-                                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs">2</div>
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs">
+                                            2
+                                        </div>
                                         {t("permission.workspaceRole")}
                                     </div>
 
@@ -384,16 +419,22 @@ export default function AssignResourcesModal({
                                         </div> */}
 
                                         {permissionGroups.map((pg) => {
-                                             const isSelected = selectedPermissionGroup === pg.id;
-                                             return (
+                                            const isSelected =
+                                                selectedPermissionGroup ===
+                                                pg.id;
+                                            return (
                                                 <div
                                                     key={pg.id}
-                                                    onClick={() => setSelectedPermissionGroup(pg.id)}
+                                                    onClick={() =>
+                                                        setSelectedPermissionGroup(
+                                                            pg.id,
+                                                        )
+                                                    }
                                                     className={cn(
                                                         "cursor-pointer relative flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-200 hover:shadow-md",
                                                         isSelected
                                                             ? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-600"
-                                                            : "border-gray-200 bg-white hover:border-blue-200"
+                                                            : "border-gray-200 bg-white hover:border-blue-200",
                                                     )}
                                                 >
                                                     {isSelected && (
@@ -401,18 +442,34 @@ export default function AssignResourcesModal({
                                                             <Check className="h-4 w-4" />
                                                         </div>
                                                     )}
-                                                    <Shield className={cn("h-6 w-6 mb-2", isSelected ? "text-blue-600" : "text-gray-400")} />
-                                                    <span className={cn("text-sm font-medium text-center", isSelected ? "text-blue-900" : "text-gray-700")}>
+                                                    <Shield
+                                                        className={cn(
+                                                            "h-6 w-6 mb-2",
+                                                            isSelected
+                                                                ? "text-blue-600"
+                                                                : "text-gray-400",
+                                                        )}
+                                                    />
+                                                    <span
+                                                        className={cn(
+                                                            "text-sm font-medium text-center",
+                                                            isSelected
+                                                                ? "text-blue-900"
+                                                                : "text-gray-700",
+                                                        )}
+                                                    >
                                                         {pg.name}
                                                     </span>
                                                 </div>
-                                             );
+                                            );
                                         })}
                                     </div>
                                 </div>
 
                                 {/* 3. Teams Section */}
-                                {selectedWorkspace.teams.length > 0 && (
+
+                                {/* Anh phèo với thằng Long kêu ẩn đi. không phải tôi */}
+                                {/* {selectedWorkspace.teams.length > 0 && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
@@ -439,7 +496,7 @@ export default function AssignResourcesModal({
                                             ))}
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </>
                         )}
                     </div>
@@ -459,7 +516,9 @@ export default function AssignResourcesModal({
                         disabled={!isValid || isPending}
                         className={cn(
                             "min-w-[120px]",
-                            isValid ? "bg-blue-600 hover:bg-blue-700" : "opacity-50"
+                            isValid
+                                ? "bg-blue-600 hover:bg-blue-700"
+                                : "opacity-50",
                         )}
                     >
                         {isPending ? (

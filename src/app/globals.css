@@ -366,3 +366,19 @@ div[style="position: absolute; inset: 0px; display: flex; flex-direction: column
 .tox-tinymce {
     border: none !important;
 }
+
+/* Auto-hide Scrollbar Class */
+.auto-hide-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.auto-hide-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.auto-hide-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+}

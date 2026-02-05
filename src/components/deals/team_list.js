@@ -67,10 +67,10 @@ const CExpansionTile = ({ child, childs, onTap, style, index }) => {
                 <ContextMenuTrigger asChild>
                     <div
                         className={cn(
-                            `flex items-center py-2 pr-3 transition-all duration-400 border-l-[3px]`,
+                            `flex items-center p-2 border-b border-gray-100 cursor-pointer transition-all duration-200`,
                             teamId == child.id
-                                ? "bg-bg2 border-l-primary rounded-l-[4px]"
-                                : "border-l-transparent hover:bg-accent"
+                                ? "bg-white border-l-4 border-l-blue-600 outline-none"
+                                : "hover:bg-gray-50 border-l-4 border-l-transparent",
                         )}
                         onClick={() => {
                             if (!isExpanded) {
@@ -86,10 +86,11 @@ const CExpansionTile = ({ child, childs, onTap, style, index }) => {
                             {childs.length != 0 && (
                                 <div
                                     className={cn(
-                                        `text-2xl transition-transform ${isExpanded
-                                            ? "rotate-0"
-                                            : "-rotate-90"
-                                        }`
+                                        `text-2xl transition-transform ${
+                                            isExpanded
+                                                ? "rotate-0"
+                                                : "-rotate-90"
+                                        }`,
                                     )}
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -107,10 +108,10 @@ const CExpansionTile = ({ child, childs, onTap, style, index }) => {
                             round
                         />
                         <div className="leading-[1.2] ml-2">
-                            <div className="text-[16px] font-medium">
+                            <div className="text-sm font-medium text-gray-900">
                                 {name}
                             </div>
-                            <div className="text-text2 text-[14px]">
+                            <div className="text-xs text-gray-500">
                                 {managers.length === 0
                                     ? "Chưa có trưởng nhóm"
                                     : managers[0].fullName}
@@ -162,7 +163,7 @@ const CExpansionTile = ({ child, childs, onTap, style, index }) => {
                                         const response = await deleteTeam(
                                             orgId,
                                             workspaceId,
-                                            child.id
+                                            child.id,
                                         );
                                         return response;
                                     } catch (e) {
@@ -179,8 +180,8 @@ const CExpansionTile = ({ child, childs, onTap, style, index }) => {
                                     router.replace(
                                         pathname.replace(
                                             searchParams.get("teamId"),
-                                            ""
-                                        )
+                                            "",
+                                        ),
                                     );
                                 }
                                 setRefreshList();
@@ -203,7 +204,7 @@ const CExpansionTile = ({ child, childs, onTap, style, index }) => {
             <div
                 className={cn(
                     ` transition-[grid-template-rows] duration-500 grid grid-rows-[0fr]`,
-                    isExpanded && "grid-rows-[1fr]"
+                    isExpanded && "grid-rows-[1fr]",
                 )}
             >
                 <div className="overflow-hidden">

@@ -929,7 +929,7 @@ export default function ReminderConfigDialog({
                         >
                             {isSubmitting ? "Đang lưu..." : "Lưu"}
                         </Button>
-                    )}
+                    )}{" "}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

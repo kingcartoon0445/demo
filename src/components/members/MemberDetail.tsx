@@ -17,13 +17,17 @@ import { usePermissionGroups } from "@/hooks/useOrganizations";
 import { OrgMember, UserProfile, UserWorkspace } from "@/lib/interface";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+    Briefcase,
     ChevronDown,
     ChevronRight,
+    Edit3,
     MoreVertical,
     Settings,
+    Shield,
     Trash2,
     UserCheck,
     UserCog,
+    X,
 } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -101,21 +105,21 @@ export default function MemberDetail({
 
     // Filter permission groups by scope (like in AssignResourcesModal)
     const workspacePermissionGroups: Permission[] = allPermissionGroups.filter(
-        (group: PermissionGroup) => group.scope === "WORKSPACE"
+        (group: PermissionGroup) => group.scope === "WORKSPACE",
     );
 
     const organizationPermissionGroups: Permission[] =
         allPermissionGroups.filter(
-            (group: PermissionGroup) => group.scope === "ORGANIZATION"
+            (group: PermissionGroup) => group.scope === "ORGANIZATION",
         );
 
     const [expandedWorkspaces, setExpandedWorkspaces] = useState<Set<string>>(
-        new Set()
+        new Set(),
     );
     const [openTeamMenuId, setOpenTeamMenuId] = useState<string | null>(null);
     const [openWsMenuId, setOpenWsMenuId] = useState<string | null>(null);
     const [showWsPermissions, setShowWsPermissions] = useState<string | null>(
-        null
+        null,
     );
     const [showTeamRoles, setShowTeamRoles] = useState<string | null>(null);
     const [showOrgPermissions, setShowOrgPermissions] = useState(false);
@@ -200,7 +204,7 @@ export default function MemberDetail({
     };
 
     const handleGrantOrganizationPermission = async (
-        permission: Permission
+        permission: Permission,
     ) => {
         if (!orgId || !member.profileId) return;
 
@@ -220,7 +224,7 @@ export default function MemberDetail({
                     toast.success(
                         t("success.grantedPermission", {
                             permissionName: permission.name,
-                        })
+                        }),
                     );
                     setShowOrgPermissions(false);
 
@@ -243,14 +247,14 @@ export default function MemberDetail({
                     setIsLoading(false);
                     closeConfirmDialog();
                 }
-            }
+            },
         );
     };
 
     const showConfirmDialog = (
         title: string,
         description: string,
-        onConfirm: () => void
+        onConfirm: () => void,
     ) => {
         setConfirmDialog({
             open: true,
@@ -300,14 +304,14 @@ export default function MemberDetail({
                     setIsLoading(false);
                     closeConfirmDialog();
                 }
-            }
+            },
         );
     };
 
     const handleRemoveMemberFromTeam = async (
         workspaceId: string,
         teamId: string,
-        teamName: string
+        teamName: string,
     ) => {
         if (!orgId || !member.profileId) return;
 
@@ -324,7 +328,7 @@ export default function MemberDetail({
                         orgId,
                         workspaceId,
                         teamId,
-                        member.profileId
+                        member.profileId,
                     );
                     toast.success(t("success.removedFromTeam", { teamName }));
                     setOpenTeamMenuId(null);
@@ -336,13 +340,13 @@ export default function MemberDetail({
                     setIsLoading(false);
                     closeConfirmDialog();
                 }
-            }
+            },
         );
     };
 
     const handleGrantWorkspacePermission = async (
         workspaceId: string,
-        permission: Permission
+        permission: Permission,
     ) => {
         if (!orgId || !member.profileId) return;
         setIsLoading(true);
@@ -354,7 +358,7 @@ export default function MemberDetail({
             toast.success(
                 t("success.grantedPermission", {
                     permissionName: permission.name,
-                })
+                }),
             );
             setShowWsPermissions(null);
             setOpenWsMenuId(null);
@@ -370,7 +374,7 @@ export default function MemberDetail({
     const handleUpdateTeamRole = async (
         workspaceId: string,
         teamId: string,
-        role: string
+        role: string,
     ) => {
         if (!orgId || !member.profileId) return;
 
@@ -383,7 +387,7 @@ export default function MemberDetail({
             toast.success(
                 t("success.updatedRole", {
                     roleName: getTypeOfTeamLabel(role, t),
-                })
+                }),
             );
             setShowTeamRoles(null);
             setOpenTeamMenuId(null);
@@ -398,7 +402,7 @@ export default function MemberDetail({
 
     const handleRemoveMemberFromWorkspace = async (
         workspaceId: string,
-        workspaceName: string
+        workspaceName: string,
     ) => {
         if (!orgId || !member.profileId) return;
 
@@ -414,7 +418,7 @@ export default function MemberDetail({
                     await removeWorkspaceMember(
                         orgId,
                         workspaceId,
-                        member.profileId
+                        member.profileId,
                     );
                     toast.success(t("success.removedFromWorkspace"));
                     setOpenWsMenuId(null);
@@ -426,7 +430,7 @@ export default function MemberDetail({
                     setIsLoading(false);
                     closeConfirmDialog();
                 }
-            }
+            },
         );
     };
 
@@ -450,7 +454,7 @@ export default function MemberDetail({
                             <p className="text-sm text-gray-500">
                                 {getTypeOfEmployeeLabel(
                                     member.typeOfEmployee,
-                                    t
+                                    t,
                                 )}
                             </p>
                             {member.typeOfEmployee !== "OWNER" && (
@@ -461,7 +465,7 @@ export default function MemberDetail({
                                     <button
                                         onClick={() =>
                                             setShowOrgPermissions(
-                                                !showOrgPermissions
+                                                !showOrgPermissions,
                                             )
                                         }
                                         className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-200 transition-colors"
@@ -469,7 +473,7 @@ export default function MemberDetail({
                                     >
                                         {memberProfile?.role?.name ||
                                             t(
-                                                "permission.organizationPermission"
+                                                "permission.organizationPermission",
                                             )}
                                         <ChevronDown className="w-3 h-3 inline ml-1" />
                                     </button>
@@ -478,14 +482,14 @@ export default function MemberDetail({
                                         <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-lg py-1 z-50">
                                             <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">
                                                 {t(
-                                                    "permission.selectOrgPermission"
+                                                    "permission.selectOrgPermission",
                                                 )}
                                             </div>
                                             {organizationPermissionGroups.length ===
                                             0 ? (
                                                 <div className="px-3 py-2 text-sm text-gray-500">
                                                     {t(
-                                                        "permission.noOrgGroups"
+                                                        "permission.noOrgGroups",
                                                     )}
                                                 </div>
                                             ) : (
@@ -510,7 +514,7 @@ export default function MemberDetail({
                                                                         !isCurrentRole
                                                                     ) {
                                                                         handleGrantOrganizationPermission(
-                                                                            permission
+                                                                            permission,
                                                                         );
                                                                     }
                                                                 }}
@@ -529,7 +533,7 @@ export default function MemberDetail({
                                                                 )}
                                                             </button>
                                                         );
-                                                    }
+                                                    },
                                                 )
                                             )}
                                         </div>
@@ -615,11 +619,11 @@ export default function MemberDetail({
                                     </label>
                                     <p className="text-sm text-gray-900">
                                         {new Date(
-                                            member.createdDate
+                                            member.createdDate,
                                         ).toLocaleDateString(
                                             language === "vi"
                                                 ? "vi-VN"
-                                                : "en-US"
+                                                : "en-US",
                                         )}
                                     </p>
                                 </div>
@@ -650,7 +654,7 @@ export default function MemberDetail({
                                                     className="flex items-center space-x-2 flex-1 text-left"
                                                     onClick={() =>
                                                         toggleWorkspaceExpansion(
-                                                            workspace.workspaceId
+                                                            workspace.workspaceId,
                                                         )
                                                     }
                                                 >
@@ -670,7 +674,7 @@ export default function MemberDetail({
                                                     ) : (
                                                         <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
                                                             {t(
-                                                                "permission.noPermission"
+                                                                "permission.noPermission",
                                                             )}
                                                         </span>
                                                     )}
@@ -689,12 +693,12 @@ export default function MemberDetail({
                                                                       .teams
                                                                       .length
                                                               } ${t(
-                                                                  "team.teams"
+                                                                  "team.teams",
                                                               )}`
                                                             : t("team.noTeams")}
                                                     </span>
                                                     {expandedWorkspaces.has(
-                                                        workspace.workspaceId
+                                                        workspace.workspaceId,
                                                     ) ? (
                                                         <ChevronDown className="w-4 h-4 text-gray-400" />
                                                     ) : (
@@ -715,7 +719,7 @@ export default function MemberDetail({
                                                                     openWsMenuId ===
                                                                         workspace.workspaceId
                                                                         ? null
-                                                                        : workspace.workspaceId
+                                                                        : workspace.workspaceId,
                                                                 );
                                                             }}
                                                         >
@@ -730,7 +734,7 @@ export default function MemberDetail({
                                                                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
                                                                         onMouseEnter={() =>
                                                                             handleShowWsPermissions(
-                                                                                workspace.workspaceId
+                                                                                workspace.workspaceId,
                                                                             )
                                                                         }
                                                                         onMouseLeave={() =>
@@ -739,7 +743,7 @@ export default function MemberDetail({
                                                                     >
                                                                         <Settings className="w-4 h-4" />
                                                                         {t(
-                                                                            "workspace.permissions"
+                                                                            "workspace.permissions",
                                                                         )}
                                                                     </button>
 
@@ -748,7 +752,7 @@ export default function MemberDetail({
                                                                         onClick={() =>
                                                                             handleRemoveMemberFromWorkspace(
                                                                                 workspace.workspaceId,
-                                                                                workspace.workspaceName
+                                                                                workspace.workspaceName,
                                                                             )
                                                                         }
                                                                         disabled={
@@ -757,7 +761,7 @@ export default function MemberDetail({
                                                                     >
                                                                         <Trash2 className="w-4 h-4" />
                                                                         {t(
-                                                                            "workspace.removeFromWorkspace"
+                                                                            "workspace.removeFromWorkspace",
                                                                         )}
                                                                     </button>
                                                                     {showWsPermissions ===
@@ -766,7 +770,7 @@ export default function MemberDetail({
                                                                             className="absolute right-full top-0 mr-1 w-48 bg-white border rounded-lg py-1"
                                                                             onMouseEnter={() =>
                                                                                 handleShowWsPermissions(
-                                                                                    workspace.workspaceId
+                                                                                    workspace.workspaceId,
                                                                                 )
                                                                             }
                                                                             onMouseLeave={
@@ -776,14 +780,14 @@ export default function MemberDetail({
                                                                             {workspacePermissionGroups
                                                                                 .filter(
                                                                                     (
-                                                                                        permission
+                                                                                        permission,
                                                                                     ) =>
                                                                                         permission.id !==
-                                                                                        workspace.groupId
+                                                                                        workspace.groupId,
                                                                                 )
                                                                                 .map(
                                                                                     (
-                                                                                        permission
+                                                                                        permission,
                                                                                     ) => (
                                                                                         <button
                                                                                             key={
@@ -791,12 +795,12 @@ export default function MemberDetail({
                                                                                             }
                                                                                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                                                                                             onMouseDown={(
-                                                                                                e
+                                                                                                e,
                                                                                             ) => {
                                                                                                 e.preventDefault();
                                                                                                 handleGrantWorkspacePermission(
                                                                                                     workspace.workspaceId,
-                                                                                                    permission
+                                                                                                    permission,
                                                                                                 );
                                                                                             }}
                                                                                             disabled={
@@ -807,20 +811,20 @@ export default function MemberDetail({
                                                                                                 permission.name
                                                                                             }
                                                                                         </button>
-                                                                                    )
+                                                                                    ),
                                                                                 )}
                                                                             {workspacePermissionGroups.filter(
                                                                                 (
-                                                                                    permission
+                                                                                    permission,
                                                                                 ) =>
                                                                                     permission.id !==
-                                                                                    workspace.groupId
+                                                                                    workspace.groupId,
                                                                             )
                                                                                 .length ===
                                                                                 0 && (
                                                                                 <div className="px-4 py-2 text-sm text-gray-500">
                                                                                     {t(
-                                                                                        "workspace.noOtherPermissions"
+                                                                                        "workspace.noOtherPermissions",
                                                                                     )}
                                                                                 </div>
                                                                             )}
@@ -833,7 +837,7 @@ export default function MemberDetail({
                                                 </div>
                                             </div>
                                             {expandedWorkspaces.has(
-                                                workspace.workspaceId
+                                                workspace.workspaceId,
                                             ) && (
                                                 <div className="border-t border-gray-200 p-3 bg-gray-50">
                                                     {workspace.teams.length ===
@@ -860,7 +864,7 @@ export default function MemberDetail({
                                                                             <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
                                                                                 {getTypeOfTeamLabel(
                                                                                     team.role,
-                                                                                    t
+                                                                                    t,
                                                                                 )}
                                                                             </span>
 
@@ -879,7 +883,7 @@ export default function MemberDetail({
                                                                                             openTeamMenuId ===
                                                                                                 team.teamId
                                                                                                 ? null
-                                                                                                : team.teamId
+                                                                                                : team.teamId,
                                                                                         )
                                                                                     }
                                                                                 >
@@ -894,7 +898,7 @@ export default function MemberDetail({
                                                                                                 className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
                                                                                                 onMouseEnter={() =>
                                                                                                     handleShowTeamRoles(
-                                                                                                        team.teamId
+                                                                                                        team.teamId,
                                                                                                     )
                                                                                                 }
                                                                                                 onMouseLeave={() =>
@@ -903,7 +907,7 @@ export default function MemberDetail({
                                                                                             >
                                                                                                 <UserCheck className="w-4 h-4" />
                                                                                                 {t(
-                                                                                                    "team.updateRole"
+                                                                                                    "team.updateRole",
                                                                                                 )}
                                                                                             </button>
 
@@ -913,7 +917,7 @@ export default function MemberDetail({
                                                                                                     className="absolute right-full top-0 mr-1 w-48 bg-white border rounded-lg py-1"
                                                                                                     onMouseEnter={() =>
                                                                                                         handleShowTeamRoles(
-                                                                                                            team.teamId
+                                                                                                            team.teamId,
                                                                                                         )
                                                                                                     }
                                                                                                     onMouseLeave={
@@ -923,14 +927,14 @@ export default function MemberDetail({
                                                                                                     {teamRoles
                                                                                                         .filter(
                                                                                                             (
-                                                                                                                role
+                                                                                                                role,
                                                                                                             ) =>
                                                                                                                 role.value !==
-                                                                                                                team.role
+                                                                                                                team.role,
                                                                                                         )
                                                                                                         .map(
                                                                                                             (
-                                                                                                                role
+                                                                                                                role,
                                                                                                             ) => (
                                                                                                                 <button
                                                                                                                     key={
@@ -938,13 +942,13 @@ export default function MemberDetail({
                                                                                                                     }
                                                                                                                     className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                                                                                                                     onMouseDown={(
-                                                                                                                        e
+                                                                                                                        e,
                                                                                                                     ) => {
                                                                                                                         e.preventDefault();
                                                                                                                         handleUpdateTeamRole(
                                                                                                                             workspace.workspaceId,
                                                                                                                             team.teamId,
-                                                                                                                            role.value
+                                                                                                                            role.value,
                                                                                                                         );
                                                                                                                     }}
                                                                                                                     disabled={
@@ -955,20 +959,20 @@ export default function MemberDetail({
                                                                                                                         role.label
                                                                                                                     }
                                                                                                                 </button>
-                                                                                                            )
+                                                                                                            ),
                                                                                                         )}
                                                                                                     {teamRoles.filter(
                                                                                                         (
-                                                                                                            role
+                                                                                                            role,
                                                                                                         ) =>
                                                                                                             role.value !==
-                                                                                                            team.role
+                                                                                                            team.role,
                                                                                                     )
                                                                                                         .length ===
                                                                                                         0 && (
                                                                                                         <div className="px-4 py-2 text-sm text-gray-500">
                                                                                                             {t(
-                                                                                                                "team.noOtherRoles"
+                                                                                                                "team.noOtherRoles",
                                                                                                             )}
                                                                                                         </div>
                                                                                                     )}
@@ -982,7 +986,7 @@ export default function MemberDetail({
                                                                                                 handleRemoveMemberFromTeam(
                                                                                                     workspace.workspaceId,
                                                                                                     team.teamId,
-                                                                                                    team.teamName
+                                                                                                    team.teamName,
                                                                                                 )
                                                                                             }
                                                                                             disabled={
@@ -991,7 +995,7 @@ export default function MemberDetail({
                                                                                         >
                                                                                             <Trash2 className="w-4 h-4" />
                                                                                             {t(
-                                                                                                "team.removeFromTeam"
+                                                                                                "team.removeFromTeam",
                                                                                             )}
                                                                                         </button>
                                                                                     </div>
@@ -999,7 +1003,7 @@ export default function MemberDetail({
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                )
+                                                                ),
                                                             )}
                                                         </div>
                                                     )}

@@ -184,7 +184,7 @@ export default function AssignRatioDialog({
                         disabled={formState.isSubmitting}
                     >
                         Huỷ
-                    </Button>
+                    </Button>{" "}
                     {canSave && (
                         <Button
                             type="button"
@@ -195,7 +195,7 @@ export default function AssignRatioDialog({
                         >
                             {formState.isSubmitting ? "Đang lưu..." : "Lưu"}
                         </Button>
-                    )}
+                    )}{" "}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

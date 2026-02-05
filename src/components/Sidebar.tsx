@@ -67,7 +67,7 @@ import {
     ReportIcon,
     SettingIcon,
 } from "./icons";
-import { MdOutlineGroupAdd, MdMailOutline } from "react-icons/md";
+import { MdMailOutline, MdOutlineGroupAdd } from "react-icons/md";
 import { JoinOrg } from "./join_org";
 import { Button } from "./ui/button";
 import { useCustomSidebarMenu } from "@/hooks/useCustomSideBarMenu";
@@ -76,16 +76,15 @@ import { CreateOrgDialog } from "./create_org_dialog";
 import { getOrgUsageStatistics } from "@/api/org";
 import { useOrgStore } from "@/store/useOrgStore";
 import UpgradeSupscriptionDialog from "./upgrade_subscription_dialog";
+// import { Glass } from "./Glass";
+import { Settings, Triangle, X, HeartHandshake } from "lucide-react";
 
 type NavItem = {
     label: string;
     href?: string;
     icon?: LucideIcon | IconType;
     children?: NavItem[];
-    moduleCode?: string | null;
-    permission?: string;
 };
-
 const buildNavTree = (
     orgId: string,
     t: (key: string) => string,
@@ -214,30 +213,6 @@ type ApiMenuItem = {
     children?: ApiMenuItem[];
 };
 
-const getModuleCodeFromUrl = (url: string | undefined): string | null => {
-    if (!url) return null;
-    const lowerUrl = url.toLowerCase();
-    if (lowerUrl.includes("/leads")) return "LEAD";
-    if (lowerUrl.includes("/deals")) return "DEAL";
-    if (lowerUrl.includes("/customers")) return "CUSTOMER";
-    if (lowerUrl.includes("/automation")) return "AUTOMATION";
-    if (lowerUrl.includes("/reminders")) return "ACTIVITY";
-    if (lowerUrl.includes("/report")) return "REPORT";
-    if (lowerUrl.includes("/products")) return "PRODUCT";
-    if (lowerUrl.includes("/members")) return "USER";
-    if (lowerUrl.includes("/extend")) return "EXTENSION";
-    if (lowerUrl.includes("/mail-box")) return "EXTENSION";
-    if (lowerUrl.includes("/teams")) return "SALES_TEAM";
-    return null;
-};
-
-const getPermissionFromUrl = (url: string | undefined): string | null => {
-    if (!url) return null;
-    const lowerUrl = url.toLowerCase();
-    if (lowerUrl.includes("/mail-box")) return "INTEGRATION_MAILBOX.CREATE";
-    return null;
-};
-
 const mapApiToNavItems = (
     items: ApiMenuItem[] = [],
     orgId: string,
@@ -287,6 +262,29 @@ const mapApiToNavItems = (
                         : undefined,
             };
         });
+};
+const getModuleCodeFromUrl = (url: string | undefined): string | null => {
+    if (!url) return null;
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes("/leads")) return "LEAD";
+    if (lowerUrl.includes("/deals")) return "DEAL";
+    if (lowerUrl.includes("/customers")) return "CUSTOMER";
+    if (lowerUrl.includes("/automation")) return "AUTOMATION";
+    if (lowerUrl.includes("/reminders")) return "ACTIVITY";
+    if (lowerUrl.includes("/report")) return "REPORT";
+    if (lowerUrl.includes("/products")) return "PRODUCT";
+    if (lowerUrl.includes("/members")) return "USER";
+    if (lowerUrl.includes("/extend")) return "EXTENSION";
+    if (lowerUrl.includes("/mail-box")) return "EXTENSION";
+    if (lowerUrl.includes("/teams")) return "SALES_TEAM";
+    return null;
+};
+
+const getPermissionFromUrl = (url: string | undefined): string | null => {
+    if (!url) return null;
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes("/mail-box")) return "INTEGRATION_MAILBOX.CREATE";
+    return null;
 };
 
 export default function Sidebar() {
@@ -388,14 +386,6 @@ export default function Sidebar() {
             );
             router.push(newPath);
         }
-    };
-
-    const handleLogout = () => {
-        // Remove auth tokens first
-        removeAuthTokens();
-        // Remove all queries without triggering refetch
-        queryClient.removeQueries();
-        router.push("/sign-in");
     };
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -631,6 +621,409 @@ export default function Sidebar() {
         }
     };
 
+    // Function to render custom SVGs with specific animations
+    const renderIcon = (id: string) => {
+        switch (id) {
+            case "care":
+            case "leads": // Heart Handshake Icon
+                return (
+                    <HeartHandshake
+                        className="icon-animate-hand-shake"
+                        size={20}
+                    />
+                );
+            case "members": // The old 'care' icon (Users hugging)
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        {/* Left User */}
+                        <g
+                            className="icon-animate-hug-left"
+                            style={{
+                                transformOrigin: "center",
+                                transformBox: "fill-box",
+                            }}
+                        >
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                        </g>
+                        {/* Right User - Moves left to hug */}
+                        <g
+                            className="icon-animate-hug-right"
+                            style={{
+                                transformOrigin: "center",
+                                transformBox: "fill-box",
+                            }}
+                        >
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </g>
+                    </svg>
+                );
+            case "closing":
+            case "deals": // Grid flying in
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="7"
+                            height="7"
+                            className="icon-animate-grid-fly-tl"
+                        />
+                        <rect
+                            x="14"
+                            y="3"
+                            width="7"
+                            height="7"
+                            className="icon-animate-grid-fly-tr"
+                        />
+                        <rect
+                            x="14"
+                            y="14"
+                            width="7"
+                            height="7"
+                            className="icon-animate-grid-fly-br"
+                        />
+                        <rect
+                            x="3"
+                            y="14"
+                            width="7"
+                            height="7"
+                            className="icon-animate-grid-fly-bl"
+                        />
+                    </svg>
+                );
+            case "customers": // Message zoom
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="icon-animate-chat-grow origin-bottom-left"
+                    >
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                    </svg>
+                );
+            case "activity":
+            case "reminders": // Heartbeat drawing
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path
+                            d="M22 12h-4l-3 9L9 3l-3 9H2"
+                            className="icon-animate-zap-draw"
+                            strokeDasharray="60"
+                        />
+                    </svg>
+                );
+            case "report": // Pie chart slice
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                        <path
+                            d="M22 12A10 10 0 0 0 12 2v10z"
+                            className="icon-animate-pie-stick"
+                        />
+                    </svg>
+                );
+            case "automation": // Zap
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <polygon
+                            points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+                            className="group-hover:fill-yellow-400 group-hover:text-yellow-600 transition-colors duration-300"
+                        />
+                    </svg>
+                );
+            case "products": // Box opening
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path
+                            d="m7.5 4.27 9 5.15"
+                            className="icon-animate-box-open"
+                        />
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                        <path d="m3.3 7 8.7 5 8.7-5" />
+                        <path d="M12 22V12" />
+                    </svg>
+                );
+            case "docs": // Text lines running
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line
+                            x1="16"
+                            x2="8"
+                            y1="13"
+                            y2="13"
+                            className="icon-animate-text-write"
+                            strokeDasharray="12"
+                        />
+                        <line
+                            x1="16"
+                            x2="8"
+                            y1="17"
+                            y2="17"
+                            className="icon-animate-text-write icon-animate-text-write-delay-1"
+                            strokeDasharray="12"
+                        />
+                        <line
+                            x1="10"
+                            x2="8"
+                            y1="9"
+                            y2="9"
+                            className="icon-animate-text-write icon-animate-text-write-delay-2"
+                            strokeDasharray="12"
+                        />
+                    </svg>
+                );
+            case "store":
+            case "extend": // Bag lift
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                        <path d="M3 6h18" />
+                        <path
+                            d="M16 10a4 4 0 0 1-8 0"
+                            className="icon-animate-bag-lift"
+                        />
+                    </svg>
+                );
+            case "settings": // Settings gear with spin animation
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="group-hover:animate-spin"
+                    >
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                );
+            case "teams": // Teams/Users icon with animation
+                return (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="icon-animate-icon-scale"
+                    >
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                );
+            default:
+                return null;
+        }
+    };
+
+    // Helper function to get icon id from href or label
+    const getIconId = (href?: string, label?: string): string => {
+        if (!href && !label) return "";
+        const path = href || label || "";
+
+        // Check path first
+        if (path.includes("/leads")) return "leads";
+        if (path.includes("/deals")) return "deals";
+        if (path.includes("/customers")) return "customers";
+        if (path.includes("/automation")) return "automation";
+        if (path.includes("/reminders")) return "reminders";
+        if (path.includes("/report")) return "report";
+        if (path.includes("/products")) return "products";
+        if (path.includes("/members")) return "members";
+        if (path.includes("/extend")) return "extend";
+        if (path.includes("/teams")) return "teams";
+        if (path.includes("/settings")) return "settings";
+
+        // Fallback to label - normalize Vietnamese text
+        const labelLower = (label || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, ""); // Remove diacritics for better matching
+
+        // Exact matches first
+        if (
+            labelLower === "chăm khách" ||
+            labelLower.includes("cham khach") ||
+            labelLower.includes("lead")
+        )
+            return "leads";
+        if (
+            labelLower === "khách hàng" ||
+            labelLower.includes("khach hang") ||
+            labelLower.includes("customer")
+        )
+            return "customers";
+        if (
+            labelLower === "hoạt động" ||
+            labelLower.includes("hoat dong") ||
+            labelLower.includes("activity")
+        )
+            return "reminders";
+        if (
+            labelLower === "báo cáo" ||
+            labelLower.includes("bao cao") ||
+            labelLower.includes("report")
+        )
+            return "report";
+        if (
+            labelLower === "sản phẩm" ||
+            labelLower.includes("san pham") ||
+            labelLower.includes("product")
+        )
+            return "products";
+        if (
+            labelLower === "đội sale" ||
+            labelLower.includes("doi sale") ||
+            labelLower.includes("team")
+        )
+            return "teams";
+        if (
+            labelLower === "mở rộng" ||
+            labelLower.includes("mo rong") ||
+            labelLower.includes("extend")
+        )
+            return "extend";
+
+        // Partial matches
+        if (labelLower.includes("chăm") || labelLower.includes("cham"))
+            return "leads";
+        if (
+            labelLower.includes("deal") ||
+            labelLower.includes("chốt") ||
+            labelLower.includes("chot")
+        )
+            return "deals";
+        if (labelLower.includes("khách") || labelLower.includes("khach"))
+            return "customers";
+        if (labelLower.includes("automation")) return "automation";
+        if (labelLower.includes("hoạt") || labelLower.includes("hoat"))
+            return "reminders";
+        if (labelLower.includes("báo") || labelLower.includes("bao"))
+            return "report";
+        if (labelLower.includes("sản") || labelLower.includes("san"))
+            return "products";
+        if (
+            labelLower.includes("member") ||
+            labelLower.includes("thành viên") ||
+            labelLower.includes("thanh vien")
+        )
+            return "members";
+        if (labelLower.includes("mở") || labelLower.includes("mo"))
+            return "extend";
+        if (
+            labelLower.includes("setting") ||
+            labelLower.includes("cài đặt") ||
+            labelLower.includes("cai dat")
+        )
+            return "settings";
+        if (labelLower.includes("đội") || labelLower.includes("doi"))
+            return "teams";
+
+        return "";
+    };
+
     const renderItems = (items: NavItem[], level = 0): React.ReactNode => {
         return items.map((item) => {
             const key = item.href ?? item.label;
@@ -644,18 +1037,30 @@ export default function Sidebar() {
                         <button
                             onClick={() => toggleNode(key)}
                             className={cn(
-                                "flex items-center gap-2 w-full text-left px-4 py-2 rounded-md hover:bg-[oklch(0.65_0.28_276_/_0.05)]",
+                                "flex items-center gap-2 w-full text-left px-4 py-2 rounded-md hover:bg-[oklch(0.65_0.28_276/0.05)]",
                                 indentCls(level),
                                 isCollapsed && "justify-center px-2",
                             )}
                         >
                             <div className="flex items-center gap-2">
-                                {item.icon && (
-                                    <item.icon
-                                        className="size-5 shrink-0 text-[#646A73]"
-                                        style={{ color: "#646A73" }}
-                                    />
-                                )}
+                                {(() => {
+                                    const iconId = getIconId(
+                                        item.href,
+                                        item.label,
+                                    );
+                                    const animatedIcon = iconId
+                                        ? renderIcon(iconId)
+                                        : null;
+                                    return (
+                                        animatedIcon ||
+                                        (item.icon ? (
+                                            <item.icon
+                                                className="size-5 shrink-0 text-[#646A73]"
+                                                style={{ color: "#646A73" }}
+                                            />
+                                        ) : null)
+                                    );
+                                })()}
                                 {!isCollapsed && <span>{item.label}</span>}
                             </div>
                             {!isCollapsed && (
@@ -680,16 +1085,25 @@ export default function Sidebar() {
                     <Link
                         href={item.href ?? "#"}
                         className={cn(
-                            "group flex items-center gap-3 px-4 py-2 text-sm rounded-md hover:bg-[oklch(0.65_0.28_276_/_0.1)] transition-colors",
+                            "group flex items-center gap-3 px-4 py-2 text-sm rounded-md hover:bg-[oklch(0.65_0.28_276/0.1)] transition-colors",
                             indentCls(level),
-                            isActive && "bg-[oklch(0.65_0.28_276_/_0.1)]",
+                            isActive && "bg-[oklch(0.65_0.28_276/0.1)]",
                             isCollapsed && "justify-center px-2",
                         )}
                         title={item.label}
                     >
-                        {item.icon && (
-                            <item.icon className="size-5 shrink-0 text-[#646A73]" />
-                        )}
+                        {(() => {
+                            const iconId = getIconId(item.href, item.label);
+                            const animatedIcon = iconId
+                                ? renderIcon(iconId)
+                                : null;
+                            return (
+                                animatedIcon ||
+                                (item.icon ? (
+                                    <item.icon className="size-5 shrink-0 text-[#646A73]" />
+                                ) : null)
+                            );
+                        })()}
                         {!isCollapsed && <span>{item.label}</span>}
                     </Link>
                 </li>
@@ -762,21 +1176,8 @@ export default function Sidebar() {
                 isManager ? undefined : permissions,
             );
         }
-        return selectedOrg
-            ? buildNavTree(
-                  selectedOrg.id,
-                  t,
-                  isManager ? undefined : permissions,
-              )
-            : [];
-    }, [
-        customMenuData?.data,
-        selectedOrg?.id,
-        language,
-        t,
-        permissions,
-        isManager,
-    ]);
+        return selectedOrg ? buildNavTree(selectedOrg.id, t) : [];
+    }, [customMenuData?.data, selectedOrg?.id, language, t]);
 
     // Banner thông báo hết hạn/gần hết hạn
     const [hideSubBanner, setHideSubBanner] = useState(() => {
@@ -886,12 +1287,12 @@ export default function Sidebar() {
             {showOrgSelector && (
                 <>
                     <div
-                        className="fixed inset-0 z-[35] bg-black/20"
+                        className="fixed inset-0 z-35 bg-black/20"
                         onClick={() => setShowOrgSelector(false)}
                     />
 
                     <div
-                        className="fixed z-[40] bg-background border border-border rounded-lg w-80 max-h-[calc(100vh-100px)] overflow-hidden"
+                        className="fixed z-40 bg-background border border-border rounded-lg w-80 max-h-[calc(100vh-100px)] overflow-hidden"
                         style={{
                             left: isCollapsed ? "64px" : "192px",
                             bottom: "12px",
@@ -972,7 +1373,7 @@ export default function Sidebar() {
                 </>
             )}
 
-            <nav
+            {/* <nav
                 className="hidden lg:flex h-[57px] bg-sidebar fixed right-0 transition-all duration-300 z-10 border-b"
                 style={{
                     top: `${bannerHeight}px`,
@@ -1037,8 +1438,7 @@ export default function Sidebar() {
                                                 name={userDetail?.fullName}
                                                 src={
                                                     getAvatarUrl(
-                                                        userDetail?.avatar ||
-                                                            "",
+                                                        userDetail?.avatar || ""
                                                     ) || undefined
                                                 }
                                                 alt="User Avatar"
@@ -1065,7 +1465,7 @@ export default function Sidebar() {
                                                     src={
                                                         getAvatarUrl(
                                                             userDetail?.avatar ||
-                                                                "",
+                                                                ""
                                                         ) || undefined
                                                     }
                                                     size="32"
@@ -1080,7 +1480,7 @@ export default function Sidebar() {
                                                     onClick={() => {
                                                         setShowUserMenu(false);
                                                         router.push(
-                                                            `/org/${selectedOrg?.id}/settings/my-account`,
+                                                            `/org/${selectedOrg?.id}/settings/my-account`
                                                         );
                                                     }}
                                                     className="text-xs text-muted-foreground underline cursor-pointer"
@@ -1098,7 +1498,7 @@ export default function Sidebar() {
                                                 onClick={() => {
                                                     setShowUserMenu(false);
                                                     router.push(
-                                                        `/org/${selectedOrg?.id}/wallet`,
+                                                        `/org/${selectedOrg?.id}/wallet`
                                                     );
                                                 }}
                                                 className="flex items-center justify-start gap-2 w-full border-none shadow-none rounded-none hover:bg-[oklch(0.65_0.28_276_/_0.1)] !px-4 !py-2"
@@ -1107,7 +1507,7 @@ export default function Sidebar() {
                                                 {t("nav.wallet")}:{" "}
                                                 <span className="font-bold text-primary">
                                                     {wallet?.credit.toLocaleString(
-                                                        "vi-VN",
+                                                        "vi-VN"
                                                     )}{" "}
                                                     Coin
                                                 </span>
@@ -1138,16 +1538,16 @@ export default function Sidebar() {
                         </div>
                     </div>
                 </div>
-            </nav>
+            </nav> */}
 
             {shouldShowBanner && (
                 <div
                     ref={bannerRef}
                     className={cn(
-                        "hidden lg:flex items-center gap-3 fixed top-0 right-0 z-20 border-b px-4 py-2 transition-all duration-300",
+                        "hidden lg:flex items-center gap-3 fixed top-0 right-0 z-20 border-b px-4 py-2 transition-all duration-300 backdrop-blur-md bg-white/20",
                         isExpired
-                            ? "bg-red-50 text-red-700 border-red-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200",
+                            ? "text-red-700 border-red-200"
+                            : "text-amber-700 border-amber-200",
                     )}
                     style={{
                         left: isCollapsed ? "64px" : sidebarWidth,
@@ -1197,87 +1597,138 @@ export default function Sidebar() {
 
             <aside
                 className={cn(
-                    "hidden lg:flex flex-col border-r bg-sidebar text-sidebar-foreground fixed top-0 left-0 z-20 transition-all duration-300 h-full",
-                    isCollapsed ? "w-16" : "w-48",
+                    "hidden lg:flex flex-col transition-all duration-300 h-full min-w-64",
                 )}
             >
-                <div className="relative">
-                    <div className="flex items-center justify-center gap-2 px-2 py-2">
-                        <div className="relative">
-                            {!isCollapsed ? (
+                <div className="h-full flex flex-col w-full rounded-none md:rounded-2xl bg-sidebar border-r">
+                    <div className="p-6 flex items-center justify-between border-b border-white/20">
+                        <div className="flex items-center space-x-3">
+                            <div className="group cursor-pointer">
                                 <Image
-                                    src={"/icons/txt-logo-hor.svg"}
-                                    alt="Workspace"
-                                    width={120}
-                                    height={32}
-                                    className="h-8 w-auto"
-                                />
-                            ) : (
-                                <Image
-                                    src={"/icons/logo_without_text.svg"}
-                                    alt="Workspace"
-                                    width={32}
-                                    height={32}
-                                    className="h-8 w-8 rounded-lg object-cover"
-                                />
-                            )}
-                        </div>
-
-                        {!isCollapsed && (
-                            <div className="flex-1 flex justify-end pt-2">
-                                <button
-                                    onClick={() => setIsCollapsed(!isCollapsed)}
-                                    className="p-1 hover:bg-sidebar-accent rounded-md transition-colors"
-                                >
-                                    <PanelLeftClose className="size-4" />
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    {isCollapsed && (
-                        <button
-                            onClick={() => setIsCollapsed(!isCollapsed)}
-                            className="absolute -right-8 top-4 bg-sidebar p-1 hover:bg-sidebar-accent transition-colors z-10"
-                        >
-                            <PanelRightClose className="size-4" />
-                        </button>
-                    )}
-                </div>
-
-                <nav className="flex-1 overflow-y-auto py-4 flex flex-col gap-2 justify-between">
-                    <ul className="space-y-1 text-sm">
-                        {renderItems(navItems)}
-                    </ul>
-                    <>
-                        <button
-                            onClick={() => setShowOrgSelector(!showOrgSelector)}
-                            className="flex items-center gap-2 hover:bg-sidebar-accent rounded-md px-4 py-2 transition-colors"
-                        >
-                            <div className="size-8 relative flex items-center justify-between">
-                                <Avatar
-                                    src={
-                                        getAvatarUrl(
-                                            selectedOrg?.avatar || "",
-                                        ) || undefined
-                                    }
-                                    name={selectedOrg?.name}
-                                    alt="Workspace"
-                                    size="32"
-                                    round
+                                    src="/icons/logo_without_text.svg"
+                                    alt="COKA LOGO"
+                                    width={40}
+                                    height={40}
+                                    className="transform transition-transform duration-300 group-hover:scale-110"
                                 />
                             </div>
                             {!isCollapsed && (
-                                <div className="flex items-center gap-1 min-w-0">
-                                    <span className="text-sm font-medium line-clamp-1 flex-1 min-w-[99.2px] text-left">
-                                        {selectedOrg?.name}
+                                <span className="font-bold text-2xl text-gray-800 tracking-tight drop-shadow-sm">
+                                    COKA
+                                </span>
+                            )}
+                        </div>
+
+                        {/* {!isCollapsed && (
+                            <button
+                                onClick={() => setIsCollapsed(!isCollapsed)}
+                                className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                            >
+                                <PanelLeftClose
+                                    size={20}
+                                    className="text-gray-600"
+                                />
+                            </button>
+                        )} */}
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto py-6 space-y-1.5 px-4 custom-scrollbar">
+                        {navItems.map((item) => {
+                            const key = item.href ?? item.label;
+                            let isActive =
+                                item.href && pathname.startsWith(item.href);
+
+                            // Special case for Settings to stay active on sub-pages
+                            if (
+                                item.href &&
+                                item.href.includes("/settings") &&
+                                pathname.includes("/settings")
+                            ) {
+                                isActive = true;
+                            }
+                            // Always try to get animated icon first
+                            const iconId = getIconId(item.href, item.label);
+                            const animatedIcon = iconId
+                                ? renderIcon(iconId)
+                                : null;
+                            // Debug: uncomment to see what's being matched
+                            // if (!animatedIcon && item.label) {
+                            //     console.log("No animation for:", item.label, "iconId:", iconId);
+                            // }
+
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => {
+                                        if (item.href) {
+                                            router.push(item.href);
+                                        }
+                                    }}
+                                    className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
+                                        isActive
+                                            ? "bg-white/40 text-gray-900 font-semibold shadow-lg border border-white/40 backdrop-blur-md"
+                                            : "text-gray-600 hover:bg-white/20 hover:text-gray-900 hover:shadow-md hover:border hover:border-white/10"
+                                    }`}
+                                >
+                                    <span
+                                        className={`relative z-10 transition-colors duration-300 ${
+                                            isActive
+                                                ? "text-indigo-600"
+                                                : "text-gray-500 group-hover:text-gray-800"
+                                        }`}
+                                    >
+                                        {animatedIcon ||
+                                            (item.icon ? (
+                                                <item.icon className="size-5" />
+                                            ) : null)}
                                     </span>
-                                    <ChevronsUpDown className="shrink-0 size-4" />
+                                    {!isCollapsed && (
+                                        <span className="relative z-10">
+                                            {item.label}
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* User Mini Profile */}
+                    <div className="p-4 backdrop-blur-md mt-auto border-t border-white/20">
+                        <button
+                            onClick={() => setShowOrgSelector(!showOrgSelector)}
+                            className="w-full flex items-center space-x-3"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-md border border-white/20">
+                                {selectedOrg?.name
+                                    ? selectedOrg.name
+                                          .substring(0, 2)
+                                          .toUpperCase()
+                                    : "ORG"}
+                            </div>
+                            {!isCollapsed && (
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-gray-800 truncate">
+                                        {selectedOrg?.name || "Organization"}
+                                    </p>
+                                    <p className="text-xs text-gray-500 truncate font-medium">
+                                        {orgDetail?.planName ||
+                                            orgDetail?.plan ||
+                                            "Enterprise Plan"}
+                                    </p>
                                 </div>
                             )}
                         </button>
-                    </>
-                </nav>
+                    </div>
+                </div>
+
+                {isCollapsed && (
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="absolute -right-8 top-4 bg-white/40 backdrop-blur-md p-1 hover:bg-white/60 transition-colors z-10 rounded-md border border-white/50"
+                    >
+                        <PanelRightClose className="size-4 text-gray-600" />
+                    </button>
+                )}
             </aside>
             {openJoinOrg && (
                 <JoinOrg

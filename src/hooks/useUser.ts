@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
 import { getAccessToken } from "@/lib/authCookies";
 import { getProfile } from "@/api/auth";
 import { getUserProfileDetail, updateProfile } from "@/api/user";
 import { toast } from "react-hot-toast";
+import { useParams } from "next/navigation";
 export interface User {
     id: string;
     fullName: string;

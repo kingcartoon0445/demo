@@ -79,6 +79,10 @@ export default function RecallConfigDialogNew({
                                 {...formState}
                                 editMode={editMode}
                             />
+                            <RecallConfigContent
+                                {...formState}
+                                editMode={editMode}
+                            />{" "}
                         </TabsContent>
 
                         <TabsContent value="history">
@@ -119,7 +123,7 @@ export default function RecallConfigDialogNew({
                         >
                             {formState.isSubmitting ? "Đang lưu..." : "Lưu"}
                         </Button>
-                    )}
+                    )}{" "}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

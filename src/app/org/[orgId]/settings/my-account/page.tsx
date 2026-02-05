@@ -1,5 +1,6 @@
 "use client";
 
+import { Glass } from "@/components/Glass";
 import { getOrgList } from "@/api/org";
 import { getUserWorkspaceRoles, getUserWorkspaceRolesV2 } from "@/api/user";
 import Avatar from "react-avatar";
@@ -78,7 +79,7 @@ export default function MyAccountPage() {
         [orgId: string]: Workspace[];
     }>({});
     const [loadingWorkspaces, setLoadingWorkspaces] = useState<Set<string>>(
-        new Set()
+        new Set(),
     );
     const [isEdit, setIsEdit] = useState(false);
     const [formData, setFormData] = useState({
@@ -152,7 +153,7 @@ export default function MyAccountPage() {
                 try {
                     const workspaces = await getUserWorkspaceRolesV2(
                         orgId,
-                        currentUser.data?.id
+                        currentUser.data?.id,
                     );
 
                     setWorkspaceData((prev) => ({
@@ -232,7 +233,7 @@ export default function MyAccountPage() {
                 [field]: value,
             }));
         },
-        []
+        [],
     );
 
     const handleSaveProfile = React.useCallback(async () => {
@@ -249,7 +250,7 @@ export default function MyAccountPage() {
                             const yyyy = date.getFullYear();
                             const mm = String(date.getMonth() + 1).padStart(
                                 2,
-                                "0"
+                                "0",
                             );
                             const dd = String(date.getDate()).padStart(2, "0");
                             formDataToSend.append(key, `${yyyy}-${mm}-${dd}`);
@@ -325,7 +326,7 @@ export default function MyAccountPage() {
                 reader.readAsDataURL(file);
             }
         },
-        []
+        [],
     );
 
     // Khởi tạo hooks ở top level
@@ -340,7 +341,7 @@ export default function MyAccountPage() {
         try {
             const workspaces = await getUserWorkspaceRoles(
                 orgId,
-                currentUser.data.id
+                currentUser.data.id,
             );
 
             setWorkspaceData((prev) => ({
@@ -369,7 +370,7 @@ export default function MyAccountPage() {
                     // Reload lại danh sách workspace sau khi rời thành công
                     reloadWorkspaceData(orgId);
                 },
-            }
+            },
         );
     };
 
@@ -378,9 +379,12 @@ export default function MyAccountPage() {
             {/* Left Column - Personal Info */}
             <div className="col-span-12 h-full">
                 {/* THÔNG TIN CHUNG */}
-                <div className="bg-white h-full overflow-y-auto">
+                <Glass
+                    intensity="medium"
+                    className="h-full overflow-y-auto rounded-2xl"
+                >
                     <div className="pt-0 h-full">
-                        <div className="bg-gray-50 px-6 py-2 h-full">
+                        <div className="px-6 py-4 h-full">
                             <div className="space-y-4">
                                 <div className="flex flex-row items-center gap-2">
                                     <User className="w-5 h-5 text-gray-600" />
@@ -449,12 +453,13 @@ export default function MyAccountPage() {
                                     <div className="relative">
                                         <Avatar
                                             name={getFirstAndLastWord(
-                                                currentUser.data?.fullName || ""
+                                                currentUser.data?.fullName ||
+                                                    "",
                                             )}
                                             src={
                                                 getAvatarUrl(
                                                     currentUser.data?.avatar ||
-                                                        ""
+                                                        "",
                                                 ) || ""
                                             }
                                             size={"96"}
@@ -464,7 +469,7 @@ export default function MyAccountPage() {
                                                 if (isEdit) {
                                                     document
                                                         .getElementById(
-                                                            "avatar-upload"
+                                                            "avatar-upload",
                                                         )
                                                         ?.click();
                                                 }
@@ -477,7 +482,7 @@ export default function MyAccountPage() {
                                                     onClick={() =>
                                                         document
                                                             .getElementById(
-                                                                "avatar-upload"
+                                                                "avatar-upload",
                                                             )
                                                             ?.click()
                                                     }
@@ -520,11 +525,11 @@ export default function MyAccountPage() {
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         "fullName",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder={t(
-                                                    "common.enterFullName"
+                                                    "common.enterFullName",
                                                 )}
                                                 autoComplete="off"
                                             />
@@ -548,11 +553,11 @@ export default function MyAccountPage() {
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         "email",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder={t(
-                                                    "common.enterEmail"
+                                                    "common.enterEmail",
                                                 )}
                                             />
                                         ) : (
@@ -572,11 +577,11 @@ export default function MyAccountPage() {
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         "phone",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder={t(
-                                                    "common.enterPhone"
+                                                    "common.enterPhone",
                                                 )}
                                             />
                                         ) : (
@@ -595,18 +600,18 @@ export default function MyAccountPage() {
                                                 onChange={(value) =>
                                                     handleInputChange(
                                                         "dob",
-                                                        value
+                                                        value,
                                                     )
                                                 }
                                                 placeholder={t(
-                                                    "common.enterDob"
+                                                    "common.enterDob",
                                                 )}
                                             />
                                         ) : (
                                             <div className="text-gray-500">
                                                 {currentUser.data?.dob
                                                     ? formatDate(
-                                                          currentUser.data.dob
+                                                          currentUser.data.dob,
                                                       )
                                                     : ""}
                                             </div>
@@ -625,14 +630,14 @@ export default function MyAccountPage() {
                                                 onValueChange={(value) =>
                                                     handleInputChange(
                                                         "gender",
-                                                        value
+                                                        value,
                                                     )
                                                 }
                                             >
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue
                                                         placeholder={t(
-                                                            "common.selectGender"
+                                                            "common.selectGender",
                                                         )}
                                                     />
                                                 </SelectTrigger>
@@ -650,9 +655,9 @@ export default function MyAccountPage() {
                                                 {currentUser.data?.gender === 1
                                                     ? t("common.male")
                                                     : currentUser.data
-                                                          ?.gender === 0
-                                                    ? t("common.female")
-                                                    : ""}
+                                                            ?.gender === 0
+                                                      ? t("common.female")
+                                                      : ""}
                                             </div>
                                         )}
                                     </div>
@@ -670,11 +675,11 @@ export default function MyAccountPage() {
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         "address",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder={t(
-                                                    "common.enterAddress"
+                                                    "common.enterAddress",
                                                 )}
                                             />
                                         ) : (
@@ -694,11 +699,11 @@ export default function MyAccountPage() {
                                                 onChange={(e) =>
                                                     handleInputChange(
                                                         "about",
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder={t(
-                                                    "common.enterAbout"
+                                                    "common.enterAbout",
                                                 )}
                                             />
                                         ) : (
@@ -731,25 +736,25 @@ export default function MyAccountPage() {
                                             (org: Organization) => (
                                                 <div
                                                     key={org.id}
-                                                    className="border rounded-lg overflow-hidden"
+                                                    className="rounded-2xl shadow-sm hover:shadow-md transition-all ring-1 ring-gray-100 bg-white"
                                                 >
                                                     {/* Organization Item */}
                                                     <div
-                                                        className="flex items-center gap-3 p-4 hover:bg-[oklch(0.65_0.28_276_/_0.1)] cursor-pointer transition-colors bg-white"
+                                                        className={`flex items-center gap-3 p-4 bg-white cursor-pointer ${expandedOrgs.has(org.id) ? "rounded-t-2xl" : "rounded-2xl"}`}
                                                         onClick={() =>
                                                             toggleOrganization(
-                                                                org.id
+                                                                org.id,
                                                             )
                                                         }
                                                     >
                                                         <Avatar
                                                             name={getFirstAndLastWord(
-                                                                org.name
+                                                                org.name,
                                                             )}
                                                             src={
                                                                 getAvatarUrl(
                                                                     org.avatar ||
-                                                                        ""
+                                                                        "",
                                                                 ) || ""
                                                             }
                                                             size={"32"}
@@ -765,16 +770,16 @@ export default function MyAccountPage() {
                                                                 <Badge
                                                                     variant="outline"
                                                                     className={getRoleColor(
-                                                                        org.typeOfEmployee
+                                                                        org.typeOfEmployee,
                                                                     )}
                                                                 >
                                                                     {getRoleText(
-                                                                        org.typeOfEmployee
+                                                                        org.typeOfEmployee,
                                                                     )}
                                                                 </Badge>
                                                             )}
                                                             {expandedOrgs.has(
-                                                                org.id
+                                                                org.id,
                                                             ) ? (
                                                                 <ChevronDown className="w-4 h-4 text-gray-400" />
                                                             ) : (
@@ -787,7 +792,7 @@ export default function MyAccountPage() {
                                                                     <Button
                                                                         variant="ghost"
                                                                         onClick={(
-                                                                            e
+                                                                            e,
                                                                         ) =>
                                                                             e.stopPropagation()
                                                                         }
@@ -795,7 +800,7 @@ export default function MyAccountPage() {
                                                                         <MoreVertical className="w-4 h-4 text-gray-400" />
                                                                     </Button>
                                                                 </PopoverTrigger>
-                                                                <PopoverContent>
+                                                                <PopoverContent className="w-40">
                                                                     <div className="w-full space-y-1">
                                                                         {(() => {
                                                                             const orgType =
@@ -813,9 +818,13 @@ export default function MyAccountPage() {
                                                                         })() && (
                                                                             <Button
                                                                                 variant="ghost"
-                                                                                className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                                                                size="sm"
+                                                                                style={{
+                                                                                    height: "24px",
+                                                                                }}
+                                                                                className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 transition-colors text-sm py-0 min-h-0"
                                                                                 onClick={(
-                                                                                    e
+                                                                                    e,
                                                                                 ) => {
                                                                                     e.stopPropagation();
                                                                                     setEditOrgState(
@@ -831,10 +840,10 @@ export default function MyAccountPage() {
                                                                                                                 [
                                                                                                                     "organizations",
                                                                                                                 ],
-                                                                                                        }
+                                                                                                        },
                                                                                                     );
                                                                                                 },
-                                                                                        }
+                                                                                        },
                                                                                     );
                                                                                 }}
                                                                             >
@@ -846,18 +855,22 @@ export default function MyAccountPage() {
                                                                         )}
                                                                         <Button
                                                                             variant="ghost"
-                                                                            className="w-full justify-start hover:bg-red-50 hover:text-red-600 transition-colors"
+                                                                            size="sm"
+                                                                            style={{
+                                                                                height: "24px",
+                                                                            }}
+                                                                            className="w-full justify-start hover:bg-red-50 text-red-600 hover:text-red-700 transition-colors text-sm py-0 min-h-0"
                                                                             onClick={(
-                                                                                e
+                                                                                e,
                                                                             ) => {
                                                                                 e.stopPropagation();
                                                                                 handleLeaveOrg(
-                                                                                    org.id
+                                                                                    org.id,
                                                                                 );
                                                                             }}
                                                                         >
                                                                             {t(
-                                                                                "common.leaveOrganization"
+                                                                                "common.leaveOrganization",
                                                                             )}
                                                                         </Button>
                                                                     </div>
@@ -868,15 +881,15 @@ export default function MyAccountPage() {
 
                                                     {/* Workspaces List */}
                                                     {expandedOrgs.has(
-                                                        org.id
+                                                        org.id,
                                                     ) && (
-                                                        <div className="border-t bg-gray-50">
+                                                        <div className="border-t bg-transparent">
                                                             {loadingWorkspaces.has(
-                                                                org.id
+                                                                org.id,
                                                             ) ? (
                                                                 <div className="p-4 text-center text-gray-500 text-sm">
                                                                     {t(
-                                                                        "common.loading"
+                                                                        "common.loading",
                                                                     )}
                                                                 </div>
                                                             ) : workspaceData[
@@ -885,29 +898,29 @@ export default function MyAccountPage() {
                                                               0 ? (
                                                                 <div className="p-4 text-center text-gray-500 text-sm">
                                                                     {t(
-                                                                        "common.noWorkspace"
+                                                                        "common.noWorkspace",
                                                                     )}
                                                                 </div>
                                                             ) : (
                                                                 <div className="p-4">
                                                                     <div className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wide">
                                                                         {t(
-                                                                            "common.workspaces"
+                                                                            "common.workspaces",
                                                                         )}
                                                                     </div>
-                                                                    <div className="space-y-2 pb-6">
+                                                                    <div className="space-y-1 pb-4 px-2">
                                                                         {workspaceData[
                                                                             org
                                                                                 .id
                                                                         ]?.map(
                                                                             (
-                                                                                workspace: Workspace
+                                                                                workspace: Workspace,
                                                                             ) => (
                                                                                 <div
                                                                                     key={
                                                                                         workspace.workspaceId
                                                                                     }
-                                                                                    className="bg-white rounded border overflow-hidden"
+                                                                                    className="hover:bg-gray-50 transition-colors border border-transparent rounded-2xl hover:rounded-lg hover:border-gray-200"
                                                                                 >
                                                                                     {/* Workspace Header */}
                                                                                     <div className="flex items-center gap-3 p-3">
@@ -927,7 +940,7 @@ export default function MyAccountPage() {
                                                                                         ) : (
                                                                                             <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
                                                                                                 {t(
-                                                                                                    "permission.noPermission"
+                                                                                                    "permission.noPermission",
                                                                                                 )}
                                                                                             </span>
                                                                                         )}
@@ -950,10 +963,10 @@ export default function MyAccountPage() {
                                                                                                           .teams
                                                                                                           .length
                                                                                                   } ${t(
-                                                                                                      "team.teams"
+                                                                                                      "team.teams",
                                                                                                   )}`
                                                                                                 : t(
-                                                                                                      "team.noTeams"
+                                                                                                      "team.noTeams",
                                                                                                   )}
                                                                                         </span>
 
@@ -967,7 +980,7 @@ export default function MyAccountPage() {
                                                                                                     <Button
                                                                                                         variant="ghost"
                                                                                                         onClick={(
-                                                                                                            e
+                                                                                                            e,
                                                                                                         ) =>
                                                                                                             e.stopPropagation()
                                                                                                         }
@@ -981,17 +994,17 @@ export default function MyAccountPage() {
                                                                                                             variant="ghost"
                                                                                                             className="w-full justify-start hover:bg-red-50 hover:text-red-600 transition-colors"
                                                                                                             onClick={(
-                                                                                                                e
+                                                                                                                e,
                                                                                                             ) => {
                                                                                                                 e.stopPropagation();
                                                                                                                 handleLeaveWorkspace(
                                                                                                                     org.id,
-                                                                                                                    workspace.workspaceId
+                                                                                                                    workspace.workspaceId,
                                                                                                                 );
                                                                                                             }}
                                                                                                         >
                                                                                                             {t(
-                                                                                                                "common.leaveWorkspace"
+                                                                                                                "common.leaveWorkspace",
                                                                                                             )}
                                                                                                         </Button>
                                                                                                     </div>
@@ -1009,7 +1022,7 @@ export default function MyAccountPage() {
                                                                                             <div className="border-t bg-gray-25 px-3 py-2">
                                                                                                 <div className="text-xs font-medium text-gray-500 mb-2">
                                                                                                     {t(
-                                                                                                        "common.teams"
+                                                                                                        "common.teams",
                                                                                                     )}{" "}
                                                                                                     (
                                                                                                     {
@@ -1023,7 +1036,7 @@ export default function MyAccountPage() {
                                                                                                 <div className="space-y-1">
                                                                                                     {workspace.teams.map(
                                                                                                         (
-                                                                                                            team
+                                                                                                            team,
                                                                                                         ) => (
                                                                                                             <div
                                                                                                                 key={
@@ -1042,7 +1055,7 @@ export default function MyAccountPage() {
                                                                                                                 <div className="flex items-center gap-2">
                                                                                                                     <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
                                                                                                                         {getTeamRoleText(
-                                                                                                                            team.role
+                                                                                                                            team.role,
                                                                                                                         )}
                                                                                                                     </span>
                                                                                                                     {/* <Popover>
@@ -1084,13 +1097,13 @@ export default function MyAccountPage() {
                                                                                                                     </Popover> */}
                                                                                                                 </div>
                                                                                                             </div>
-                                                                                                        )
+                                                                                                        ),
                                                                                                     )}
                                                                                                 </div>
                                                                                             </div>
                                                                                         )}
                                                                                 </div>
-                                                                            )
+                                                                            ),
                                                                         )}
                                                                     </div>
                                                                 </div>
@@ -1098,14 +1111,14 @@ export default function MyAccountPage() {
                                                         </div>
                                                     )}
                                                 </div>
-                                            )
+                                            ),
                                         )
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </Glass>
             </div>
             {editOrgState.isOpen && (
                 <EditOrgDialog

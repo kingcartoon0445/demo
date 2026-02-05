@@ -708,7 +708,6 @@ export default function AutomationConfigList({
                             } data-[state=checked]:bg-[#9B8CF7]`}
                         />
                     </div>
-
                     <div className="flex flex-col mt-1">
                         <div className="flex-1">
                             {configType === "reminder" ? (
@@ -976,8 +975,8 @@ export default function AutomationConfigList({
                     editMode={true}
                     ruleData={selectedConfig}
                     onSuccess={handleRefreshList}
-                    canSave={canCreate}
-                />
+           
+                    canSave={canCreate}     />
             )}
 
             {/* Dialog chỉnh sửa phân phối */}
@@ -988,8 +987,8 @@ export default function AutomationConfigList({
                     editMode={true}
                     ruleData={selectedConfig}
                     onSuccess={handleRefreshList}
-                    canSave={canCreate}
-                />
+     
+                    canSave={canCreate}           />
             )}
 
             {/* Alert Dialog xác nhận xóa */}

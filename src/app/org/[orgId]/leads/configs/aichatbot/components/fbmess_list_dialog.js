@@ -52,20 +52,18 @@ export function FbbMessListDialog({
         const connectPromise = connectFacebookLead(orgId, {
             accessTokens,
             workspaceId: workspaceId || "",
-        }).then(
-            (res) => {
-                if (res?.message) {
-                    throw new Error(res.message);
-                }
-                if (res.status && res.status !== 200) {
-                    throw new Error(res.message);
-                }
-                if (res.code && res.code !== 0) {
-                    throw new Error(res.message);
-                }
-                return res;
+        }).then((res) => {
+            if (res?.message) {
+                throw new Error(res.message);
             }
-        );
+            if (res.status && res.status !== 200) {
+                throw new Error(res.message);
+            }
+            if (res.code && res.code !== 0) {
+                throw new Error(res.message);
+            }
+            return res;
+        });
 
         toast.promise(
             connectPromise,
@@ -74,7 +72,7 @@ export function FbbMessListDialog({
                 success: "Kết nối Facebook Lead thành công!",
                 error: (err) => `Lỗi kết nối: ${err.message || ""}`,
             },
-            { position: "top-center" }
+            { position: "top-center" },
         );
 
         connectPromise
@@ -104,12 +102,12 @@ export function FbbMessListDialog({
                                 setIsConnecting(true);
                                 try {
                                     const data = await fbLogin(
-                                        "email,openid,pages_show_list,leads_retrieval,pages_read_engagement,pages_manage_metadata,pages_read_user_content,pages_manage_engagement,public_profile"
+                                        "email,openid,pages_show_list,leads_retrieval,pages_read_engagement,pages_manage_metadata,pages_read_user_content,pages_manage_engagement,public_profile",
                                     );
                                     if (!data || data.status !== "connected") {
                                         toast.error(
                                             "Đăng nhập Facebook thất bại hoặc bị hủy",
-                                            { position: "top-center" }
+                                            { position: "top-center" },
                                         );
                                         return;
                                     }
@@ -122,12 +120,12 @@ export function FbbMessListDialog({
                                             {
                                                 position: "top-center",
                                                 id: "loading-pages-mess",
-                                            }
+                                            },
                                         );
                                         const pagesResponse =
                                             await getFacebookPages(
                                                 userID,
-                                                accessToken
+                                                accessToken,
                                             );
                                         toast.dismiss("loading-pages-mess");
                                         if (
@@ -135,29 +133,29 @@ export function FbbMessListDialog({
                                             pagesResponse.data.length > 0
                                         ) {
                                             setFacebookPages(
-                                                pagesResponse.data
+                                                pagesResponse.data,
                                             );
                                             setShowPageSelection(true);
                                         } else {
                                             toast.error(
                                                 "Không tìm thấy trang Facebook nào hoặc bạn chưa cấp quyền quản lý trang",
-                                                { position: "top-center" }
+                                                { position: "top-center" },
                                             );
                                         }
                                     } catch (error) {
                                         toast.dismiss("loading-pages-mess");
                                         console.error(
                                             "Error fetching Facebook pages:",
-                                            error
+                                            error,
                                         );
                                         toast.error(
                                             "Có lỗi xảy ra khi lấy danh sách trang Facebook",
-                                            { position: "top-center" }
+                                            { position: "top-center" },
                                         );
                                     }
                                 } catch (error) {
                                     const message = String(
-                                        error?.message || error
+                                        error?.message || error,
                                     );
                                     if (
                                         message
@@ -169,17 +167,17 @@ export function FbbMessListDialog({
                                     ) {
                                         toast.error(
                                             "Yêu cầu đăng nhập bị giới hạn. Vui lòng thử lại sau.",
-                                            { position: "top-center" }
+                                            { position: "top-center" },
                                         );
                                     } else {
                                         toast.error(
                                             "Có lỗi xảy ra khi đăng nhập Facebook",
-                                            { position: "top-center" }
+                                            { position: "top-center" },
                                         );
                                     }
                                     console.error(
                                         "Facebook login error:",
-                                        error
+                                        error,
                                     );
                                 } finally {
                                     setIsConnecting(false);
@@ -199,11 +197,11 @@ export function FbbMessListDialog({
                             key={i}
                             onClick={() => {
                                 const exists = selectedList?.some(
-                                    (item) => item.id == e.id
+                                    (item) => item.id == e.id,
                                 );
                                 if (exists) {
                                     setSelectedList((prev) =>
-                                        prev.filter((item) => item.id !== e.id)
+                                        prev.filter((item) => item.id !== e.id),
                                     );
                                 } else {
                                     setSelectedList((prev) => [
@@ -227,7 +225,7 @@ export function FbbMessListDialog({
                             </div>
                             <Checkbox
                                 checked={selectedList?.some(
-                                    (item) => item.id == e.id
+                                    (item) => item.id == e.id,
                                 )}
                                 onCheckedChange={(checked) => {
                                     if (checked) {
@@ -235,8 +233,8 @@ export function FbbMessListDialog({
                                     } else {
                                         setSelectedList((prev) =>
                                             prev.filter(
-                                                (item) => item.id !== e.id
-                                            )
+                                                (item) => item.id !== e.id,
+                                            ),
                                         );
                                     }
                                 }}

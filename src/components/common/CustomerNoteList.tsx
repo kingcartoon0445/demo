@@ -457,7 +457,7 @@ export default function CustomerNoteList({
                                                     ? lastElementRef
                                                     : null
                                             }
-                                            className="relative flex gap-4 px-3 hover:bg-muted/30 rounded-lg transition-colors"
+                                            className="relative flex gap-4 px-3 hover:bg-muted/30 rounded-xl transition-colors"
                                         >
                                             {/* Timeline connector */}
                                             <div className="relative flex flex-col">

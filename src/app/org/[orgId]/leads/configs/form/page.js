@@ -29,6 +29,7 @@ import { EditZaloFormDialog } from "./components/edit_zaloform_dialog";
 import { UnlinkButton } from "./components/unlink_button";
 import { useRefresh } from "./hooks/useRefresh";
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { Glass } from "@/components/Glass";
 
 export default function Page({ params }) {
     const orgId = use(params).orgId;
@@ -49,7 +50,7 @@ export default function Page({ params }) {
             if (res?.code !== 0) {
                 return toast.error(
                     res?.message ?? "Đã có lỗi xảy ra xin vui lòng thử lại",
-                    { position: "top-center" }
+                    { position: "top-center" },
                 );
             }
 
@@ -142,7 +143,10 @@ export default function Page({ params }) {
                         orgId={orgId}
                     />
                 )}
-                <div className="rounded-2xl flex flex-col bg-white h-full">
+                <Glass
+                    className="rounded-2xl flex flex-col h-full"
+                    intensity="high"
+                >
                     <div className="flex items-center w-full justify-between pl-5 pr-3 py-4 border-b relative">
                         <div className="text-[18px] font-medium">
                             Kênh kết nối
@@ -177,10 +181,10 @@ export default function Page({ params }) {
                                                             key={`webhook-${i}`}
                                                             onClick={() => {
                                                                 setWebhookConfig(
-                                                                    e
+                                                                    e,
                                                                 );
                                                                 setOpenWebhookConfig(
-                                                                    true
+                                                                    true,
                                                                 );
                                                             }}
                                                         />
@@ -192,10 +196,10 @@ export default function Page({ params }) {
                                                             key={`zalo-${i}`}
                                                             onClick={() => {
                                                                 setZaloConfig(
-                                                                    e
+                                                                    e,
                                                                 );
                                                                 setOpenZaloConfig(
-                                                                    true
+                                                                    true,
                                                                 );
                                                             }}
                                                         />
@@ -207,10 +211,10 @@ export default function Page({ params }) {
                                                             key={`tiktok-${i}`}
                                                             onClick={() => {
                                                                 setTiktokConfig(
-                                                                    e
+                                                                    e,
                                                                 );
                                                                 setOpenTiktokConfig(
-                                                                    true
+                                                                    true,
                                                                 );
                                                             }}
                                                         />
@@ -228,10 +232,10 @@ export default function Page({ params }) {
                                                                     "webform"
                                                                 ) {
                                                                     setWebformConfig(
-                                                                        e
+                                                                        e,
                                                                     );
                                                                     setOpenWebformConfig(
-                                                                        true
+                                                                        true,
                                                                     );
                                                                 }
                                                             }}
@@ -244,7 +248,7 @@ export default function Page({ params }) {
                             );
                         })}
                     </div>
-                </div>
+                </Glass>
             </div>
         </LeadsLayout>
     );
@@ -274,7 +278,7 @@ const WebhookItem = ({ e, onClick }) => {
             <ContextMenuTrigger className="h-full">
                 <div
                     onClick={onClick}
-                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer"
+                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20"
                 >
                     <div className=" flex items-center gap-2">
                         <div className="w-[28px] h-[28px]">
@@ -309,7 +313,7 @@ const WebhookItem = ({ e, onClick }) => {
                                         e.organizationId,
                                         e.id,
                                         e.provider,
-                                        value ? 1 : 0
+                                        value ? 1 : 0,
                                     )
                                         .then((res) => {
                                             setLoading(false);
@@ -317,7 +321,7 @@ const WebhookItem = ({ e, onClick }) => {
                                                 return toast.error(res.message);
                                             setChecked(value);
                                         })
-                                        .catch((err) => setLoading(false))
+                                        .catch((err) => setLoading(false)),
                                 );
                             }}
                         />
@@ -329,7 +333,7 @@ const WebhookItem = ({ e, onClick }) => {
                         {e.connectionState && (
                             <span
                                 className={`text-xs px-2 py-0.5 whitespace-nowrap rounded-full ${getBadgeStyle(
-                                    e.connectionState
+                                    e.connectionState,
                                 )}`}
                             >
                                 {e.connectionState}
@@ -341,7 +345,7 @@ const WebhookItem = ({ e, onClick }) => {
                                 deleteLeadConnection(
                                     e.organizationId,
                                     e.id,
-                                    e.provider
+                                    e.provider,
                                 ).then((res) => {
                                     if (res?.message) toast.error(res.message);
                                     setRefreshConnectionsList();
@@ -367,7 +371,7 @@ const WebhookItem = ({ e, onClick }) => {
                                     const response = await deleteLeadConnection(
                                         e.organizationId,
                                         e.id,
-                                        e.provider
+                                        e.provider,
                                     );
                                     if (response.message)
                                         toast.error(response.message);
@@ -395,7 +399,7 @@ const ZaloItem = ({ e, onClick }) => {
         <ContextMenu className="h-full">
             <ContextMenuTrigger className="h-full">
                 <div
-                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer"
+                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20"
                     onClick={onClick}
                 >
                     <div className="flex items-center gap-2">
@@ -433,17 +437,19 @@ const ZaloItem = ({ e, onClick }) => {
                                                 e.organizationId,
                                                 e.id,
                                                 e.provider,
-                                                value ? 1 : 0
+                                                value ? 1 : 0,
                                             )
                                                 .then((res) => {
                                                     setLoading(false);
                                                     if (res?.message)
                                                         return toast.error(
-                                                            res.message
+                                                            res.message,
                                                         );
                                                     setChecked(value);
                                                 })
-                                                .catch((e) => setLoading(false))
+                                                .catch((e) =>
+                                                    setLoading(false),
+                                                ),
                                         );
                                     } else {
                                         ToastPromise(() =>
@@ -451,17 +457,19 @@ const ZaloItem = ({ e, onClick }) => {
                                                 e.organizationId,
                                                 e.id,
                                                 e.provider,
-                                                value ? 1 : 0
+                                                value ? 1 : 0,
                                             )
                                                 .then((res) => {
                                                     setLoading(false);
                                                     if (res?.message)
                                                         return toast.error(
-                                                            res.message
+                                                            res.message,
                                                         );
                                                     setChecked(value);
                                                 })
-                                                .catch((e) => setLoading(false))
+                                                .catch((e) =>
+                                                    setLoading(false),
+                                                ),
                                         );
                                     }
                                 }}
@@ -475,7 +483,7 @@ const ZaloItem = ({ e, onClick }) => {
                         {e.connectionState && (
                             <span
                                 className={`text-xs px-2 py-0.5 whitespace-nowrap rounded-full ${getBadgeStyle(
-                                    e.connectionState
+                                    e.connectionState,
                                 )}`}
                             >
                                 {e.connectionState}
@@ -487,7 +495,7 @@ const ZaloItem = ({ e, onClick }) => {
                                 deleteLeadConnection(
                                     e.organizationId,
                                     e.id,
-                                    e.provider
+                                    e.provider,
                                 ).then((res) => {
                                     if (res?.message) toast.error(res.message);
                                     setRefreshConnectionsList();
@@ -517,7 +525,7 @@ const ZaloItem = ({ e, onClick }) => {
                                     const response = await deleteLeadConnection(
                                         e.organizationId,
                                         e.id,
-                                        e.provider
+                                        e.provider,
                                     );
                                     if (response.message)
                                         toast.error(response.message);
@@ -555,7 +563,7 @@ const TiktokItem = ({ e, onClick }) => {
         <ContextMenu className="h-full">
             <ContextMenuTrigger className="h-full">
                 <div
-                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer relative"
+                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer relative transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20"
                     onClick={onClick}
                 >
                     <div className="flex items-center gap-2">
@@ -592,20 +600,20 @@ const TiktokItem = ({ e, onClick }) => {
                                             e.organizationId,
                                             e.id,
                                             e.provider,
-                                            value ? 1 : 0
+                                            value ? 1 : 0,
                                         )
                                             .then((res) => {
                                                 setLoading(false);
                                                 if (res?.message)
                                                     return toast.error(
-                                                        res.message
+                                                        res.message,
                                                     );
                                                 setChecked(value);
                                             })
                                             .catch((err) => {
                                                 console.error(err);
                                                 setLoading(false);
-                                            })
+                                            }),
                                     );
                                 }}
                             />
@@ -620,7 +628,7 @@ const TiktokItem = ({ e, onClick }) => {
                                 {e.connectionState && (
                                     <span
                                         className={`text-xs px-2 py-0.5 whitespace-nowrap rounded-full ${getBadgeStyle(
-                                            e.connectionState
+                                            e.connectionState,
                                         )}`}
                                     >
                                         {e.connectionState}
@@ -634,14 +642,14 @@ const TiktokItem = ({ e, onClick }) => {
                                         deleteLeadConnection(
                                             e.organizationId,
                                             e.id,
-                                            e.provider
+                                            e.provider,
                                         ).then((res) => {
                                             if (res?.message)
                                                 toast.error(res.message);
                                             setRefreshConnectionsList();
                                             toast.success(
                                                 "Đã xóa form thành công",
-                                                { position: "top-center" }
+                                                { position: "top-center" },
                                             );
                                         });
                                     }}
@@ -684,7 +692,7 @@ const TiktokItem = ({ e, onClick }) => {
                                     const response = await deleteLeadConnection(
                                         e.organizationId,
                                         e.id,
-                                        e.provider
+                                        e.provider,
                                     );
                                     if (response.message)
                                         toast.error(response.message);
@@ -700,7 +708,7 @@ const TiktokItem = ({ e, onClick }) => {
                                     return response;
                                 } catch (error) {
                                     toast.error(
-                                        error.message || "Có lỗi xảy ra"
+                                        error.message || "Có lỗi xảy ra",
                                     );
                                 }
                             },
@@ -723,7 +731,7 @@ const ListItem = ({ e, onClick }) => {
             <ContextMenuTrigger className="h-full">
                 <div
                     onClick={onClick}
-                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer"
+                    className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20"
                 >
                     <div className="flex items-center gap-2">
                         <div className="w-[28px] h-[28px]">
@@ -766,17 +774,19 @@ const ListItem = ({ e, onClick }) => {
                                                 e.organizationId,
                                                 e.id,
                                                 e.provider,
-                                                value ? 1 : 0
+                                                value ? 1 : 0,
                                             )
                                                 .then((res) => {
                                                     setLoading(false);
                                                     if (res?.message)
                                                         return toast.error(
-                                                            res.message
+                                                            res.message,
                                                         );
                                                     setChecked(value);
                                                 })
-                                                .catch((e) => setLoading(false))
+                                                .catch((e) =>
+                                                    setLoading(false),
+                                                ),
                                         );
                                     } else {
                                         ToastPromise(() =>
@@ -784,17 +794,19 @@ const ListItem = ({ e, onClick }) => {
                                                 e.organizationId,
                                                 e.id,
                                                 e.provider,
-                                                value ? 1 : 0
+                                                value ? 1 : 0,
                                             )
                                                 .then((res) => {
                                                     setLoading(false);
                                                     if (res?.message)
                                                         return toast.error(
-                                                            res.message
+                                                            res.message,
                                                         );
                                                     setChecked(value);
                                                 })
-                                                .catch((e) => setLoading(false))
+                                                .catch((e) =>
+                                                    setLoading(false),
+                                                ),
                                         );
                                     }
                                 }}
@@ -808,7 +820,7 @@ const ListItem = ({ e, onClick }) => {
                         {e.connectionState && (
                             <span
                                 className={`text-xs px-2 py-0.5 whitespace-nowrap rounded-full ${getBadgeStyle(
-                                    e.connectionState
+                                    e.connectionState,
                                 )}`}
                             >
                                 {e.connectionState}
@@ -820,7 +832,7 @@ const ListItem = ({ e, onClick }) => {
                                 deleteLeadConnection(
                                     e.organizationId,
                                     e.id,
-                                    e.provider
+                                    e.provider,
                                 ).then((res) => {
                                     if (res?.message) toast.error(res.message);
                                     if (e?.provider == "FACEBOOK")
@@ -853,7 +865,7 @@ const ListItem = ({ e, onClick }) => {
                                             await deleteLeadConnection(
                                                 e.organizationId,
                                                 e.id,
-                                                e.provider
+                                                e.provider,
                                             );
                                         if (response.message)
                                             toast.error(response.message);
@@ -868,7 +880,7 @@ const ListItem = ({ e, onClick }) => {
                                         return response;
                                     } catch (error) {
                                         toast.error(
-                                            error.message || "Có lỗi xảy ra"
+                                            error.message || "Có lỗi xảy ra",
                                         );
                                     }
                                 },

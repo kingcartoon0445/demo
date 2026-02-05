@@ -1,6 +1,7 @@
 "use client";
 import { resendOtp, verifyOtp } from "@/api/auth";
 import { updateProfile } from "@/api/user";
+import { Glass } from "@/components/Glass";
 import {
     Form,
     FormControl,
@@ -168,7 +169,7 @@ export default function Page() {
                 toast.success("Chúc mừng bạn đã đăng ký thành công");
                 // Kiểm tra redirect param
                 const searchParams = new URLSearchParams(
-                    window.location.search
+                    window.location.search,
                 );
                 const redirect = searchParams.get("redirect");
                 router.push(redirect || "/");
@@ -192,7 +193,7 @@ export default function Page() {
 
             setAuthTokens(
                 dataLogin.metadata.accessToken,
-                dataLogin.metadata.refreshToken
+                dataLogin.metadata.refreshToken,
             );
 
             // Kiểm tra xem có phải user mới không
@@ -222,7 +223,7 @@ export default function Page() {
             } else {
                 // Kiểm tra redirect param
                 const searchParams = new URLSearchParams(
-                    window.location.search
+                    window.location.search,
                 );
                 const redirect = searchParams.get("redirect");
                 router.push(redirect || `/`);
@@ -279,9 +280,17 @@ export default function Page() {
     };
 
     return (
-        <div className="h-screen w-screen flex items-center justify-center">
+        <div className="relative h-screen w-screen flex items-center justify-center overflow-hidden bg-slate-50">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-5%] left-[-5%] w-[40vw] h-[40vw] bg-indigo-300/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob"></div>
+                <div className="absolute top-[5%] right-[-5%] w-[35vw] h-[35vw] bg-purple-300/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob animation-delay-2000"></div>
+                <div className="absolute bottom-[-10%] left-[20%] w-[45vw] h-[45vw] bg-pink-300/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob animation-delay-4000"></div>
+            </div>
             {isNewUser ? (
-                <div className="shadow-1 p-4 mx-4 md:p-8 rounded-2xl bg-white transition-all w-full md:w-auto">
+                <Glass
+                    className="p-4 mx-4 md:p-8 rounded-2xl w-full md:w-auto relative z-10"
+                    intensity="medium"
+                >
                     <div className="flex flex-col items-center md:min-w-[480px]">
                         <div className="text-2xl md:text-3xl font-medium mt-5">
                             Cập nhật Profile
@@ -415,11 +424,14 @@ export default function Page() {
                             </form>
                         </div>
                     </div>
-                </div>
+                </Glass>
             ) : (
-                <div className="shadow-1 p-4 mx-4 md:p-8 rounded-2xl bg-white transition-all w-full md:w-auto">
+                <Glass
+                    className="p-4 mx-4 md:p-8 rounded-2xl w-full md:w-auto relative z-10"
+                    intensity="medium"
+                >
                     <div className="flex flex-col items-center md:min-w-[480px]">
-                        <div className="p-4 rounded-3xl shadow-0 border-[1px] border-[#E4E7EC]">
+                        <div className="p-4 rounded-3xl shadow-0 border border-[#E4E7EC] bg-white/50">
                             <Image
                                 alt="logo"
                                 src={"/icons/mail_ic.svg"}
@@ -500,7 +512,7 @@ export default function Page() {
                             </b>
                         </div>
                     </div>
-                </div>
+                </Glass>
             )}
         </div>
     );

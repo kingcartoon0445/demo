@@ -35,7 +35,7 @@ export function Tooltip({
                     side={side}
                     sideOffset={sideOffset}
                     className={cn(
-                        "z-50 overflow-hidden rounded-md bg-white px-2 py-1.5 text-xs text-black shadow-md data-[state=delayed-open]:animate-fade-in"
+                        "z-50 overflow-hidden rounded-md bg-white px-2 py-1.5 text-xs text-black shadow-md data-[state=delayed-open]:animate-fade-in",
                     )}
                 >
                     {content}

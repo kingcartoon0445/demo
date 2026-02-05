@@ -172,6 +172,7 @@ export async function generateGoogleSheetMapping(
             formUrl,
             targetRow,
         });
+
         return response.data;
     } catch (error) {
         console.log(error);
@@ -189,6 +190,7 @@ export async function importGoogleSheet(
 ) {
     try {
         const api = createApiCall(orgId, workspaceId);
+
         const response = await api.post(`${paths.googlesheetImport}`, {
             formUrl,
             targetRow,
@@ -203,6 +205,52 @@ export async function importGoogleSheet(
 }
 
 export async function exportCustomersToExcel(
+    orgId,
+    workspaceId,
+    searchText,
+    stageGroupId,
+    startDate,
+    endDate,
+    categoryList,
+    sourceList,
+    rating,
+    stage,
+    tags,
+    profileIds,
+    teamIds,
+    channels,
+
+) {
+    try {
+        const api = createApiCall(orgId, workspaceId);
+        const response = await api.post(
+            paths.exportLeads,
+            {
+                searchText,
+                stageGroupId,
+                startDate,
+                endDate,
+                categoryList,
+                sourceList,
+                rating,
+                stage,
+                tags,
+                profileIds,
+                teamIds,
+                channels,
+            },
+            {
+                responseType: "blob",
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+export async function exportLeadsToExcel(
     orgId,
     workspaceId,
     searchText,

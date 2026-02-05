@@ -1,4 +1,6 @@
+import { Glass } from "../Glass";
 import { Customer } from "@/lib/interface";
+import { useState } from "react";
 import CustomerSidebar from "./CustomerSidebar";
 import CustomerHeader from "./CustomerHeader";
 import TabsUserDetail from "@/components/common/TabsUserDetail";
@@ -24,37 +26,50 @@ export default function CustomerDetailLayout({
     expandedSections,
     onToggleSection,
 }: CustomerDetailLayoutProps) {
+    const [showSidebar, setShowSidebar] = useState(true);
+
     return (
-        <div className="flex h-screen bg-gray-50">
-            {/* Left Sidebar */}
-            <CustomerSidebar
-                customer={customer}
-                expandedSections={expandedSections}
-                onToggleSection={onToggleSection}
+        <Glass
+            intensity="medium"
+            className="flex flex-col h-screen rounded-2xl mr-2 shadow-xl"
+        >
+            {/* Top Header */}
+            <CustomerHeader
+                customerName={customer.fullName}
+                orgId={orgId}
+                customerId={customer.id}
+                assignees={customer.assignees}
+                customerSelected={customer}
             />
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col">
-                {/* Top Header */}
-                <CustomerHeader
-                    customerName={customer.fullName}
-                    orgId={orgId}
-                    customerId={customer.id}
-                    assignees={customer.assignees}
-                    customerSelected={customer}
-                />
-
-                {/* Tab Content */}
-                <div className="flex-1 overflow-hidden">
-                    <TabsUserDetail
-                        taskId={null}
-                        provider="customer"
+            <div className="flex flex-1 overflow-hidden">
+                {/* Left Sidebar */}
+                {showSidebar && (
+                    <CustomerSidebar
                         customer={customer}
-                        orgId={orgId}
-                        workspaceId={customer.workspaceId}
+                        expandedSections={expandedSections}
+                        onToggleSection={onToggleSection}
+                        hideHeader={true}
                     />
+                )}
+
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col min-w-0 p-4">
+                    {/* Tab Content */}
+                    <div className="flex-1 overflow-hidden">
+                        <TabsUserDetail
+                            taskId={null}
+                            provider="customer"
+                            customer={customer}
+                            orgId={orgId}
+                            workspaceId={customer.workspaceId}
+                            handleShowCustomerDetail={() =>
+                                setShowSidebar((prev) => !prev)
+                            }
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
+        </Glass>
     );
 }

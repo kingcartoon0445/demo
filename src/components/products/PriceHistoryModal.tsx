@@ -71,7 +71,7 @@ export default function PriceHistoryModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="min-w-[800px] max-h-[90vh] overflow-auto">
+            <DialogContent className="min-w-[800px] max-h-[90vh] overflow-auto ">
                 <DialogHeader>
                     <DialogTitle>Lịch sử thay đổi giá</DialogTitle>
                 </DialogHeader>

@@ -1,5 +1,7 @@
 "use client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Glass } from "@/components/Glass";
+
 import { useRef, useState, useEffect, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { OrgAssigneeSelectDialog } from "./components/org_assignee_select_dialog";
@@ -58,7 +60,7 @@ export default function OrgReportPage() {
     // Sử dụng useReportLayout để quản lý layout
     const { reportLayout, saveLayout } = useReportLayout(
         selectedReportId,
-        fullReportConfig
+        fullReportConfig,
     );
 
     // State cho filters
@@ -161,10 +163,10 @@ export default function OrgReportPage() {
                 try {
                     // Nếu giá trị là ngày cụ thể (format yyyy-MM-dd)
                     const fromParts = startCondition.value.match(
-                        /^(\d{4})-(\d{2})-(\d{2})$/
+                        /^(\d{4})-(\d{2})-(\d{2})$/,
                     );
                     const toParts = endCondition.value.match(
-                        /^(\d{4})-(\d{2})-(\d{2})$/
+                        /^(\d{4})-(\d{2})-(\d{2})$/,
                     );
 
                     if (fromParts && toParts) {
@@ -173,11 +175,15 @@ export default function OrgReportPage() {
                                 new Date(
                                     fromParts[1],
                                     fromParts[2] - 1,
-                                    fromParts[3]
-                                )
+                                    fromParts[3],
+                                ),
                             ),
                             to: endOfDay(
-                                new Date(toParts[1], toParts[2] - 1, toParts[3])
+                                new Date(
+                                    toParts[1],
+                                    toParts[2] - 1,
+                                    toParts[3],
+                                ),
                             ),
                         });
                         newDateSelect = null; // Custom date range
@@ -247,7 +253,7 @@ export default function OrgReportPage() {
                     assigneeIds.map((id) => ({
                         profileId: id,
                         fullName: id.substring(0, 8), // Hiển thị phần đầu của ID
-                    }))
+                    })),
                 );
             }
         } catch (error) {
@@ -314,7 +320,7 @@ export default function OrgReportPage() {
                     operator: "<=",
                     value: "TODAY",
                     extendValues: [],
-                }
+                },
             );
         } else if (dateSelect === "-1") {
             // Yesterday
@@ -330,7 +336,7 @@ export default function OrgReportPage() {
                     operator: "<=",
                     value: "YESTERDAY",
                     extendValues: [],
-                }
+                },
             );
         } else if (dateSelect === "-7") {
             // Last 7 days
@@ -346,7 +352,7 @@ export default function OrgReportPage() {
                     operator: "<=",
                     value: "TODAY",
                     extendValues: [],
-                }
+                },
             );
         } else if (dateSelect === "-30") {
             // Last 30 days
@@ -362,7 +368,7 @@ export default function OrgReportPage() {
                     operator: "<=",
                     value: "TODAY",
                     extendValues: [],
-                }
+                },
             );
         } else if (dateSelect === "thisyear") {
             // This year
@@ -378,7 +384,7 @@ export default function OrgReportPage() {
                     operator: "<=",
                     value: "TODAY",
                     extendValues: [],
-                }
+                },
             );
         } else {
             // Custom date range
@@ -421,20 +427,20 @@ export default function OrgReportPage() {
             const timeConditions = getTimeConditions();
             updatedConfig = updateTimeConditionsInConfig(
                 updatedConfig,
-                timeConditions
+                timeConditions,
             );
 
             // Cập nhật điều kiện workspace
             const workspaceIds = selectedWorkspaces.map((ws) => ws.id);
             updatedConfig = updateWorkspaceConditionInConfig(
                 updatedConfig,
-                workspaceIds
+                workspaceIds,
             );
 
             // Cập nhật điều kiện người phụ trách
             updatedConfig = updateAssigneeConditionInConfig(
                 updatedConfig,
-                selectedAssigneeIds
+                selectedAssigneeIds,
             );
 
             // Cập nhật workingConfig
@@ -445,7 +451,7 @@ export default function OrgReportPage() {
         } catch (error) {
             console.error(
                 "Lỗi khi cập nhật cấu hình và gọi API preview:",
-                error
+                error,
             );
             toast.error("Đã có lỗi khi cập nhật báo cáo");
         }
@@ -471,18 +477,17 @@ export default function OrgReportPage() {
                     targetReportId = reports[0].id;
 
                     // Fetch cấu hình của báo cáo đầu tiên
-                    const fetchedConfig = await fetchReportConfig(
-                        targetReportId
-                    );
+                    const fetchedConfig =
+                        await fetchReportConfig(targetReportId);
                     if (!fetchedConfig) {
                         console.warn(
-                            `Không thể tải cấu hình cho báo cáo ${targetReportId}, sử dụng cấu hình mặc định.`
+                            `Không thể tải cấu hình cho báo cáo ${targetReportId}, sử dụng cấu hình mặc định.`,
                         );
                         configToUse = JSON.parse(
-                            JSON.stringify(DEFAULT_REPORT_CONFIG)
+                            JSON.stringify(DEFAULT_REPORT_CONFIG),
                         );
                         setOriginalConfig(
-                            JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG))
+                            JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG)),
                         );
                         setFullReportConfig({
                             ...DEFAULT_REPORT_CONFIG,
@@ -563,7 +568,7 @@ export default function OrgReportPage() {
                     }
                 } else {
                     configToUse = JSON.parse(
-                        JSON.stringify(DEFAULT_REPORT_CONFIG)
+                        JSON.stringify(DEFAULT_REPORT_CONFIG),
                     );
                 }
 
@@ -603,7 +608,7 @@ export default function OrgReportPage() {
         if (selectedReportId === "default" && !workingConfig) {
             setWorkingConfig(JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG)));
             setOriginalConfig(
-                JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG))
+                JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG)),
             );
         }
     }, [selectedReportId, workingConfig]);
@@ -616,7 +621,7 @@ export default function OrgReportPage() {
             `${window.location.pathname}?${newSearchParams.toString()}`,
             {
                 scroll: false,
-            }
+            },
         );
     };
 
@@ -635,7 +640,7 @@ export default function OrgReportPage() {
                 // Sử dụng cấu hình mặc định
                 configToUse = JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG));
                 setOriginalConfig(
-                    JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG))
+                    JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG)),
                 );
                 setFullReportConfig({
                     ...DEFAULT_REPORT_CONFIG,
@@ -704,10 +709,10 @@ export default function OrgReportPage() {
                 if (!fetchedConfig) {
                     toast.error("Không thể tải cấu hình báo cáo");
                     configToUse = JSON.parse(
-                        JSON.stringify(DEFAULT_REPORT_CONFIG)
+                        JSON.stringify(DEFAULT_REPORT_CONFIG),
                     );
                     setOriginalConfig(
-                        JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG))
+                        JSON.parse(JSON.stringify(DEFAULT_REPORT_CONFIG)),
                     );
                     setFullReportConfig(null);
                 } else {
@@ -742,13 +747,13 @@ export default function OrgReportPage() {
 
     const removeWorkspace = (id) => {
         setSelectedWorkspaces((prev) =>
-            prev.filter((workspace) => workspace.id !== id)
+            prev.filter((workspace) => workspace.id !== id),
         );
     };
 
     const removeAssigneeId = (id) => {
         setSelectedAssigneeIds((prev) =>
-            prev.filter((assigneeId) => assigneeId !== id)
+            prev.filter((assigneeId) => assigneeId !== id),
         );
     };
 
@@ -802,7 +807,7 @@ export default function OrgReportPage() {
             // Đảm bảo có điều kiện trong cấu hình
             if (!configToUse.condition)
                 configToUse.condition = JSON.parse(
-                    JSON.stringify(DEFAULT_REPORT_CONFIG.condition)
+                    JSON.stringify(DEFAULT_REPORT_CONFIG.condition),
                 );
             if (!configToUse.condition.conditions)
                 configToUse.condition.conditions = [];
@@ -817,20 +822,20 @@ export default function OrgReportPage() {
             const timeConditions = getTimeConditions();
             const configWithTime = updateTimeConditionsInConfig(
                 configToUse,
-                timeConditions
+                timeConditions,
             );
 
             // Cập nhật điều kiện workspace
             const workspaceIds = selectedWorkspaces.map((ws) => ws.id);
             const configWithWorkspace = updateWorkspaceConditionInConfig(
                 configWithTime,
-                workspaceIds
+                workspaceIds,
             );
 
             // Cập nhật điều kiện người phụ trách
             const configWithAssignee = updateAssigneeConditionInConfig(
                 configWithWorkspace,
-                selectedAssigneeIds
+                selectedAssigneeIds,
             );
 
             // Đặt tiêu đề cho cấu hình
@@ -877,7 +882,7 @@ export default function OrgReportPage() {
             const configToSave = JSON.parse(JSON.stringify(workingConfig));
             if (!configToSave.condition)
                 configToSave.condition = JSON.parse(
-                    JSON.stringify(DEFAULT_REPORT_CONFIG.condition)
+                    JSON.stringify(DEFAULT_REPORT_CONFIG.condition),
                 );
             if (!configToSave.condition.conditions)
                 configToSave.condition.conditions = [];
@@ -893,42 +898,41 @@ export default function OrgReportPage() {
             const timeConditions = getTimeConditions();
             const configWithTime = updateTimeConditionsInConfig(
                 configToSave,
-                timeConditions
+                timeConditions,
             );
 
             // Cập nhật điều kiện workspace
             const workspaceIds = selectedWorkspaces.map((ws) => ws.id);
             const configWithWorkspace = updateWorkspaceConditionInConfig(
                 configWithTime,
-                workspaceIds
+                workspaceIds,
             );
 
             // Cập nhật điều kiện người phụ trách
             const configWithAssignee = updateAssigneeConditionInConfig(
                 configWithWorkspace,
-                selectedAssigneeIds
+                selectedAssigneeIds,
             );
 
             // Lưu cấu hình cuối cùng
             const success = await saveReportConfig(
                 selectedReportId,
-                configWithAssignee
+                configWithAssignee,
             );
 
             if (success) {
                 // Cập nhật originalConfig để khớp với workingConfig
                 setOriginalConfig(
-                    JSON.parse(JSON.stringify(configWithAssignee))
+                    JSON.parse(JSON.stringify(configWithAssignee)),
                 );
                 setWorkingConfig(
-                    JSON.parse(JSON.stringify(configWithAssignee))
+                    JSON.parse(JSON.stringify(configWithAssignee)),
                 );
 
                 // Cập nhật fullReportConfig khi lưu thành công
                 // Lấy lại cấu hình báo cáo đầy đủ từ API
-                const updatedFullConfig = await fetchReportConfig(
-                    selectedReportId
-                );
+                const updatedFullConfig =
+                    await fetchReportConfig(selectedReportId);
                 if (updatedFullConfig) {
                     setFullReportConfig(updatedFullConfig);
                 }
@@ -983,7 +987,7 @@ export default function OrgReportPage() {
                 } else {
                     // Nếu không còn báo cáo nào, sử dụng cấu hình mặc định
                     const defaultConfig = JSON.parse(
-                        JSON.stringify(DEFAULT_REPORT_CONFIG)
+                        JSON.stringify(DEFAULT_REPORT_CONFIG),
                     );
                     setSelectedReportId("default");
                     updateUrlWithReportId("default");
@@ -1019,7 +1023,7 @@ export default function OrgReportPage() {
             if (selectedReportId === "default") {
                 // Có thể hiển thị thông báo để người dùng biết cần lưu báo cáo trước
                 toast.info(
-                    "Vui lòng lưu báo cáo này trước khi lưu cấu hình pivot"
+                    "Vui lòng lưu báo cáo này trước khi lưu cấu hình pivot",
                 );
                 return false;
             }
@@ -1037,7 +1041,7 @@ export default function OrgReportPage() {
                 !Array.isArray(currentConfig.displayedCards)
             ) {
                 console.error(
-                    "Cấu trúc báo cáo không đúng: thiếu displayedCards"
+                    "Cấu trúc báo cáo không đúng: thiếu displayedCards",
                 );
                 toast.error("Cấu trúc báo cáo không đúng");
                 return false;
@@ -1047,7 +1051,7 @@ export default function OrgReportPage() {
             const pivotCardIndex = currentConfig.displayedCards.findIndex(
                 (card) =>
                     (card.id === pivotId || card.pivotId === pivotId) &&
-                    card.component === "PivotCard"
+                    card.component === "PivotCard",
             );
 
             if (pivotCardIndex === -1) {
@@ -1066,7 +1070,7 @@ export default function OrgReportPage() {
             // Lưu cấu hình mới
             const success = await saveReportConfig(
                 selectedReportId,
-                updatedConfig
+                updatedConfig,
             );
 
             if (success) {
@@ -1084,77 +1088,79 @@ export default function OrgReportPage() {
     };
 
     return (
-        <ScrollArea
-            ref={scrollRef}
-            className="w-full h-full mx-auto p-4 pt-0 space-y-4 bg-white rounded-xl max-w-[1920px]"
+        <Glass
+            intensity="high"
+            className="w-full h-full mx-auto rounded-xl max-w-[1920px] overflow-hidden"
         >
-            <ReportFilters
-                reportList={reportList}
-                selectedReportId={selectedReportId}
-                onReportChange={handleReportChange}
-                date={date}
-                setDate={setDate}
-                dateSelect={dateSelect}
-                setDateSelect={setDateSelect}
-                selectedWorkspaces={selectedWorkspaces}
-                removeWorkspace={removeWorkspace}
-                selectedAssigneeIds={selectedAssigneeIds}
-                getMemberNameById={getMemberNameById}
-                removeAssigneeId={removeAssigneeId}
-                configChanged={configChanged}
-                isReportChanging={isLoadingReport}
-                onSaveConfig={handleSaveConfig}
-                onResetConfig={handleResetConfig}
-                onOpenWorkspaceDialog={() => setWorkspaceDialogOpen(true)}
-                onOpenAssigneeDialog={() => setAssigneeDialogOpen(true)}
-                onOpenLayoutDialog={() => setReportLayoutDialogOpen(true)}
-                onCreateReport={() => setCreateReportDialogOpen(true)}
-                onDeleteReport={handleDeleteReport}
-                onCreateDefaultReport={handleCreateDefaultReport}
-            />
+            <ScrollArea ref={scrollRef} className="w-full h-full p-4 space-y-4">
+                <ReportFilters
+                    reportList={reportList}
+                    selectedReportId={selectedReportId}
+                    onReportChange={handleReportChange}
+                    date={date}
+                    setDate={setDate}
+                    dateSelect={dateSelect}
+                    setDateSelect={setDateSelect}
+                    selectedWorkspaces={selectedWorkspaces}
+                    removeWorkspace={removeWorkspace}
+                    selectedAssigneeIds={selectedAssigneeIds}
+                    getMemberNameById={getMemberNameById}
+                    removeAssigneeId={removeAssigneeId}
+                    configChanged={configChanged}
+                    isReportChanging={isLoadingReport}
+                    onSaveConfig={handleSaveConfig}
+                    onResetConfig={handleResetConfig}
+                    onOpenWorkspaceDialog={() => setWorkspaceDialogOpen(true)}
+                    onOpenAssigneeDialog={() => setAssigneeDialogOpen(true)}
+                    onOpenLayoutDialog={() => setReportLayoutDialogOpen(true)}
+                    onCreateReport={() => setCreateReportDialogOpen(true)}
+                    onDeleteReport={handleDeleteReport}
+                    onCreateDefaultReport={handleCreateDefaultReport}
+                />
 
-            <ReportCards
-                reportLayout={reportLayout}
-                reportData={reportData}
-                reportMetadata={reportMetadata}
-                isLoading={isApiLoading}
-                onSavePivotConfig={handleSavePivotConfig}
-                reportId={selectedReportId}
-            />
+                <ReportCards
+                    reportLayout={reportLayout}
+                    reportData={reportData}
+                    reportMetadata={reportMetadata}
+                    isLoading={isApiLoading}
+                    onSavePivotConfig={handleSavePivotConfig}
+                    reportId={selectedReportId}
+                />
 
-            <WorkspaceMultiSelectDialog
-                open={workspaceDialogOpen}
-                setOpen={setWorkspaceDialogOpen}
-                selected={selectedWorkspaces}
-                onSelect={setSelectedWorkspaces}
-            />
+                <WorkspaceMultiSelectDialog
+                    open={workspaceDialogOpen}
+                    setOpen={setWorkspaceDialogOpen}
+                    selected={selectedWorkspaces}
+                    onSelect={setSelectedWorkspaces}
+                />
 
-            <OrgAssigneeSelectDialog
-                open={assigneeDialogOpen}
-                setOpen={setAssigneeDialogOpen}
-                selected={selectedAssigneeIds}
-                onSelect={handleAssigneeChange}
-                orgId={params.orgId}
-            />
+                <OrgAssigneeSelectDialog
+                    open={assigneeDialogOpen}
+                    setOpen={setAssigneeDialogOpen}
+                    selected={selectedAssigneeIds}
+                    onSelect={handleAssigneeChange}
+                    orgId={params.orgId}
+                />
 
-            <ReportLayoutDialog
-                open={reportLayoutDialogOpen}
-                setOpen={setReportLayoutDialogOpen}
-                onLayoutChange={handleLayoutChange}
-                selectedReportId={selectedReportId}
-                onDeleteReport={handleDeleteReport}
-                orgId={params.orgId}
-                saveReportConfig={saveReportConfig}
-                reportConfig={fullReportConfig}
-                onUpdateReportList={refreshReportList}
-            />
+                <ReportLayoutDialog
+                    open={reportLayoutDialogOpen}
+                    setOpen={setReportLayoutDialogOpen}
+                    onLayoutChange={handleLayoutChange}
+                    selectedReportId={selectedReportId}
+                    onDeleteReport={handleDeleteReport}
+                    orgId={params.orgId}
+                    saveReportConfig={saveReportConfig}
+                    reportConfig={fullReportConfig}
+                    onUpdateReportList={refreshReportList}
+                />
 
-            <CreateReportDialog
-                open={createReportDialogOpen}
-                setOpen={setCreateReportDialogOpen}
-                onCreateReport={handleCreateReport}
-                isCreating={isCreatingReport}
-            />
-        </ScrollArea>
+                <CreateReportDialog
+                    open={createReportDialogOpen}
+                    setOpen={setCreateReportDialogOpen}
+                    onCreateReport={handleCreateReport}
+                    isCreating={isCreatingReport}
+                />
+            </ScrollArea>
+        </Glass>
     );
 }

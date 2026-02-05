@@ -7,13 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInfiniteLeadsWithBodyFilter } from "@/hooks/useCustomerV2";
 import { firebaseDb } from "@/lib/firebase";
 import { Lead } from "@/lib/interface";
-import { getAvatarUrl, getFirstAndLastWord } from "@/lib/utils";
+import { getAvatarUrl, getFirstAndLastWord, cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { onChildAdded, onChildChanged, ref } from "firebase/database";
 import { MessageCircle } from "lucide-react";
 import Avatar from "react-avatar";
 import { toast } from "react-hot-toast";
 import Loading from "../common/Loading";
+import { Glass } from "../Glass";
 interface ConversationListProps {
     orgId: string;
     workspaceId: string;
@@ -26,9 +27,11 @@ interface ConversationListProps {
 const ConversationItem = ({
     conversation,
     onClick,
+    selected = false,
 }: {
     conversation: Conversation;
     onClick?: () => void;
+    selected?: boolean;
 }) => {
     const formatTime = (timestamp: number) => {
         try {
@@ -50,60 +53,80 @@ const ConversationItem = ({
 
     return (
         <div
-            className={`p-3 border-b hover:bg-gray-50 cursor-pointer transition-colors w-full 
-            h-18`}
             onClick={onClick}
+            className={cn(
+                "p-3 rounded-2xl cursor-pointer transition-all duration-300 border mb-2 mx-2",
+                selected
+                    ? "bg-white/90 border-indigo-200 shadow-md transform scale-[1.01]"
+                    : "bg-white/40 border-white/30 hover:bg-white/60 hover:shadow-sm",
+            )}
         >
-            <div className="flex items-start gap-3">
-                {/* Avatar */}
-                <div className="relative">
-                    <Avatar
-                        name={getFirstAndLastWord(conversation.fullName) || ""}
-                        src={getAvatarUrl(conversation.avatar) || ""}
-                        round
-                        size={"24"}
-                    />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                        <div className="flex flex-col gap-1 w-[150px]">
-                            <h4 className="font-medium text-sm text-gray-900 truncate">
-                                {conversation.fullName}
-                            </h4>
-                            {conversation.snippet && (
-                                <p className="text-sm text-gray-600 line-clamp-1">
-                                    {conversation.snippet}
-                                </p>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-xs text-gray-500 flex-shrink-0">
-                                {formatTime(
-                                    new Date(
-                                        conversation.lastModifiedDate
-                                    ).getTime()
-                                )}
-                            </span>
-                            <Avatar
-                                name={
-                                    getFirstAndLastWord(
-                                        conversation.pageName
-                                    ) || ""
-                                }
-                                src={
-                                    getAvatarUrl(conversation.pageAvatar) || ""
-                                }
-                                round
-                                size={"24"}
-                            />
-                        </div>
+            <div className="flex justify-between items-start">
+                <div className="flex items-center space-x-3">
+                    {/* Avatar */}
+                    <div className="relative">
+                        <Avatar
+                            name={
+                                getFirstAndLastWord(conversation.fullName) || ""
+                            }
+                            src={getAvatarUrl(conversation.avatar) || ""}
+                            round
+                            size={"40"}
+                            className="border-2 border-white shadow-sm"
+                        />
                     </div>
 
-                    {/* Snippet */}
+                    {/* Name and snippet */}
+                    <div>
+                        <h3
+                            className={cn(
+                                "font-bold text-sm",
+                                selected ? "text-indigo-900" : "text-gray-800",
+                            )}
+                        >
+                            {conversation.fullName}
+                        </h3>
+                        <p className="text-xs text-gray-500 font-medium truncate max-w-[120px]">
+                            {conversation.pageName || conversation.channel}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Time */}
+                <div className="flex flex-col items-end">
+                    <span className="text-xs text-gray-500">
+                        {formatTime(
+                            new Date(conversation.lastModifiedDate).getTime(),
+                        )}
+                    </span>
                 </div>
             </div>
+
+            {/* Snippet below */}
+            {conversation.snippet && (
+                <div className="mt-2 pl-13 flex items-end justify-between gap-2">
+                    <div
+                        className={cn(
+                            "text-xs px-2 py-1.5 rounded-lg inline-block truncate flex-1",
+                            selected
+                                ? "bg-indigo-50 text-indigo-700"
+                                : "bg-white/30 text-gray-600",
+                        )}
+                    >
+                        <span className="font-medium">
+                            {conversation.snippet}
+                        </span>
+                    </div>
+                    {/* Page Avatar */}
+                    <Avatar
+                        name={getFirstAndLastWord(conversation.pageName) || ""}
+                        src={getAvatarUrl(conversation.pageAvatar) || ""}
+                        round
+                        size={"20"}
+                        className="flex-shrink-0"
+                    />
+                </div>
+            )}
         </div>
     );
 };
@@ -117,7 +140,7 @@ export default function ConversationList({
     selectedConversation,
 }: ConversationListProps) {
     const [activeTab, setActiveTab] = useState<"FACEBOOK" | "ZALO">(
-        defaultProvider || "FACEBOOK"
+        defaultProvider || "FACEBOOK",
     );
     const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -165,7 +188,7 @@ export default function ConversationList({
         } catch (error) {
             console.error(
                 "ConversationList: Error setting up Firebase listeners",
-                error
+                error,
             );
         }
     }, [orgId, queryClient]);
@@ -191,7 +214,7 @@ export default function ConversationList({
             channels: ["FACEBOOK"],
             limit: 20,
         },
-        { enabled: activeTab === "FACEBOOK" }
+        { enabled: activeTab === "FACEBOOK" },
     );
 
     const {
@@ -207,7 +230,7 @@ export default function ConversationList({
             channels: ["ZALO"],
             limit: 20,
         },
-        { enabled: activeTab === "ZALO" }
+        { enabled: activeTab === "ZALO" },
     );
 
     useEffect(() => {
@@ -244,13 +267,13 @@ export default function ConversationList({
 
     const allFacebookConversations: Conversation[] = mapLeadsToConversations(
         (facebookData?.pages.flatMap((page) =>
-            page.content == null ? [] : page.content
-        ) as Lead[]) || []
+            page.content == null ? [] : page.content,
+        ) as Lead[]) || [],
     );
     const allZaloConversations: Conversation[] = mapLeadsToConversations(
         (zaloData?.pages.flatMap((page) =>
-            page.content == null ? [] : page.content
-        ) as Lead[]) || []
+            page.content == null ? [] : page.content,
+        ) as Lead[]) || [],
     );
 
     // Báo total count lên parent component
@@ -282,7 +305,7 @@ export default function ConversationList({
             (entries) => {
                 entries.forEach((entry) => {
                     const provider = entry.target.getAttribute(
-                        "data-provider"
+                        "data-provider",
                     ) as "FACEBOOK" | "ZALO";
 
                     if (entry.isIntersecting) {
@@ -313,7 +336,7 @@ export default function ConversationList({
                 root: null,
                 rootMargin: "300px", // Tăng rootMargin để trigger sớm hơn
                 threshold: 0.1,
-            }
+            },
         );
 
         observerRef.current = observer;
@@ -341,7 +364,7 @@ export default function ConversationList({
                 observerRef.current.observe(node);
             }
         },
-        []
+        [],
     );
 
     // Cleanup observer
@@ -367,7 +390,7 @@ export default function ConversationList({
         hasNextPage: boolean,
         isFetchingNextPage: boolean,
         provider: "FACEBOOK" | "ZALO",
-        totalFromFirstPage?: number
+        totalFromFirstPage?: number,
     ) => {
         if (isLoading && conversations.length === 0) {
             return <Loading />;
@@ -411,6 +434,9 @@ export default function ConversationList({
                                 onClick={() =>
                                     handleConversationClick(conversation)
                                 }
+                                selected={
+                                    selectedConversation?.id === conversation.id
+                                }
                             />
                         </div>
                     ))}
@@ -431,11 +457,15 @@ export default function ConversationList({
     };
 
     return (
-        <div className="bg-white overflow-hidden h-full">
+        <div className="overflow-hidden h-full">
             {/* Show tabs only if no defaultProvider */}
             {!defaultProvider ? (
-                <Tabs value={activeTab} onValueChange={handleTabChange}>
-                    <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                <Tabs
+                    value={activeTab}
+                    onValueChange={handleTabChange}
+                    className="flex flex-col h-full"
+                >
+                    <TabsList className="grid w-full grid-cols-2 rounded-none border-b shrink-0">
                         <TabsTrigger
                             value="FACEBOOK"
                             className="flex items-center gap-2"
@@ -452,8 +482,11 @@ export default function ConversationList({
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="FACEBOOK" className="m-0">
-                        <div className="overflow-y-auto h-[calc(100vh-200px)] min-h-[400px]">
+                    <TabsContent
+                        value="FACEBOOK"
+                        className="m-0 flex-1 overflow-hidden flex flex-col"
+                    >
+                        <div className="overflow-y-auto h-full w-full">
                             {renderConversationList(
                                 allFacebookConversations as unknown as Conversation[],
                                 facebookLoading,
@@ -461,13 +494,16 @@ export default function ConversationList({
                                 hasNextFacebook,
                                 isFetchingNextFacebook,
                                 "FACEBOOK",
-                                facebookData?.pages[0]?.metadata?.total
+                                facebookData?.pages[0]?.metadata?.total,
                             )}
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="ZALO" className="m-0">
-                        <div className="overflow-y-auto h-[calc(100vh-200px)] min-h-[400px]">
+                    <TabsContent
+                        value="ZALO"
+                        className="m-0 flex-1 overflow-hidden flex flex-col"
+                    >
+                        <div className="overflow-y-auto h-full w-full">
                             {renderConversationList(
                                 allZaloConversations as unknown as Conversation[],
                                 zaloLoading,
@@ -475,7 +511,7 @@ export default function ConversationList({
                                 hasNextZalo,
                                 isFetchingNextZalo,
                                 "ZALO",
-                                zaloData?.pages[0]?.metadata?.total
+                                zaloData?.pages[0]?.metadata?.total,
                             )}
                         </div>
                     </TabsContent>
@@ -491,7 +527,7 @@ export default function ConversationList({
                               hasNextFacebook,
                               isFetchingNextFacebook,
                               "FACEBOOK",
-                              facebookData?.pages[0]?.metadata?.total
+                              facebookData?.pages[0]?.metadata?.total,
                           )
                         : renderConversationList(
                               allZaloConversations as unknown as Conversation[],
@@ -500,7 +536,7 @@ export default function ConversationList({
                               hasNextZalo,
                               isFetchingNextZalo,
                               "ZALO",
-                              zaloData?.pages[0]?.metadata?.total
+                              zaloData?.pages[0]?.metadata?.total,
                           )}
                 </div>
             )}

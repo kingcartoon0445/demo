@@ -89,7 +89,7 @@ export const ReminderListContent = ({
                             </span>
                         )}
                     </Button>
-                </div>
+                </div>  
             )}
         </div>
     );

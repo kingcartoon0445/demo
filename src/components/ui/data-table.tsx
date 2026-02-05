@@ -9,6 +9,7 @@ import {
     RowSelectionState,
     OnChangeFn,
 } from "@tanstack/react-table";
+import { cn } from "@/lib/utils";
 
 import {
     Table,
@@ -33,6 +34,9 @@ interface DataTableProps<TData, TValue> {
     showCustomHeader?: boolean;
     selectedRowId?: string;
     emptyMessage?: string;
+    className?: string;
+    headerClassName?: string;
+    rowClassName?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -47,6 +51,9 @@ export function DataTable<TData, TValue>({
     showCustomHeader = false,
     selectedRowId,
     emptyMessage = "No results.",
+    className,
+    headerClassName,
+    rowClassName,
 }: DataTableProps<TData, TValue>) {
     const [internalRowSelection, setInternalRowSelection] =
         useState<RowSelectionState>({});
@@ -65,7 +72,7 @@ export function DataTable<TData, TValue>({
     });
 
     return (
-        <div className="rounded-md border">
+        <div className={cn("rounded-lg border border-gray-100", className)}>
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -74,7 +81,10 @@ export function DataTable<TData, TValue>({
                                 // Khi hiển thị custom header, render một cell duy nhất span toàn bộ
                                 <TableHead
                                     colSpan={headerGroup.headers.length}
-                                    className="p-0 bg-[#F9F9F9]"
+                                    className={cn(
+                                        "p-0 bg-indigo-50/60 text-xs font-semibold text-gray-700 uppercase tracking-wider",
+                                        headerClassName,
+                                    )}
                                 >
                                     {customHeaderContent}
                                 </TableHead>
@@ -84,14 +94,17 @@ export function DataTable<TData, TValue>({
                                     return (
                                         <TableHead
                                             key={header.id}
-                                            className="bg-[#F9F9F9]"
+                                            className={cn(
+                                                "bg-indigo-50/60 text-xs font-semibold text-gray-700 uppercase tracking-wider py-3",
+                                                headerClassName,
+                                            )}
                                         >
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
                                                       header.column.columnDef
                                                           .header,
-                                                      header.getContext()
+                                                      header.getContext(),
                                                   )}
                                         </TableHead>
                                     );
@@ -119,17 +132,18 @@ export function DataTable<TData, TValue>({
                                 onClick={() =>
                                     onRowClick && onRowClick(row.original)
                                 }
-                                className={
+                                className={cn(
                                     onRowClick
-                                        ? "cursor-pointer hover:bg-muted"
-                                        : ""
-                                }
+                                        ? "cursor-pointer hover:bg-indigo-50/40"
+                                        : "hover:bg-gray-50/50",
+                                    rowClassName,
+                                )}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>
                                         {flexRender(
                                             cell.column.columnDef.cell,
-                                            cell.getContext()
+                                            cell.getContext(),
                                         )}
                                     </TableCell>
                                 ))}

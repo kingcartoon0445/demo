@@ -15,6 +15,7 @@ const getApiBase = () => {
             hostname === "localhost" ||
             hostname === "192.168.1.20" ||
             hostname === "beta.coka.ai" ||
+            hostname === "192.168.1.31" ||
             hostname === "192.168.10.109" ||
             hostname === "alpha.coka.ai"
         ) {
@@ -145,6 +146,7 @@ const paths = {
     customerCreate: "/api/v1/crm/contact/create",
     customerApi: "/api/v1/crm/",
     customerExportExcel: "/api/v1/export/contact/byworkspace",
+    exportLeads: "/api/v2/lead/export",
     customerUserCurrentManagerList: "/api/v1/crm/team/user/current-managers",
     customerJourneyList: "/api/v1/crm/contact/",
     teamApi: "/api/v1/crm/team",
@@ -308,7 +310,6 @@ const paths = {
     googlesheetMappingGenerate:
         "/api/v2/lead/import/googlesheet/mappinggenerator",
     googlesheetImport: "/api/v2/lead/import/googlesheet/import",
-    exportLeads: "/api/v2/lead/export",
 };
 
 // Thêm các đường dẫn mới cho payment và wallet

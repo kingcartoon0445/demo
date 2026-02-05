@@ -59,7 +59,7 @@ export function formatCurrency(value: number | undefined | null): string {
 
 export const defaultTitleHeader = "CoKa AI - CRM Platform";
 
-export const getAvatarUrl = (avatar: string) => {
+export const getAvatarUrl = (avatar: string | undefined | null) => {
     if (!avatar) return null;
     if (avatar.includes("https")) return avatar;
     return avatar[0] == "/" ? `${apiBase}${avatar}` : `${apiBase}/${avatar}`;
@@ -110,7 +110,7 @@ export function playSound(url: string) {
     });
 }
 
-export function getFirstAndLastWord(sentence: string) {
+export function getFirstAndLastWord(sentence: string | undefined | null) {
     if (!sentence) return "";
     let words = sentence?.trim()?.split(" ");
     let firstWord = words?.[0] || "";
@@ -442,10 +442,13 @@ export const getIconPath = (
 ) => {
     console.log("customerSource", customerSource);
     if (customerSource) {
-        if (type == "SOURCE" && customerSource[0].toLowerCase() == "form") {
+        if (type == "SOURCE" && customerSource[0]?.toLowerCase() == "form") {
             return "/images/form_icon.png";
         }
-        if (type == "SOURCE" && customerSource[0].toLowerCase() == "nhập vào") {
+        if (
+            type == "SOURCE" &&
+            customerSource[0]?.toLowerCase() == "nhập vào"
+        ) {
             return "/images/pencil.png";
         }
     }

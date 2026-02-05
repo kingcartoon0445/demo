@@ -19,6 +19,8 @@ import OwnerSelector from "@/components/componentsWithHook/OwnerSelector";
 import FollowerSelector from "@/components/componentsWithHook/FollowerSelector";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Glass } from "@/components/Glass";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function ProductDetailPage() {
@@ -44,10 +46,10 @@ export default function ProductDetailPage() {
     const [isOwnerPopoverOpen, setIsOwnerPopoverOpen] = useState(false);
     const [isFollowerPopoverOpen, setIsFollowerPopoverOpen] = useState(false);
     const owner = product?.assignedTo?.find(
-        (assignee) => assignee.type === "OWNER"
+        (assignee) => assignee.type === "OWNER",
     );
     const followers = product?.assignedTo?.filter(
-        (assignee) => assignee.type === "FOLLOWER"
+        (assignee) => assignee.type === "FOLLOWER",
     );
     const handleBack = () => {
         router.back();
@@ -59,7 +61,7 @@ export default function ProductDetailPage() {
     const { mutate: updateProduct } = useUpdateProduct(orgId, productId);
     const { mutateAsync: updateProductAssignee } = useUpdateProductAssignee(
         orgId,
-        productId
+        productId,
     );
     const handleDetailsSave = useCallback((data: CreateUpdateProduct) => {
         updateProduct(data);
@@ -115,7 +117,7 @@ export default function ProductDetailPage() {
 
         // Lấy IDs của members (profileId hoặc id)
         const memberIds = members.map(
-            (member) => member.profileId || member.id
+            (member) => member.profileId || member.id,
         );
 
         // Lấy IDs của teams
@@ -158,15 +160,65 @@ export default function ProductDetailPage() {
     }
 
     return (
-        <div className="flex flex-col bg-white">
-            <div className="bg-white border-b border-gray-200 flex items-center justify-between">
-                <div className="flex items-center gap-2 w-1/4 p-4">
-                    <Button variant="ghost" size="icon" onClick={handleBack}>
+        <div className="flex h-[calc(100vh-4rem)] bg-transparent p-4 gap-4">
+            {/* Left Glass Panel: Title + Images + Details */}
+            <Glass
+                intensity="high"
+                className="w-1/4 min-w-[320px] flex flex-col rounded-2xl overflow-hidden p-0"
+            >
+                {/* Fixed Header within Glass */}
+                <div className="p-4 border-b border-white/20 flex items-center gap-2 bg-white">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleBack}
+                        className="hover:bg-white/60"
+                    >
                         <ArrowLeftIcon className="w-4 h-4" />
                     </Button>
-                    <h1 className="text-2xl font-bold">{product.name}</h1>
+                    <h1
+                        className="text-xl font-bold truncate"
+                        title={product.name}
+                    >
+                        {product.name}
+                    </h1>
                 </div>
-                <div className="flex items-center gap-4 w-3/4 justify-end p-4">
+
+                {/* Scrollable Content */}
+                <ScrollArea className="flex-1">
+                    <div className="p-4 space-y-4">
+                        <div className="rounded-xl overflow-hidden">
+                            <ImageSection
+                                product={product}
+                                currentImageIndex={currentImageIndex}
+                                isExpanded={isImageExpanded}
+                                setIsExpanded={setIsImageExpanded}
+                                onImageSelect={handleImageSelect}
+                                orgId={orgId}
+                                refetch={refetch}
+                            />
+                        </div>
+                        <div className="rounded-xl overflow-hidden">
+                            <DetailsSection
+                                product={product}
+                                isExpanded={isDetailsExpanded}
+                                setIsExpanded={setIsDetailsExpanded}
+                                onSave={handleDetailsSave}
+                                categories={categories}
+                                isCategoryLoading={isCategoryLoading}
+                            />
+                        </div>
+                    </div>
+                </ScrollArea>
+            </Glass>
+
+            {/* Right Glass Panel: Actions + Tabs */}
+            <Glass
+                intensity="high"
+                className="flex-1 flex flex-col rounded-2xl overflow-hidden p-0"
+            >
+                {/* Fixed Header within Glass */}
+                <div className="p-4 border-b border-white/20 flex items-center justify-end gap-2 bg-white">
                     <OwnerSelector
                         orgId={orgId}
                         owner={owner}
@@ -183,48 +235,17 @@ export default function ProductDetailPage() {
                         ownerId={owner?.id}
                     />
                 </div>
-            </div>
-            {/* Left Sidebar */}
-            <div className="flex">
-                <div className="w-1/4 flex flex-col space-y-2 border-r border-gray-200 p-4">
-                    <div className="border rounded-md bg-white">
-                        {/* Image Section */}
-                        <ImageSection
-                            product={product}
-                            currentImageIndex={currentImageIndex}
-                            isExpanded={isImageExpanded}
-                            setIsExpanded={setIsImageExpanded}
-                            onImageSelect={handleImageSelect}
-                            orgId={orgId}
-                            refetch={refetch}
-                        />
-                    </div>
-                    <div className="border rounded-md bg-white">
-                        {/* Details Section */}
-                        <DetailsSection
-                            product={product}
-                            isExpanded={isDetailsExpanded}
-                            setIsExpanded={setIsDetailsExpanded}
-                            onSave={handleDetailsSave}
-                            categories={categories}
-                            isCategoryLoading={isCategoryLoading}
-                        />
-                    </div>
-                </div>
 
-                {/* Right Content Area */}
-                <div className="flex-1 flex flex-col">
-                    {/* Tabs Content */}
-                    <div className="flex-1 overflow-hidden">
-                        <ProductTabs
-                            product={product}
-                            activeTab={activeTab}
-                            setActiveTab={setActiveTab}
-                            onSave={handleDetailsSave}
-                        />
-                    </div>
+                {/* Tabs Content */}
+                <div className="flex-1 bg-transparent overflow-hidden">
+                    <ProductTabs
+                        product={product}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        onSave={handleDetailsSave}
+                    />
                 </div>
-            </div>
+            </Glass>
         </div>
     );
 }

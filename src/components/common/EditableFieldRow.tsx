@@ -25,7 +25,7 @@ export function useEditableField() {
     const context = useContext(EditableFieldContext);
     if (!context) {
         throw new Error(
-            "useEditableField must be used within EditableFieldRow"
+            "useEditableField must be used within EditableFieldRow",
         );
     }
     return context;

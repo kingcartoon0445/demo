@@ -518,7 +518,7 @@ export default function CustomerJourney({
                                                             ? lastElementRef
                                                             : null
                                                     }
-                                                    className="relative flex gap-4 px-3 hover:bg-muted/30 rounded-lg transition-colors w-full mb-3"
+                                                    className="relative flex gap-4 px-3 hover:bg-muted/30 rounded-xl transition-colors w-full mb-3"
                                                 >
                                                     {/* Timeline connector */}
                                                     <div className="relative flex flex-col">
@@ -789,178 +789,97 @@ export default function CustomerJourney({
                                                                                             );
                                                                               })()
                                                                             : event.type ===
-                                                                                "EMAIL"
+                                                                                "ASSIGNTO"
                                                                               ? (() => {
-                                                                                    const emailInfo =
-                                                                                        transformJourneyToTimeline(
-                                                                                            event.jsonSummary ||
-                                                                                                "",
-                                                                                            event.type,
+                                                                                    const assignInfo =
+                                                                                        transformAssignToTimeline(
+                                                                                            event.summary,
                                                                                         );
-                                                                                    if (
-                                                                                        typeof emailInfo ===
-                                                                                            "object" &&
-                                                                                        emailInfo &&
-                                                                                        (
-                                                                                            emailInfo as EmailTimelineInfo
-                                                                                        )
-                                                                                            .type ===
-                                                                                            "email_info"
-                                                                                    ) {
-                                                                                        const info =
-                                                                                            emailInfo as EmailTimelineInfo;
-                                                                                        return (
-                                                                                            <div className="text-sm space-y-1">
-                                                                                                <div className="font-medium">
-                                                                                                    {
-                                                                                                        info.summary
-                                                                                                    }
-                                                                                                </div>
-                                                                                                {info.to &&
-                                                                                                    info.to !==
-                                                                                                        "—" && (
-                                                                                                        <div>
-                                                                                                            Email:{" "}
-                                                                                                            <span className="font-semibold">
-                                                                                                                {
-                                                                                                                    info.to
-                                                                                                                }
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    )}
-                                                                                                {info.cc &&
-                                                                                                    info.cc !==
-                                                                                                        "—" && (
-                                                                                                        <div>
-                                                                                                            CC:{" "}
-                                                                                                            <span className="font-semibold">
-                                                                                                                {
-                                                                                                                    info.cc
-                                                                                                                }
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    )}
-                                                                                                {info.bcc &&
-                                                                                                    info.bcc !==
-                                                                                                        "—" && (
-                                                                                                        <div>
-                                                                                                            BCC:{" "}
-                                                                                                            <span className="font-semibold">
-                                                                                                                {
-                                                                                                                    info.bcc
-                                                                                                                }
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    )}
-                                                                                                {info.emailId && (
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline mt-1"
-                                                                                                        onClick={() =>
-                                                                                                            handleOpenEmailPreview(
-                                                                                                                info.emailId!,
-                                                                                                            )
-                                                                                                        }
-                                                                                                    >
-                                                                                                        Xem
-                                                                                                        nội
-                                                                                                        dung
-                                                                                                    </button>
-                                                                                                )}
-                                                                                            </div>
-                                                                                        );
-                                                                                    }
-                                                                                    return renderTextWithLinks(
-                                                                                        event.summary,
-                                                                                    );
+                                                                                    return typeof assignInfo ===
+                                                                                        "string"
+                                                                                        ? renderTextWithLinks(
+                                                                                              assignInfo,
+                                                                                          )
+                                                                                        : assignInfo;
                                                                                 })()
                                                                               : event.type ===
-                                                                                      "UPDATE_ASSIGNTO" ||
-                                                                                  event.type ===
-                                                                                      "UPDATE_ASSIGNTEAM" ||
-                                                                                  event.type ===
-                                                                                      "ASSIGNTO"
+                                                                                  "EMAIL"
                                                                                 ? (() => {
-                                                                                      const assignInfo =
+                                                                                      const emailInfo =
                                                                                           transformJourneyToTimeline(
                                                                                               event.jsonSummary ||
-                                                                                                  event.newValue ||
                                                                                                   "",
                                                                                               event.type,
-                                                                                              event.title,
-                                                                                          ) as AssignTimelineInfo;
+                                                                                          );
                                                                                       if (
-                                                                                          assignInfo &&
-                                                                                          assignInfo.type ===
-                                                                                              "assign_info"
+                                                                                          typeof emailInfo ===
+                                                                                              "object" &&
+                                                                                          emailInfo &&
+                                                                                          (
+                                                                                              emailInfo as EmailTimelineInfo
+                                                                                          )
+                                                                                              .type ===
+                                                                                              "email_info"
                                                                                       ) {
+                                                                                          const info =
+                                                                                              emailInfo as EmailTimelineInfo;
                                                                                           return (
-                                                                                              <div className="text-sm">
+                                                                                              <div className="text-sm space-y-1">
                                                                                                   <div className="font-medium">
                                                                                                       {
-                                                                                                          assignInfo.title
+                                                                                                          info.summary
                                                                                                       }
                                                                                                   </div>
-                                                                                                  {(assignInfo.userName ||
-                                                                                                      assignInfo.teamName) && (
-                                                                                                      <div className="mt-1">
-                                                                                                          {assignInfo.userName ? (
-                                                                                                              <>
-                                                                                                                  Sang:{" "}
-                                                                                                                  {assignInfo.userProfileId ? (
-                                                                                                                      <ProfilePopover
-                                                                                                                          profileId={
-                                                                                                                              assignInfo.userProfileId
-                                                                                                                          }
-                                                                                                                      >
-                                                                                                                          <span className="font-bold text-primary cursor-pointer hover:underline">
-                                                                                                                              {
-                                                                                                                                  assignInfo.userName
-                                                                                                                              }
-                                                                                                                          </span>
-                                                                                                                      </ProfilePopover>
-                                                                                                                  ) : (
-                                                                                                                      <span className="font-bold text-primary">
-                                                                                                                          {
-                                                                                                                              assignInfo.userName
-                                                                                                                          }
-                                                                                                                      </span>
-                                                                                                                  )}
-                                                                                                                  {assignInfo.teamName &&
-                                                                                                                      ", "}
-                                                                                                              </>
-                                                                                                          ) : null}
-                                                                                                          {assignInfo.teamName ? (
-                                                                                                              <>
-                                                                                                                  đội
-                                                                                                                  sale{" "}
-                                                                                                                  {assignInfo.teamId ? (
-                                                                                                                      <a
-                                                                                                                          href={`/org/${orgId}/teams?teamId=${assignInfo.teamId}`}
-                                                                                                                          className="font-bold text-primary text-blue-600 hover:underline cursor-pointer"
-                                                                                                                          onClick={(
-                                                                                                                              e,
-                                                                                                                          ) => {
-                                                                                                                              e.preventDefault();
-                                                                                                                              router.push(
-                                                                                                                                  `/org/${orgId}/teams?teamId=${assignInfo.teamId}`,
-                                                                                                                              );
-                                                                                                                          }}
-                                                                                                                      >
-                                                                                                                          {
-                                                                                                                              assignInfo.teamName
-                                                                                                                          }
-                                                                                                                      </a>
-                                                                                                                  ) : (
-                                                                                                                      <span className="font-bold text-primary">
-                                                                                                                          {
-                                                                                                                              assignInfo.teamName
-                                                                                                                          }
-                                                                                                                      </span>
-                                                                                                                  )}
-                                                                                                              </>
-                                                                                                          ) : null}
-                                                                                                      </div>
+                                                                                                  {info.to &&
+                                                                                                      info.to !==
+                                                                                                          "—" && (
+                                                                                                          <div>
+                                                                                                              Email:{" "}
+                                                                                                              <span className="font-semibold">
+                                                                                                                  {
+                                                                                                                      info.to
+                                                                                                                  }
+                                                                                                              </span>
+                                                                                                          </div>
+                                                                                                      )}
+                                                                                                  {info.cc &&
+                                                                                                      info.cc !==
+                                                                                                          "—" && (
+                                                                                                          <div>
+                                                                                                              CC:{" "}
+                                                                                                              <span className="font-semibold">
+                                                                                                                  {
+                                                                                                                      info.cc
+                                                                                                                  }
+                                                                                                              </span>
+                                                                                                          </div>
+                                                                                                      )}
+                                                                                                  {info.bcc &&
+                                                                                                      info.bcc !==
+                                                                                                          "—" && (
+                                                                                                          <div>
+                                                                                                              BCC:{" "}
+                                                                                                              <span className="font-semibold">
+                                                                                                                  {
+                                                                                                                      info.bcc
+                                                                                                                  }
+                                                                                                              </span>
+                                                                                                          </div>
+                                                                                                      )}
+                                                                                                  {info.emailId && (
+                                                                                                      <button
+                                                                                                          type="button"
+                                                                                                          className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline mt-1"
+                                                                                                          onClick={() =>
+                                                                                                              handleOpenEmailPreview(
+                                                                                                                  info.emailId!,
+                                                                                                              )
+                                                                                                          }
+                                                                                                      >
+                                                                                                          Xem
+                                                                                                          nội
+                                                                                                          dung
+                                                                                                      </button>
                                                                                                   )}
                                                                                               </div>
                                                                                           );
@@ -970,42 +889,92 @@ export default function CustomerJourney({
                                                                                       );
                                                                                   })()
                                                                                 : event.type ===
-                                                                                        "UPDATE_FIELD" ||
+                                                                                        "UPDATE_ASSIGNTO" ||
                                                                                     event.type ===
-                                                                                        "SOURCE"
+                                                                                        "UPDATE_ASSIGNTEAM"
                                                                                   ? (() => {
-                                                                                        const info =
+                                                                                        const assignInfo =
                                                                                             transformJourneyToTimeline(
                                                                                                 event.jsonSummary ||
+                                                                                                    event.newValue ||
                                                                                                     "",
-                                                                                                event.type ||
-                                                                                                    "",
+                                                                                                event.type,
                                                                                                 event.title,
-                                                                                                event.oldValue,
-                                                                                                event.newValue,
-                                                                                            );
+                                                                                            ) as AssignTimelineInfo;
                                                                                         if (
-                                                                                            typeof info ===
-                                                                                                "object" &&
-                                                                                            info &&
-                                                                                            (
-                                                                                                info as any
-                                                                                            )
-                                                                                                .type ===
-                                                                                                "source_html"
+                                                                                            assignInfo &&
+                                                                                            assignInfo.type ===
+                                                                                                "assign_info"
                                                                                         ) {
                                                                                             return (
-                                                                                                info as any
-                                                                                            )
-                                                                                                .node;
-                                                                                        }
-                                                                                        if (
-                                                                                            typeof info ===
-                                                                                            "string"
-                                                                                        ) {
-                                                                                            return renderTextWithLinks(
-                                                                                                info ||
-                                                                                                    event.summary,
+                                                                                                <div className="text-sm">
+                                                                                                    <div className="font-medium">
+                                                                                                        {
+                                                                                                            assignInfo.title
+                                                                                                        }
+                                                                                                    </div>
+                                                                                                    {(assignInfo.userName ||
+                                                                                                        assignInfo.teamName) && (
+                                                                                                        <div className="mt-1">
+                                                                                                            {assignInfo.userName ? (
+                                                                                                                <>
+                                                                                                                    Sang:{" "}
+                                                                                                                    {assignInfo.userProfileId ? (
+                                                                                                                        <ProfilePopover
+                                                                                                                            profileId={
+                                                                                                                                assignInfo.userProfileId
+                                                                                                                            }
+                                                                                                                        >
+                                                                                                                            <span className="font-bold text-primary cursor-pointer hover:underline">
+                                                                                                                                {
+                                                                                                                                    assignInfo.userName
+                                                                                                                                }
+                                                                                                                            </span>
+                                                                                                                        </ProfilePopover>
+                                                                                                                    ) : (
+                                                                                                                        <span className="font-bold text-primary">
+                                                                                                                            {
+                                                                                                                                assignInfo.userName
+                                                                                                                            }
+                                                                                                                        </span>
+                                                                                                                    )}
+                                                                                                                    {assignInfo.teamName &&
+                                                                                                                        ", "}
+                                                                                                                </>
+                                                                                                            ) : null}
+                                                                                                            {assignInfo.teamName ? (
+                                                                                                                <>
+                                                                                                                    đội
+                                                                                                                    sale{" "}
+                                                                                                                    {assignInfo.teamId ? (
+                                                                                                                        <a
+                                                                                                                            href={`/org/${orgId}/teams?teamId=${assignInfo.teamId}`}
+                                                                                                                            className="font-bold text-primary text-blue-600 hover:underline cursor-pointer"
+                                                                                                                            onClick={(
+                                                                                                                                e,
+                                                                                                                            ) => {
+                                                                                                                                e.preventDefault();
+                                                                                                                                router.push(
+                                                                                                                                    `/org/${orgId}/teams?teamId=${assignInfo.teamId}`,
+                                                                                                                                );
+                                                                                                                            }}
+                                                                                                                        >
+                                                                                                                            {
+                                                                                                                                assignInfo.teamName
+                                                                                                                            }
+                                                                                                                        </a>
+                                                                                                                    ) : (
+                                                                                                                        <span className="font-bold text-primary">
+                                                                                                                            {
+                                                                                                                                assignInfo.teamName
+                                                                                                                            }
+                                                                                                                        </span>
+                                                                                                                    )}
+                                                                                                                </>
+                                                                                                            ) : null}
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                </div>
                                                                                             );
                                                                                         }
                                                                                         return renderTextWithLinks(
@@ -1013,27 +982,70 @@ export default function CustomerJourney({
                                                                                         );
                                                                                     })()
                                                                                   : event.type ===
-                                                                                      "UPDATE_INFO"
-                                                                                    ? event.title
+                                                                                          "UPDATE_FIELD" ||
+                                                                                      event.type ===
+                                                                                          "SOURCE"
+                                                                                    ? (() => {
+                                                                                          const info =
+                                                                                              transformJourneyToTimeline(
+                                                                                                  event.jsonSummary ||
+                                                                                                      "",
+                                                                                                  event.type ||
+                                                                                                      "",
+                                                                                                  event.title,
+                                                                                                  event.oldValue,
+                                                                                                  event.newValue,
+                                                                                              );
+                                                                                          if (
+                                                                                              typeof info ===
+                                                                                                  "object" &&
+                                                                                              info &&
+                                                                                              (
+                                                                                                  info as any
+                                                                                              )
+                                                                                                  .type ===
+                                                                                                  "source_html"
+                                                                                          ) {
+                                                                                              return (
+                                                                                                  info as any
+                                                                                              )
+                                                                                                  .node;
+                                                                                          }
+                                                                                          if (
+                                                                                              typeof info ===
+                                                                                              "string"
+                                                                                          ) {
+                                                                                              return renderTextWithLinks(
+                                                                                                  info ||
+                                                                                                      event.summary,
+                                                                                              );
+                                                                                          }
+                                                                                          return renderTextWithLinks(
+                                                                                              event.summary,
+                                                                                          );
+                                                                                      })()
                                                                                     : event.type ===
-                                                                                        "UPDATE_STAGE"
-                                                                                      ? transformUpdateStage(
-                                                                                            event.oldValue ||
-                                                                                                "",
-                                                                                            event.newValue ||
-                                                                                                "",
-                                                                                            event.summary,
-                                                                                        )
+                                                                                        "UPDATE_INFO"
+                                                                                      ? event.title
                                                                                       : event.type ===
-                                                                                          "CREATE_NOTE"
-                                                                                        ? transformCreateNote(
+                                                                                          "UPDATE_STAGE"
+                                                                                        ? transformUpdateStage(
+                                                                                              event.oldValue ||
+                                                                                                  "",
                                                                                               event.newValue ||
                                                                                                   "",
                                                                                               event.summary,
                                                                                           )
-                                                                                        : renderTextWithLinks(
-                                                                                              event.summary,
-                                                                                          )}
+                                                                                        : event.type ===
+                                                                                            "CREATE_NOTE"
+                                                                                          ? transformCreateNote(
+                                                                                                event.newValue ||
+                                                                                                    "",
+                                                                                                event.summary,
+                                                                                            )
+                                                                                          : renderTextWithLinks(
+                                                                                                event.summary,
+                                                                                            )}
                                                                 </p>
                                                             )}
                                                         </div>

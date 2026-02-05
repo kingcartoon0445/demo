@@ -74,16 +74,16 @@ export function KanbanColumn({
                     ref={providedDraggable.innerRef}
                     {...providedDraggable.draggableProps}
                     className={cn(
-                        "flex flex-col rounded-lg p-2 w-[320px] flex-shrink-0 transition-all duration-200 border rounded-lg max-h-full",
+                        "flex flex-col rounded-lg p-2 w-[320px] flex-shrink-0 transition-all duration-200 rounded-lg max-h-full",
                         snapshotDraggable.isDragging
                             ? "rotate-1 scale-105"
                             : "",
-                        isEditMode ? "ring-2 ring-blue-300 bg-blue-50" : ""
+                        isEditMode ? "ring-2 ring-blue-300 bg-blue-50" : "",
                     )}
                     style={{
                         ...(providedDraggable.draggableProps.style || {}),
-                        backgroundColor: isEditMode ? "#3B82F61A" : "#F4F2FA",
-                        borderColor: isEditMode ? "#3B82F61A" : "#F4F2FA",
+                        // backgroundColor: isEditMode ? "#3B82F61A" : "#F4F2FA",
+                        // borderColor: isEditMode ? "#3B82F61A" : "#F4F2FA",
                     }}
                 >
                     <div className="flex justify-between mb-4 flex-col">
@@ -137,13 +137,13 @@ export function KanbanColumn({
                                         "font-semibold text-gray-800 flex-1 text-sm",
                                         isEditMode
                                             ? "cursor-pointer hover:bg-blue-100 px-2 py-1 rounded border-2 border-dashed border-blue-300"
-                                            : ""
+                                            : "",
                                     )}
                                     onClick={() =>
                                         isEditMode &&
                                         startEditingColumn(
                                             column.id,
-                                            column.title
+                                            column.title,
                                         )
                                     }
                                     title={
@@ -254,7 +254,7 @@ export function KanbanColumn({
                                                 "space-y-3 min-h-[500px] rounded-lg transition-colors",
                                                 snapshotDroppable.isDraggingOver
                                                     ? "bg-blue-50 ring-2 ring-blue-200"
-                                                    : ""
+                                                    : "",
                                             )}
                                         >
                                             {paginationState[column.id]
@@ -293,7 +293,7 @@ export function KanbanColumn({
                                                             >
                                                                 {(
                                                                     providedDeal,
-                                                                    snapshotDeal
+                                                                    snapshotDeal,
                                                                 ) => (
                                                                     <div
                                                                         ref={
@@ -305,7 +305,7 @@ export function KanbanColumn({
                                                                             "transition-transform",
                                                                             snapshotDeal.isDragging
                                                                                 ? "rotate-2 scale-105"
-                                                                                : ""
+                                                                                : "",
                                                                         )}
                                                                     >
                                                                         <DealCard
@@ -321,7 +321,7 @@ export function KanbanColumn({
                                                                     </div>
                                                                 )}
                                                             </Draggable>
-                                                        )
+                                                        ),
                                                     )}
                                                     {paginationState[column.id]
                                                         ?.isLoading && (
@@ -338,7 +338,7 @@ export function KanbanColumn({
                                                             <div className="py-3 flex flex-col items-center justify-center">
                                                                 <div className="text-xs text-gray-500 mb-2">
                                                                     {t(
-                                                                        "deal.loaded"
+                                                                        "deal.loaded",
                                                                     )}
                                                                     :{" "}
                                                                     {paginationState[
@@ -355,7 +355,7 @@ export function KanbanColumn({
                                                                         ?.totalItems ||
                                                                         0}{" "}
                                                                     {t(
-                                                                        "deal.transactions"
+                                                                        "deal.transactions",
                                                                     )}
                                                                 </div>
                                                             </div>

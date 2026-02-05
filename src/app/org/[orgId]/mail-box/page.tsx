@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { EmailList } from "@/components/mail-box/EmailList";
 import { EmailSidebar } from "@/components/mail-box/EmailSidebar";
 import { EmailView } from "@/components/mail-box/EmailView";
@@ -11,7 +12,7 @@ import {
     EmailFilterParams,
 } from "@/components/mail-box/EmailFilter";
 import { EmailAccountsManager } from "@/components/mail-box/EmailAccountsManager";
-// import { Glass } from "@/components/Glass";
+import { Glass } from "@/components/Glass";
 import {
     getEmailList,
     testEmailConnection,
@@ -116,7 +117,7 @@ export default function EmailPage({
                     setSelectedConfigId(firstAccount.id);
 
                     // Step 2: Get folders for mapping
-                    console.log("� Step 2: Loading folders...");
+                    console.log(" Step 2: Loading folders...");
                     const folderMapping = await fetchFolderMapping(
                         firstAccount.id,
                     );
@@ -982,80 +983,93 @@ export default function EmailPage({
     };
 
     return (
-        <div className="h-full w-full flex overflow-hidden bg-white">
-            {/* Column 1: Sidebar (Fixed width) */}
-            <div className="w-[260px] shrink-0 overflow-y-auto border-r border-gray-200 bg-gray-50/50">
-                <EmailSidebar
-                    activeFolder={activeFolder}
-                    onFolderSelect={handleFolderSelect}
-                    onComposeClick={() => handleCompose()}
-                    emailConfigs={emailConfigs}
-                    selectedConfigId={selectedConfigId}
-                    onConfigSelect={handleConfigSelect}
-                    onAddAccountClick={() => setIsSettingsView(true)}
-                    onCollapse={() => setIsSettingsView(false)} // Or manage expand/collapse
-                    onSettingsClick={() => setIsSettingsView(true)}
-                    onSelectLabel={handleSelectLabel}
-                    orgId={orgId}
-                    isSettingsOpen={isSettingsView}
-                    availableTags={availableTags}
-                    onTagsUpdate={(refreshEmails = true) => {
-                        // Reload tags when sidebar updates them
-                        if (!orgId || !selectedConfigId) return;
-
-                        // Reload tags
-                        getEmailTags(orgId, selectedConfigId).then((result) => {
-                            if (
-                                result?.content &&
-                                Array.isArray(result.content)
-                            ) {
-                                setAvailableTags(result.content);
-                            } else if (Array.isArray(result)) {
-                                setAvailableTags(result);
-                            }
-                        });
-
-                        // Reload emails only if requested (default true)
-                        if (refreshEmails) {
-                            setIsLoading(true);
-                            getEmails(orgId, selectedConfigId, {
-                                Page: 1,
-                                PageSize: 20,
-                                Folder:
-                                    activeFolder === "Inbox"
-                                        ? undefined
-                                        : activeFolderMap[activeFolder] ||
-                                          activeFolder,
-                            }).then((result) => {
-                                // ... existing logic
-                                let emailsData =
-                                    result?.content?.data || result?.data || [];
-                                if (!Array.isArray(emailsData)) emailsData = [];
-
-                                const paginationData =
-                                    result?.content?.pagination ||
-                                    result?.pagination;
-
-                                setEmails(emailsData);
-                                setPagination(paginationData);
-                                setIsLoading(false);
-                            });
-                        }
-                    }}
-                    folders={folders}
-                />
-            </div>
-
-            {isSettingsView ? (
-                <EmailAccountsManager
-                    orgId={orgId}
-                    onBack={() => setIsSettingsView(false)}
-                    onSuccess={handleReloadConfigs}
-                />
-            ) : (
-                <>
-                    {/* Column 2: Email List (Fixed width or Resizable) */}
-                    <div className="w-[350px] shrink-0 flex flex-col border-r border-gray-200 bg-white">
+        <div className="h-full w-full flex gap-3">
+            {/* Grouped Sidebar and Email List/Settings */}
+            <Glass
+                intensity="medium"
+                border={true}
+                className={cn(
+                    "flex rounded-xl overflow-hidden shrink-0",
+                    isSettingsView ? "w-full" : "",
+                )}
+            >
+                {/* Sidebar Section */}
+                <Glass
+                    intensity="medium"
+                    border={true}
+                    className="flex rounded-l-xl overflow-hidden border-r shrink-0"
+                >
+                    <div className="w-[260px] flex flex-col border-r border-gray-100/50">
+                        <EmailSidebar
+                            activeFolder={activeFolder}
+                            onFolderSelect={handleFolderSelect}
+                            onComposeClick={() => handleCompose()}
+                            emailConfigs={emailConfigs}
+                            selectedConfigId={selectedConfigId}
+                            onConfigSelect={handleConfigSelect}
+                            onAddAccountClick={() => setIsSettingsView(true)}
+                            onCollapse={() => setIsSettingsView(false)}
+                            onSettingsClick={() => setIsSettingsView(true)}
+                            onSelectLabel={handleSelectLabel}
+                            orgId={orgId}
+                            isSettingsOpen={isSettingsView}
+                            availableTags={availableTags}
+                            onTagsUpdate={(refreshEmails = true) => {
+                                if (!orgId || !selectedConfigId) return;
+                                getEmailTags(orgId, selectedConfigId).then(
+                                    (result) => {
+                                        if (
+                                            result?.content &&
+                                            Array.isArray(result.content)
+                                        ) {
+                                            setAvailableTags(result.content);
+                                        } else if (Array.isArray(result)) {
+                                            setAvailableTags(result);
+                                        }
+                                    },
+                                );
+                                if (refreshEmails) {
+                                    setIsLoading(true);
+                                    getEmails(orgId, selectedConfigId, {
+                                        Page: 1,
+                                        PageSize: 20,
+                                        Folder:
+                                            activeFolder === "Inbox"
+                                                ? undefined
+                                                : activeFolderMap[
+                                                      activeFolder
+                                                  ] || activeFolder,
+                                    }).then((result) => {
+                                        let emailsData =
+                                            result?.content?.data ||
+                                            result?.data ||
+                                            [];
+                                        if (!Array.isArray(emailsData))
+                                            emailsData = [];
+                                        const paginationData =
+                                            result?.content?.pagination ||
+                                            result?.pagination;
+                                        setEmails(emailsData);
+                                        setPagination(paginationData);
+                                        setIsLoading(false);
+                                    });
+                                }
+                            }}
+                            folders={folders}
+                        />
+                    </div>
+                </Glass>
+                {isSettingsView ? (
+                    <div className="flex-1 flex flex-col min-w-[350px]">
+                        <EmailAccountsManager
+                            orgId={orgId}
+                            onBack={() => setIsSettingsView(false)}
+                            onSuccess={handleReloadConfigs}
+                        />
+                    </div>
+                ) : (
+                    /* Email List Section */
+                    <div className="w-[350px] flex flex-col">
                         <EmailList
                             emails={displayEmails}
                             activeFolder={activeFolder}
@@ -1089,69 +1103,69 @@ export default function EmailPage({
                             onToggleRead={handleToggleReadStatus}
                         />
                     </div>
+                )}
+            </Glass>
 
-                    {/* Column 3: Email View (Fluid) */}
-                    <div className="flex-1 flex flex-col min-w-0 bg-white">
-                        {orgId && (
-                            <EmailView
-                                selectedEmailId={selectedEmailId}
-                                selectedEmailDetail={selectedEmailDetail}
-                                isLoadingDetail={isLoadingDetail}
-                                checkedEmailIds={checkedEmailIds}
-                                orgId={orgId}
-                                defaultConfigId={selectedConfigId}
-                                onCompose={handleCompose}
-                                emails={displayEmails}
-                                onMarkAsRead={handleMarkAsRead}
-                                availableTags={availableTags}
-                                isDraft={
-                                    activeFolder === "Drafts" ||
-                                    selectedEmailDetail?.folder === "Drafts"
-                                }
-                                onEmailDeleted={(
-                                    deletedIds: string | string[],
-                                ) => {
-                                    // Remove deleted emails from list
-                                    setEmails((prev) => {
-                                        const safePrev = Array.isArray(prev)
-                                            ? prev
-                                            : [];
-                                        return safePrev.filter(
-                                            (e) => !deletedIds.includes(e.id),
-                                        );
-                                    });
-                                    // Clear selection
-                                    setCheckedEmailIds((prev) =>
-                                        prev.filter(
-                                            (id) => !deletedIds.includes(id),
-                                        ),
-                                    );
-                                    // If current selected email was deleted, clear it
-                                    if (
-                                        selectedEmailId &&
-                                        deletedIds.includes(selectedEmailId)
-                                    ) {
-                                        setSelectedEmailId(null);
-                                        setSelectedEmailDetail(null);
-                                    }
-                                }}
-                                onEmailUpdated={(updatedEmail: { id: any }) => {
-                                    setEmails((prev) => {
-                                        const safePrev = Array.isArray(prev)
-                                            ? prev
-                                            : [];
-                                        return safePrev.map((email) =>
-                                            email.id === updatedEmail.id
-                                                ? { ...email, ...updatedEmail }
-                                                : email,
-                                        );
-                                    });
-                                }}
-                            />
-                        )}
-                    </div>
-                </>
-            )}
+            {/* Column 3: Email View (Fluid) */}
+            <Glass
+                intensity="high"
+                border={true}
+                className="flex-1 flex flex-col min-w-0 rounded-xl overflow-hidden"
+            >
+                {orgId && (
+                    <EmailView
+                        selectedEmailId={selectedEmailId}
+                        selectedEmailDetail={selectedEmailDetail}
+                        isLoadingDetail={isLoadingDetail}
+                        checkedEmailIds={checkedEmailIds}
+                        orgId={orgId}
+                        defaultConfigId={selectedConfigId}
+                        onCompose={handleCompose}
+                        emails={displayEmails}
+                        onMarkAsRead={handleMarkAsRead}
+                        availableTags={availableTags}
+                        isDraft={
+                            activeFolder === "Drafts" ||
+                            selectedEmailDetail?.folder === "Drafts"
+                        }
+                        onEmailDeleted={(deletedIds: string | string[]) => {
+                            // Remove deleted emails from list
+                            setEmails((prev) => {
+                                const safePrev = Array.isArray(prev)
+                                    ? prev
+                                    : [];
+                                return safePrev.filter(
+                                    (e) => !deletedIds.includes(e.id),
+                                );
+                            });
+                            // Clear selection
+                            setCheckedEmailIds((prev) =>
+                                prev.filter((id) => !deletedIds.includes(id)),
+                            );
+                            // If current selected email was deleted, clear it
+                            if (
+                                selectedEmailId &&
+                                deletedIds.includes(selectedEmailId)
+                            ) {
+                                setSelectedEmailId(null);
+                                setSelectedEmailDetail(null);
+                            }
+                        }}
+                        onEmailUpdated={(updatedEmail: { id: any }) => {
+                            setEmails((prev) => {
+                                const safePrev = Array.isArray(prev)
+                                    ? prev
+                                    : [];
+                                return safePrev.map((email) =>
+                                    email.id === updatedEmail.id
+                                        ? { ...email, ...updatedEmail }
+                                        : email,
+                                );
+                            });
+                        }}
+                    />
+                )}
+            </Glass>
 
             {orgId && (
                 <ComposeEmailModal

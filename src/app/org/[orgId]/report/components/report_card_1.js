@@ -136,7 +136,7 @@ export function ReportCard1({ reportData, isLoading: externalLoading }) {
                                 (name) => ({
                                     name,
                                     data: workspaceData[name],
-                                })
+                                }),
                             );
                             break;
                         case "Nguồn":
@@ -144,7 +144,7 @@ export function ReportCard1({ reportData, isLoading: externalLoading }) {
                                 (name) => ({
                                     name,
                                     data: sourceData[name],
-                                })
+                                }),
                             );
                             break;
                         case "Phân loại":
@@ -152,7 +152,7 @@ export function ReportCard1({ reportData, isLoading: externalLoading }) {
                                 (name) => ({
                                     name,
                                     data: categoryData[name],
-                                })
+                                }),
                             );
                             break;
                         case "Thẻ":
@@ -166,7 +166,7 @@ export function ReportCard1({ reportData, isLoading: externalLoading }) {
                                 (name) => ({
                                     name,
                                     data: staffData[name],
-                                })
+                                }),
                             );
                             break;
                         default:
@@ -215,7 +215,7 @@ export function ReportCard1({ reportData, isLoading: externalLoading }) {
     };
 
     return (
-        <Card className="w-full p-4 h-full min-h-[300px]">
+        <Card className="w-full p-4 h-full min-h-[300px] border-none shadow-none !bg-transparent">
             <div className="flex flex-col h-full">
                 <div className="flex items-center w-full flex-wrap justify-end gap-1">
                     <div className="text-title text-[1vw] font-medium">

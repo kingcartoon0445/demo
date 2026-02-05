@@ -1212,7 +1212,7 @@ export function EmailView({
                                         }
                                     </style>
                                 </head>
-                                <body>
+                                <body>  
                                     ${email.content || ""}
                                 </body>
                                 </html>

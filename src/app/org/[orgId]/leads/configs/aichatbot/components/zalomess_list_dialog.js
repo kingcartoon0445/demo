@@ -46,14 +46,14 @@ export function ZlMessListDialog({
                             onClick={() => {
                                 popupCenter(
                                     `${apiBase}/api/v2/public/integration/auth/zalo/message?organizationId=${orgId}&accessToken=${localStorage.getItem(
-                                        "accessToken"
+                                        "accessToken",
                                     )}`,
                                     "Connect Zalo OA",
                                     600,
                                     1000,
                                     () => {
                                         refreshList();
-                                    }
+                                    },
                                 );
                             }}
                             className="ml-4"
@@ -69,11 +69,11 @@ export function ZlMessListDialog({
                             key={i}
                             onClick={() => {
                                 const exists = selectedList?.some(
-                                    (item) => item.id == e.id
+                                    (item) => item.id == e.id,
                                 );
                                 if (exists) {
                                     setSelectedList((prev) =>
-                                        prev.filter((item) => item.id !== e.id)
+                                        prev.filter((item) => item.id !== e.id),
                                     );
                                 } else {
                                     setSelectedList((prev) => [
@@ -97,7 +97,7 @@ export function ZlMessListDialog({
                             </div>
                             <Checkbox
                                 checked={selectedList?.some(
-                                    (item) => item.id == e.id
+                                    (item) => item.id == e.id,
                                 )}
                                 onCheckedChange={(checked) => {
                                     if (checked) {
@@ -105,8 +105,8 @@ export function ZlMessListDialog({
                                     } else {
                                         setSelectedList((prev) =>
                                             prev.filter(
-                                                (item) => item.id !== e.id
-                                            )
+                                                (item) => item.id !== e.id,
+                                            ),
                                         );
                                     }
                                 }}

@@ -1,6 +1,7 @@
 "use client";
 import { loginApi, socialLogin } from "@/api/auth";
 import { ButtonLoading } from "@/components/button_loading";
+import { Glass } from "@/components/Glass";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -144,25 +145,25 @@ export default function Page() {
                             if (res.code == 0) {
                                 setAuthTokens(
                                     res.content.accessToken,
-                                    res.content.refreshToken
+                                    res.content.refreshToken,
                                 );
                                 // Kiểm tra redirect param
                                 const searchParams = new URLSearchParams(
-                                    window.location.search
+                                    window.location.search,
                                 );
                                 const redirect = searchParams.get("redirect");
                                 router.push(redirect || `/`);
                             } else {
                                 toast.error(res.message);
                             }
-                        }
+                        },
                     ),
                     {
                         loading: "Vui lòng chờ...",
                         success: <b>Đăng nhập thành công!</b>,
                         error: <b>Thất bại</b>,
                     },
-                    { position: "top-center" }
+                    { position: "top-center" },
                 );
             } else {
                 toast.error("Đã có lỗi xảy ra xin vui lòng thử lại");
@@ -171,22 +172,22 @@ export default function Page() {
     });
     function handleFbLogin() {
         fbLogin(
-            "email,openid,pages_show_list,pages_messaging,instagram_basic,leads_retrieval,instagram_manage_messages,pages_read_engagement,pages_manage_metadata,pages_read_user_content,pages_manage_engagement,public_profile,pages_manage_posts"
+            "email,openid,pages_show_list,pages_messaging,instagram_basic,leads_retrieval,instagram_manage_messages,pages_read_engagement,pages_manage_metadata,pages_read_user_content,pages_manage_engagement,public_profile,pages_manage_posts",
         ).then((response) => {
             if (response.status === "connected") {
                 toast.promise(
                     socialLogin(
                         response?.authResponse?.accessToken,
-                        "facebook"
+                        "facebook",
                     ).then((res) => {
                         if (res.code == 0) {
                             setAuthTokens(
                                 res.content.accessToken,
-                                res.content.refreshToken
+                                res.content.refreshToken,
                             );
                             // Kiểm tra redirect param
                             const searchParams = new URLSearchParams(
-                                window.location.search
+                                window.location.search,
                             );
                             const redirect = searchParams.get("redirect");
                             router.push(redirect || `/`);
@@ -199,7 +200,7 @@ export default function Page() {
                         success: <b>Đăng nhập thành công!</b>,
                         error: <b>Thất bại</b>,
                     },
-                    { position: "top-center" }
+                    { position: "top-center" },
                 );
             } else {
                 toast.error("Đã có lỗi xảy ra xin vui lòng thử lại");
@@ -208,10 +209,18 @@ export default function Page() {
     }
 
     return (
-        <div className="h-screen w-screen flex items-center justify-center">
-            <div className="shadow-1 p-4 mx-4 md:p-8 rounded-2xl bg-white transition-all w-full md:w-auto">
+        <div className="relative h-screen w-screen flex items-center justify-center overflow-hidden bg-slate-50">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-5%] left-[-5%] w-[40vw] h-[40vw] bg-indigo-300/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob"></div>
+                <div className="absolute top-[5%] right-[-5%] w-[35vw] h-[35vw] bg-purple-300/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob animation-delay-2000"></div>
+                <div className="absolute bottom-[-10%] left-[20%] w-[45vw] h-[45vw] bg-pink-300/40 rounded-full mix-blend-multiply filter blur-[80px] animate-blob animation-delay-4000"></div>
+            </div>
+            <Glass
+                className="relative z-10 p-4 mx-4 md:p-8 rounded-2xl w-full md:w-auto"
+                intensity="medium"
+            >
                 <div className="flex flex-col items-center md:w-[450px]">
-                    <div className="p-3 rounded-3xl border-[1px] border-[#E4E7EC]">
+                    <div className="p-3 rounded-2xl border border-[#E4E7EC] bg-transparent">
                         <Image
                             alt="logo"
                             src={"/icons/logo_without_text.svg"}
@@ -248,11 +257,11 @@ export default function Page() {
                                             <Input
                                                 onChangeCapture={(e) => {
                                                     setUserName(
-                                                        e.currentTarget.value
+                                                        e.currentTarget.value,
                                                     );
                                                 }}
                                                 placeholder="example@azvidi.vn"
-                                                className="border-none bg-[#F9F9F9]"
+                                                className="border-none bg-[#F9F9F9]/50 rounded-lg"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -268,9 +277,9 @@ export default function Page() {
                                     <Button
                                         type="submit"
                                         className={cn(
-                                            " bg-[#D9D9D9] w-full",
+                                            " bg-[#D9D9D9] w-full rounded-lg",
                                             userName.includes("@") &&
-                                                "bg-primary"
+                                                "bg-primary",
                                         )}
                                     >
                                         Đăng nhập
@@ -284,7 +293,7 @@ export default function Page() {
                                         setTermsAccepted(checked === true)
                                     }
                                     id="terms"
-                                    className="mr-2"
+                                    className="mr-2 rounded"
                                 />
                                 <label htmlFor="terms" className="text-sm">
                                     Tôi đã đọc và chấp nhận các{" "}
@@ -300,31 +309,34 @@ export default function Page() {
                         </form>
                     </Form>
                     <div className="flex items-center w-full gap-2 py-6">
-                        <div className="flex-1 h-[1px] bg-[#E4E7EC]" />
+                        <div className="flex-1 h-px bg-[#E4E7EC]" />
                         <div className="text-[#1F2329] text-base opacity-65">
                             Hoặc đăng nhập bằng
                         </div>
-                        <div className="flex-1 h-[1px] bg-[#E4E7EC]" />
+                        <div className="flex-1 h-px bg-[#E4E7EC]" />
                     </div>
                     <div className="flex flex-col w-full gap-5">
                         <SocialButton
                             title="Đăng nhập bằng Gmail"
                             icon="/icons/google_ico.svg"
                             onClick={handleGgLogin}
+                            className="rounded-lg"
                         />
                         <SocialButton
                             onClick={handleFbLogin}
                             title="Đăng nhập bằng Facebook"
                             icon="/icons/fb_ico.svg"
+                            className="rounded-lg"
                         />
                         <SocialButton
                             onClick={handleAppleLogin}
                             title="Đăng nhập bằng Apple"
                             icon="/icons/apple_ico.svg"
+                            className="rounded-lg"
                         />
                     </div>
                 </div>
-            </div>
+            </Glass>
         </div>
     );
 }

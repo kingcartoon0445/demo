@@ -11,6 +11,7 @@ import { MdAdd } from "react-icons/md";
 import { RiRobot2Line } from "react-icons/ri";
 import CreateChatbotDialog from "./components/create_chatbot_dialog";
 import EditChatbotDialog from "./components/edit_chatbot.dialog";
+import { Glass } from "@/components/Glass";
 
 export default function Page({ params }) {
     const orgId = use(params).orgId;
@@ -68,7 +69,10 @@ export default function Page({ params }) {
                         isDone={() => fetchData()}
                     />
                 )}
-                <div className="rounded-2xl flex flex-col bg-white h-full">
+                <Glass
+                    className="rounded-2xl flex flex-col h-full"
+                    intensity="high"
+                >
                     <div className="flex items-center w-full justify-between pl-5 pr-3 py-4 border-b relative">
                         <div className="text-[18px] font-medium">
                             AI Chatbot
@@ -97,7 +101,7 @@ export default function Page({ params }) {
                             />
                         ))}
                     </div>
-                </div>
+                </Glass>
             </div>
         </LeadsLayout>
     );
@@ -115,74 +119,76 @@ const ChatbotItem = ({ e, orgId, onClick }) => {
     return (
         <div
             onClick={onClick}
-            className="p-4 rounded-lg bg-[var(--bg2)] w-full flex items-center gap-2 cursor-pointer"
+            className="group flex flex-col h-full px-3 py-3 rounded-lg border border-border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20"
         >
-            <div className="flex-1 flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                    <RiRobot2Line className="text-xl text-primary" />
+            <div className="flex items-center gap-2">
+                <div className="w-[28px] h-[28px] shrink-0">
+                    <RiRobot2Line className="text-xl text-primary w-full h-full" />
+                </div>
+                <div className="text-base text-title font-medium break-all flex-1 flex gap-2">
                     {e.title}
                 </div>
-
-                {fbFeed.length + fbMessages.length + zalo.length > 0 && (
-                    <div className="flex items-center gap-1 mt-1">
-                        {fbFeed.slice(0, 3).map((c, idx) => (
-                            <TooltipProvider key={`${c.id ?? idx}-fbf`}>
-                                <Tooltip content={c.name}>
-                                    <div>
-                                        <Avatar
-                                            src={c.avatar || undefined}
-                                            name={c.name || ""}
-                                            size="20"
-                                            round
-                                        />
-                                    </div>
-                                </Tooltip>
-                            </TooltipProvider>
-                        ))}
-                        {fbMessages.slice(0, 3).map((c, idx) => (
-                            <TooltipProvider key={`${c.id ?? idx}-fbm`}>
-                                <Tooltip content={c.name}>
-                                    <div>
-                                        <Avatar
-                                            src={c.avatar || undefined}
-                                            name={c.name || ""}
-                                            size="20"
-                                            round
-                                        />
-                                    </div>
-                                </Tooltip>
-                            </TooltipProvider>
-                        ))}
-                        {zalo.slice(0, 3).map((c, idx) => (
-                            <TooltipProvider key={`${c.id ?? idx}-zalo`}>
-                                <Tooltip content={c.name}>
-                                    <div>
-                                        <Avatar
-                                            src={c.avatar || undefined}
-                                            name={c.name || ""}
-                                            size="20"
-                                            round
-                                        />
-                                    </div>
-                                </Tooltip>
-                            </TooltipProvider>
-                        ))}
-                    </div>
-                )}
+                <Switch
+                    className="ml-auto data-[state=checked]:bg-primary"
+                    onClick={(e) => e.stopPropagation()}
+                    checked={status}
+                    onCheckedChange={(value) => {
+                        updateStatusChatBot(orgId, e.id, {
+                            status: value ? 1 : 0,
+                        }).then((res) => {
+                            if (res?.message) return toast.error(res?.message);
+                            setStatus(value);
+                        });
+                    }}
+                />
             </div>
-            <Switch
-                className="ml-auto data-[state=checked]:bg-primary"
-                onClick={(e) => e.stopPropagation()}
-                checked={status}
-                onCheckedChange={(value) => {
-                    updateStatusChatBot(orgId, e.id, {
-                        status: value ? 1 : 0,
-                    }).then((res) => {
-                        if (res?.message) return toast.error(res?.message);
-                        setStatus(value);
-                    });
-                }}
-            />
+
+            {fbFeed.length + fbMessages.length + zalo.length > 0 && (
+                <div className="flex items-center gap-1 mt-1">
+                    {fbFeed.slice(0, 3).map((c, idx) => (
+                        <TooltipProvider key={`${c.id ?? idx}-fbf`}>
+                            <Tooltip content={c.name}>
+                                <div>
+                                    <Avatar
+                                        src={c.avatar || undefined}
+                                        name={c.name || ""}
+                                        size="20"
+                                        round
+                                    />
+                                </div>
+                            </Tooltip>
+                        </TooltipProvider>
+                    ))}
+                    {fbMessages.slice(0, 3).map((c, idx) => (
+                        <TooltipProvider key={`${c.id ?? idx}-fbm`}>
+                            <Tooltip content={c.name}>
+                                <div>
+                                    <Avatar
+                                        src={c.avatar || undefined}
+                                        name={c.name || ""}
+                                        size="20"
+                                        round
+                                    />
+                                </div>
+                            </Tooltip>
+                        </TooltipProvider>
+                    ))}
+                    {zalo.slice(0, 3).map((c, idx) => (
+                        <TooltipProvider key={`${c.id ?? idx}-zalo`}>
+                            <Tooltip content={c.name}>
+                                <div>
+                                    <Avatar
+                                        src={c.avatar || undefined}
+                                        name={c.name || ""}
+                                        size="20"
+                                        round
+                                    />
+                                </div>
+                            </Tooltip>
+                        </TooltipProvider>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

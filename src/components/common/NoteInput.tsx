@@ -47,7 +47,7 @@ export default function NoteInput({
     };
 
     return (
-        <div className="border rounded-lg p-3 relative bg-white">
+        <div className="border rounded-xl p-3 relative bg-white">
             <textarea
                 className="w-full p-2 border-0 resize-none min-h-[100px] focus:outline-none text-sm"
                 placeholder={t("common.enterNote")}

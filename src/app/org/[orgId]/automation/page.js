@@ -10,7 +10,6 @@ import AutomationConfigList from "./components/AutomationConfigList";
 import UnderConstruction from "@/components/common/UnderContruction";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { useParams } from "next/navigation";
-
 export default function AutomationPage() {
     const params = useParams();
     const [open, setOpen] = useState(false);
@@ -18,11 +17,9 @@ export default function AutomationPage() {
     const [reminderConfigOpen, setReminderConfigOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-    // Permission checks
     const { permissions, isManager } = useUserPermissions(params.orgId);
     const canCreate = isManager || permissions.has("AUTOMATION.CREATE");
     const canDelete = isManager || permissions.has("AUTOMATION.DELETE");
-
     const handleRecallDialogClose = (refresh = false) => {
         setRecallConfigOpen(false);
         if (refresh) {
@@ -61,7 +58,7 @@ export default function AutomationPage() {
                         {canCreate && (
                             <Dialog open={open} onOpenChange={setOpen}>
                                 <DialogTrigger asChild>
-                                    <Button className="flex items-center gap-1 h-[35px] px-[10px]">
+                                    <Button className="flex items-center gap-1 h-9 px-[10px]">
                                         <MdAdd className="text-xl" />
                                         Thêm mới
                                     </Button>
@@ -81,7 +78,7 @@ export default function AutomationPage() {
                                     />
                                 )}
                             </Dialog>
-                        )}
+                        )}{" "}
                     </div>
                 </div>
 

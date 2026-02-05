@@ -43,7 +43,7 @@ export function ReportCard3({ reportData, isLoading: externalLoading }) {
                             name,
                             value: data.count,
                             hex: data.hex,
-                        })
+                        }),
                     );
 
                     return transformedData;
@@ -71,24 +71,22 @@ export function ReportCard3({ reportData, isLoading: externalLoading }) {
 
     if (isLoading) {
         return (
-            <Card className="w-full min-h-[300px] p-4">
+            <div className="w-full min-h-[300px] p-4 h-full">
                 <Skeleton className="w-full h-full rounded-xl" />
-            </Card>
+            </div>
         );
     }
 
     if (!chartData || chartData.length === 0) {
         return (
-            <Card className="w-full min-h-[300px] p-4">
-                <div className="flex items-center justify-center h-full">
-                    <div>Không có dữ liệu</div>
-                </div>
-            </Card>
+            <div className="w-full min-h-[300px] p-4 h-full flex items-center justify-center">
+                <div className="text-gray-500">Không có dữ liệu</div>
+            </div>
         );
     }
 
     return (
-        <Card className="w-full min-h-[300px] p-4">
+        <Card className="w-full min-h-[300px] p-4 border-none shadow-none !bg-transparent">
             <div className="flex flex-col h-full">
                 <div className="flex items-center w-full">
                     <div className="text-title text-[1vw] font-medium mr-auto">

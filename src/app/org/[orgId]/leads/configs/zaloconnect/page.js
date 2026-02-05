@@ -16,6 +16,7 @@ import Avatar from "react-avatar";
 import { toast } from "react-hot-toast";
 import { UnlinkButton } from "../form/components/unlink_button";
 import ZaloConnectFrame from "./components/zaloconnect_frame";
+import { Glass } from "@/components/Glass";
 
 export default function Page({ params }) {
     const orgId = use(params).orgId;
@@ -42,29 +43,36 @@ export default function Page({ params }) {
     }, [orgId]);
     return (
         <LeadsLayout selectedSource="config-zalo" orgId={orgId}>
-            <div className="flex flex-col gap-2 w-full">
-                <ZaloConnectFrame
-                    orgId={orgId}
-                    onRefresh={loadSubscriptionList}
-                />
+            <div className="flex flex-col h-full w-full">
+                <Glass
+                    className="rounded-2xl flex flex-col h-full overflow-hidden"
+                    intensity="high"
+                >
+                    <ZaloConnectFrame
+                        orgId={orgId}
+                        onRefresh={loadSubscriptionList}
+                    />
 
-                <div className="flex flex-col px-4 gap-2 overflow-y-auto">
-                    <div className="font-medium mb-2">Trang đã liên kết</div>
-                    <div className="py-2">
-                        {subscriptionList.map((e, i) => (
-                            <CustomCard
-                                key={i}
-                                name={e.name}
-                                status={e.status}
-                                avatar={e.avatar}
-                                id={e.id}
-                                orgId={orgId}
-                                uid={e.uid}
-                                onRefresh={loadSubscriptionList}
-                            />
-                        ))}
+                    <div className="flex flex-col px-4 gap-2 overflow-y-auto min-h-0 flex-1 pb-4">
+                        <div className="font-medium mb-2 shrink-0">
+                            Trang đã liên kết
+                        </div>
+                        <div className="py-2 flex flex-col gap-5">
+                            {subscriptionList.map((e, i) => (
+                                <CustomCard
+                                    key={i}
+                                    name={e.name}
+                                    status={e.status}
+                                    avatar={e.avatar}
+                                    id={e.id}
+                                    orgId={orgId}
+                                    uid={e.uid}
+                                    onRefresh={loadSubscriptionList}
+                                />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </Glass>
             </div>
         </LeadsLayout>
     );
@@ -89,7 +97,7 @@ const CustomCard = ({ name, avatar, status, id, orgId, uid, onRefresh }) => {
                 .catch(() => {
                     // Nếu có lỗi, quay lại trạng thái cũ
                     setChecked(prevState);
-                })
+                }),
         );
     };
 
@@ -102,7 +110,7 @@ const CustomCard = ({ name, avatar, status, id, orgId, uid, onRefresh }) => {
         });
     };
     return (
-        <div className="flex items-center px-4 py-3 rounded-lg shadow-sm justify-between">
+        <div className="flex items-center px-4 py-3 rounded-lg shadow-sm justify-between bg-white/40 border border-white/20 transition-all duration-200 hover:shadow-lg hover:bg-white/60 hover:-translate-y-0.5">
             <div className="flex items-center gap-2">
                 <Avatar
                     name={getFirstAndLastWord(name)}

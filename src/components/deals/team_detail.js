@@ -50,6 +50,7 @@ import { useDebounce } from "use-debounce";
 import ConfirmDialog from "../common/ConfirmDialog";
 import { Tooltip, TooltipProvider } from "../ui/tooltip";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Glass } from "@/components/Glass";
 export function TeamDetail({
     selectedTeam,
     refreshTeamList,
@@ -107,10 +108,6 @@ export function TeamDetail({
         description: "",
         onConfirm: () => {},
     });
-
-    console.log("[TeamDetail] canDelete prop:", canDelete);
-    console.log("[TeamDetail] canAddMember prop:", canAddMember);
-    console.log("[TeamDetail] canManageMember prop:", canManageMember);
 
     useEffect(() => {
         resetMemberList();
@@ -196,34 +193,6 @@ export function TeamDetail({
         }
     };
 
-    // const handleUpdateTeamLeader = async (profileId) => {
-    //     const res = await updateTeamLeader(
-    //         orgId,
-    //         workspaceId,
-    //         teamId,
-    //         profileId
-    //     );
-    //     if (res.message) {
-    //         toast.error(res.message);
-    //     } else {
-    //         toast.success("Trưởng nhóm đã được cập nhật");
-    //     }
-    // };
-
-    // const handleUpdateSubLeader = async (profileId) => {
-    //     const res = await updateSubLeader(
-    //         orgId,
-    //         workspaceId,
-    //         teamId,
-    //         profileId
-    //     );
-    //     if (res.message) {
-    //         toast.error(res.message);
-    //     } else {
-    //         toast.success("Phó nhóm đã được cập nhật");
-    //     }
-    // };
-
     const handleDeleteMemberFromTeam = async (profileId) => {
         const res = await deleteMemberFromTeam(orgId, teamId, profileId);
         if (res.message) {
@@ -236,7 +205,10 @@ export function TeamDetail({
     };
 
     return (
-        <div className="h-full flex-1 flex flex-col bg-white rounded-2xl items-center">
+        <Glass
+            intensity="high"
+            className="h-full flex-1 flex flex-col rounded-2xl items-center overflow-hidden"
+        >
             {!selectedTeam ? (
                 <Image
                     alt="empty"
@@ -913,6 +885,6 @@ export function TeamDetail({
                     )}
                 </>
             )}
-        </div>
+        </Glass>
     );
 }

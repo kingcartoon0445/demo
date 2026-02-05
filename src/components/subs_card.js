@@ -216,7 +216,7 @@ export default function SubsCard({ setCurrentSubscriptionId }) {
     }
 
     return (
-        <div className="bg-white rounded-xl flex flex-col gap-2 flex-1 mb-2">
+        <div className="bg-transparent rounded-xl flex flex-col gap-2 flex-1 mb-2">
             {openSheet && <SubsSheet open={openSheet} setOpen={setOpenSheet} />}
             {openBuyMemberDialog && (
                 <BuyNewMemberDialog
@@ -251,7 +251,7 @@ export default function SubsCard({ setCurrentSubscriptionId }) {
                               (subscription?.expiryDate &&
                                   format(
                                       subscription?.expiryDate,
-                                      "dd/MM/yyyy"
+                                      "dd/MM/yyyy",
                                   ))}
                     </div>
                 </div>

@@ -93,12 +93,12 @@ export default function ReminderList({
                         {t("common.activity")}
                     </CardTitle>
                     <Button
-                        variant="ghost"
+                        variant="link"
                         size="sm"
-                        className="text-primary underline rounded-md"
+                        className="text-primary hover:text-primary/80 font-medium"
                         onClick={handleAddNew}
                     >
-                        <PlusIcon className="h-3 w-3 mr-1" />{" "}
+                        <PlusIcon className="h-4 w-4 mr-1" />
                         {t("common.addActivity")}
                     </Button>
                 </CardHeader>

@@ -98,7 +98,7 @@ const DealCard: React.FC<DealCardProps> = ({
         <div
             onClick={handleClick}
             className={cn(
-                "bg-white rounded-lg p-2 hover:shadow-md transition-shadow cursor-move"
+                "bg-white rounded-lg p-3 shadow-sm hover:shadow-xl transition-all duration-200 cursor-move border border-gray-100 hover:-translate-y-1",
                 // statusColors[status]
             )}
         >
@@ -112,23 +112,30 @@ const DealCard: React.FC<DealCardProps> = ({
                         (() => {
                             const visible = tags.slice(0, 3);
                             const remaining = tags.length - visible.length;
-                            const rows: typeof visible[] = [];
+                            const rows: (typeof visible)[] = [];
                             for (let i = 0; i < visible.length; i += 2) {
                                 rows.push(visible.slice(i, i + 2));
                             }
                             return (
                                 <div className="flex flex-col gap-1">
                                     {rows.map((row, rowIndex) => (
-                                        <div key={rowIndex} className="flex items-center gap-1">
+                                        <div
+                                            key={rowIndex}
+                                            className="flex items-center gap-1"
+                                        >
                                             {row.map((tag) => (
                                                 <span
                                                     key={tag.id}
                                                     className="px-1.5 py-0.5 text-[10px] font-medium rounded-md border"
                                                     style={{
-                                                        color: tag.textColor || "#111827",
+                                                        color:
+                                                            tag.textColor ||
+                                                            "#111827",
                                                         backgroundColor:
-                                                            tag.backgroundColor || "#F3F4F6",
-                                                        borderColor: "rgba(0,0,0,0.08)",
+                                                            tag.backgroundColor ||
+                                                            "#F3F4F6",
+                                                        borderColor:
+                                                            "rgba(0,0,0,0.08)",
                                                     }}
                                                     title={tag.name}
                                                 >

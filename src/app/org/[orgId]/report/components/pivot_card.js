@@ -230,7 +230,7 @@ export default function PivotCard({
             if (parsedConfig.showColumnTotals !== undefined) {
                 instance.option(
                     "showColumnTotals",
-                    parsedConfig.showColumnTotals
+                    parsedConfig.showColumnTotals,
                 );
             }
             if (parsedConfig.showRowTotals !== undefined) {
@@ -239,13 +239,13 @@ export default function PivotCard({
             if (parsedConfig.showColumnGrandTotals !== undefined) {
                 instance.option(
                     "showColumnGrandTotals",
-                    parsedConfig.showColumnGrandTotals
+                    parsedConfig.showColumnGrandTotals,
                 );
             }
             if (parsedConfig.showRowGrandTotals !== undefined) {
                 instance.option(
                     "showRowGrandTotals",
-                    parsedConfig.showRowGrandTotals
+                    parsedConfig.showRowGrandTotals,
                 );
             }
 
@@ -359,7 +359,7 @@ export default function PivotCard({
                 showColumnTotals: pivotInstance.option("showColumnTotals"),
                 showRowTotals: pivotInstance.option("showRowTotals"),
                 showColumnGrandTotals: pivotInstance.option(
-                    "showColumnGrandTotals"
+                    "showColumnGrandTotals",
                 ),
                 showRowGrandTotals: pivotInstance.option("showRowGrandTotals"),
             };
@@ -404,7 +404,7 @@ export default function PivotCard({
     // Tạo hàm debounce để giới hạn số lần gọi API
     const debouncedUpdateConfig = useMemo(
         () => debounce(updatePivotConfig, 1000),
-        [pivotId, reportId, onSaveConfig, lastSavedConfig]
+        [pivotId, reportId, onSaveConfig, lastSavedConfig],
     );
 
     // Xử lý sự kiện khi cấu hình PivotGrid thay đổi
@@ -450,7 +450,7 @@ export default function PivotCard({
                         new Blob([buffer], {
                             type: "application/octet-stream",
                         }),
-                        `${title.replace(/\s+/g, "_")}.xlsx`
+                        `${title.replace(/\s+/g, "_")}.xlsx`,
                     );
                     toast.success("Xuất Excel thành công!");
                 });
@@ -462,7 +462,9 @@ export default function PivotCard({
     };
 
     return (
-        <Card className={`w-full p-4 ${colSpan === 2 ? "col-span-2" : ""}`}>
+        <Card
+            className={`w-full p-4 ${colSpan === 2 ? "col-span-2" : ""} border-none shadow-none !bg-transparent`}
+        >
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">{title}</h2>
                 {dataSource && !isLoading && (
@@ -482,7 +484,35 @@ export default function PivotCard({
                     <Spinner />
                 </div>
             ) : dataSource ? (
-                <div className="max-w-[calc(100vw-140px)] overflow-x-auto">
+                <div className="max-w-[calc(100vw-140px)] overflow-x-auto transparent-pivot">
+                    <style>{`
+                        .transparent-pivot .dx-pivotgrid,
+                        .transparent-pivot .dx-widget,
+                        .transparent-pivot .dx-pivotgrid-area,
+                        .transparent-pivot .dx-pivotgrid-data-area,
+                        .transparent-pivot .dx-pivotgrid-headers-area {
+                            background: transparent !important;
+                            background-color: transparent !important;
+                        }
+                        .transparent-pivot .dx-area-description-cell {
+                            background-color: transparent !important;
+                        }
+                        .transparent-pivot .dx-pivotgrid-area td {
+                             border-color: rgba(255,255,255,0.2) !important;
+                             background-color: transparent !important;
+                        }
+                        /* Header cells background */
+                        .transparent-pivot .dx-pivotgrid .dx-pivotgrid-horizontal-headers .dx-pivotgrid-area td,
+                        .transparent-pivot .dx-pivotgrid .dx-pivotgrid-vertical-headers .dx-pivotgrid-area td {
+                            background-color: rgba(255,255,255,0.15) !important;
+                        }
+                        /* Totals */
+                        .transparent-pivot .dx-grandtotal, 
+                        .transparent-pivot .dx-row-total,
+                        .transparent-pivot .dx-column-total {
+                             background-color: rgba(255,255,255,0.25) !important;
+                        }
+                    `}</style>
                     <PivotGrid
                         key={pivotGridKey}
                         dataSource={dataSource}
@@ -490,7 +520,7 @@ export default function PivotCard({
                         allowSorting={true}
                         allowFiltering={true}
                         allowExpandAll={true}
-                        showBorders={true}
+                        showBorders={false}
                         showColumnTotals={false}
                         showRowTotals={false}
                         showColumnGrandTotals={true}

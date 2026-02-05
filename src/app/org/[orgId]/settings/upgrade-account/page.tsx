@@ -1,4 +1,5 @@
 "use client";
+import { Glass } from "@/components/Glass";
 import SubsCard from "@/components/subs_card";
 import { type CarouselApi } from "@/components/ui/carousel";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -10,7 +11,7 @@ export default function UpgradeAccountPage() {
     const { t } = useLanguage();
     const { orgId } = useParams();
     const { data: subscriptionPackages, isLoading } = useSubscriptionPackages(
-        orgId as string
+        orgId as string,
     );
     const subscriptionPackagesData = subscriptionPackages?.content;
     const [currentSubscriptionId, setCurrentSubscriptionId] =
@@ -40,10 +41,14 @@ export default function UpgradeAccountPage() {
     }, [carouselApi]);
 
     return (
-        <div className="bg-white h-full w-full">
-            <div className="p-4 h-full">
-                <SubsCard setCurrentSubscriptionId={setCurrentSubscriptionId} />
-            </div>
+        <div className="h-full">
+            <Glass intensity="high" className="h-full w-full rounded-2xl">
+                <div className="p-4 h-full">
+                    <SubsCard
+                        setCurrentSubscriptionId={setCurrentSubscriptionId}
+                    />
+                </div>
+            </Glass>
         </div>
     );
 }

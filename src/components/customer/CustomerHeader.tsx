@@ -1,16 +1,21 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAssignCustomer } from "@/hooks/useCustomerDetail";
 import { Assignee, Customer } from "@/lib/interface";
+import { getAvatarUrl } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import Avatar from "react-avatar";
+import { MdOutlineCall } from "react-icons/md";
 import FollowerSelector from "../componentsWithHook/FollowerSelector";
 import OwnerSelector from "../componentsWithHook/OwnerSelector";
 import AddNewDealModal from "../deals/AddNewDealModal";
 import AddCustomerModal from "../leads/AddCustomerModal";
-import AddOpportunityDropdown from "./AddOpportunityDropdown";
 import { Tooltip, TooltipProvider } from "../ui/tooltip";
-import { MdOutlineCall } from "react-icons/md";
+import AddOpportunityDropdown from "./AddOpportunityDropdown";
 import toast from "react-hot-toast";
+import { Button } from "../ui/button";
+import { ArrowLeftIcon } from "lucide-react";
+import { Glass } from "../Glass";
 
 interface CustomerHeaderProps {
     customerName?: string;
@@ -41,7 +46,7 @@ export default function CustomerHeader({
     // Tách owner và followers từ assignees
     const owner = assignees.find((assignee) => assignee.type === "OWNER");
     const followers = assignees.filter(
-        (assignee) => assignee.type === "FOLLOWER"
+        (assignee) => assignee.type === "FOLLOWER",
     );
 
     const handleAddOpportunity = () => {
@@ -101,7 +106,7 @@ export default function CustomerHeader({
 
         // Lấy IDs của members (profileId hoặc id)
         const memberIds = members.map(
-            (member) => member.profileId || member.id
+            (member) => member.profileId || member.id,
         );
 
         // Lấy IDs của teams
@@ -142,7 +147,7 @@ export default function CustomerHeader({
             currentCallStatus === "connected"
         ) {
             toast.error(
-                "Vui lòng kết thúc cuộc gọi hiện tại trước khi thực hiện cuộc gọi mới"
+                "Vui lòng kết thúc cuộc gọi hiện tại trước khi thực hiện cuộc gọi mới",
             );
             return;
         }
@@ -157,18 +162,53 @@ export default function CustomerHeader({
 
     return (
         <>
-            <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-                <div>
+            <Glass
+                intensity="medium"
+                border={false}
+                className="border-b border-white/20 p-4 flex items-center justify-between rounded-t-2xl"
+            >
+                <div className="flex items-center gap-3">
+                    {/* Back Button */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => router.back()}
+                    >
+                        <ArrowLeftIcon className="w-5 h-5" />
+                    </Button>
+
+                    {/* Customer Info */}
+                    <div className="flex items-center gap-3">
+                        <Avatar
+                            name={customerName}
+                            size="40"
+                            round={true}
+                            src={
+                                getAvatarUrl(customerSelected?.avatar || "") ||
+                                undefined
+                            }
+                            className="text-sm font-medium"
+                        />
+                        <div>
+                            <h2 className="text-lg font-semibold text-gray-900 leading-tight">
+                                {customerName || "Khách hàng"}
+                            </h2>
+                            {/* Optional: Add extra info line here */}
+                        </div>
+                    </div>
+
+                    <div className="h-6 w-px bg-gray-200 mx-2" />
+
                     <TooltipProvider>
                         <Tooltip content={<p>Gọi điện</p>}>
                             <div
                                 data-call-button
                                 onClick={handleCall}
                                 className={
-                                    "bg-[#4dae50] rounded-full p-2 cursor-pointer"
+                                    "bg-[#4dae50] rounded-full p-2 cursor-pointer hover:bg-[#439c46] transition-colors"
                                 }
                             >
-                                <MdOutlineCall className="text-2xl text-white" />
+                                <MdOutlineCall className="text-xl text-white" />
                             </div>
                         </Tooltip>
                     </TooltipProvider>
@@ -198,7 +238,7 @@ export default function CustomerHeader({
                         onAddDeal={handleAddDeal}
                     />
                 </div>
-            </div>
+            </Glass>
 
             {/* Modals */}
             <AddCustomerModal

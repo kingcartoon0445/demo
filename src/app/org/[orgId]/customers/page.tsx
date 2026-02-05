@@ -1,5 +1,7 @@
 "use client";
 
+import { Glass } from "@/components/Glass";
+import { GlassTabs } from "@/components/common/GlassTabs";
 import { TableLoading } from "@/components/common/TableLoading";
 import AddOrganizationModal from "@/components/customers/AddOrganizationModal";
 import CustomerFilter from "@/components/customers/CustomerFilter";
@@ -77,13 +79,13 @@ export default function CustomersPage() {
     // Fetch customers data using the new hook
     const { data, isLoading, error } = useCustomerListV2ByPost(
         orgId as string,
-        filterBody
+        filterBody,
     );
 
     useEffect(() => {
         if (data && data?.code !== 0) {
             toast.error(
-                data?.message || "Có lỗi xảy ra khi tải danh sách thành viên"
+                data?.message || "Có lỗi xảy ra khi tải danh sách thành viên",
             );
         }
     }, [data]);
@@ -251,48 +253,45 @@ export default function CustomersPage() {
     };
 
     return (
-        <div className="p-2">
+        <Glass
+            intensity="high"
+            className="h-screen flex flex-col rounded-2xl overflow-hidden p-2"
+        >
             <div className="flex justify-between items-center mb-2">
                 {/* Tabs bên trái */}
-                <Tabs
-                    value={tabValue}
-                    onValueChange={setTabValue}
-                    defaultValue="personal"
-                >
-                    <TabsList>
-                        <TabsTrigger value="personal">
-                            {t("common.personal")}
-                        </TabsTrigger>
-                        <TabsTrigger value="organization">
-                            {t("common.company")}
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
+                <GlassTabs
+                    tabs={[
+                        { id: "personal", label: t("common.personal") },
+                        { id: "organization", label: t("common.company") },
+                    ]}
+                    activeTab={tabValue}
+                    onChange={setTabValue}
+                />
             </div>
 
             <div className="flex items-center justify-between w-full gap-2 mb-2">
                 <div className="flex items-center gap-2">
                     {hasActiveFilters() && (
-                        <div className="text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded-md border border-blue-200 flex items-center gap-2">
+                        <div className="text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 flex items-center gap-2">
                             <span>{getActiveFilterLabels()}</span>
                         </div>
                     )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-3">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
                             type="text"
                             placeholder={t("common.searchCustomer")}
-                            className="pl-8 pr-8 h-8 w-[250px] rounded-md border border-input bg-background px-3 text-sm transition-colors"
+                            className="w-full pl-11 pr-10 h-10 rounded-lg bg-white border-0 shadow-sm text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                         />
                         {searchText && (
                             <button
                                 onClick={() => setSearchText("")}
-                                className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -302,6 +301,7 @@ export default function CustomersPage() {
 
                     <Button
                         size="sm"
+                        className="h-10 px-5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                         onClick={() => {
                             if (tabValue === "organization") {
                                 setIsAddOrganizationModalOpen(true);
@@ -310,7 +310,7 @@ export default function CustomersPage() {
                             }
                         }}
                     >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-4 w-4 mr-1.5" />
                         {tabValue === "organization"
                             ? "Thêm công ty"
                             : "Thêm mới"}
@@ -331,6 +331,9 @@ export default function CustomersPage() {
                         data={allCustomers}
                         onRowClick={handleRowClick}
                         emptyMessage="Không có khách hàng nào"
+                        headerClassName="bg-transparent border-b border-gray-100 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        rowClassName="h-16 hover:shadow-lg transition-all duration-200 bg-white border-b border-gray-100 last:border-none hover:z-10 relative hover:border-transparent hover:bg-white cursor-pointer"
+                        className="bg-white rounded-2xl shadow-sm border-none"
                     />
 
                     {allCustomers.length > 0 && (
@@ -339,6 +342,7 @@ export default function CustomersPage() {
                                 <Button
                                     variant="outline"
                                     size="sm"
+                                    className="rounded-full"
                                     onClick={handleLoadMore}
                                     disabled={isLoading}
                                 >
@@ -376,6 +380,6 @@ export default function CustomersPage() {
                     orgId={orgId as string}
                 />
             )}
-        </div>
+        </Glass>
     );
 }

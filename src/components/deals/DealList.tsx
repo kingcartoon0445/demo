@@ -31,9 +31,18 @@ import {
     useBatchMoveStage,
 } from "@/hooks/useBusinessProcessDetail";
 import { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Loader2,
+    X,
+    ArrowRight,
+    Pencil,
+    Mail,
+} from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 import { createColumns, DealRow } from "./column";
 import DealDetailPanel from "./DealDetailPanel";
 
@@ -54,6 +63,9 @@ interface CustomDeal {
     stageGroupName?: string;
     createdDate?: string;
     lastModifiedDate?: string;
+    totalCalls?: number;
+    totalReminders?: number;
+    totalNotes?: number;
 }
 
 interface DealRowWithOriginal extends DealRow {
@@ -80,7 +92,7 @@ export default function DealList({
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 10;
     const [selectedDealItem, setSelectedDealItem] = useState<CustomDeal | null>(
-        null
+        null,
     );
     const [isDealDetailOpen, setIsDealDetailOpen] = useState(false);
     const [orderDetails, setOrderDetails] = useState<Record<string, any>>({});
@@ -104,7 +116,7 @@ export default function DealList({
 
     const { data: dealStagesResponse } = useBusinessProcessStagesSelector(
         orgId,
-        workspaceId || ""
+        workspaceId || "",
     );
     const stages = dealStagesResponse?.data || [];
     const stagesMap = stages.reduce(
@@ -114,7 +126,7 @@ export default function DealList({
             }
             return acc;
         },
-        {}
+        {},
     );
 
     // Check if user has applied filters
@@ -171,7 +183,8 @@ export default function DealList({
         ? advancedQuery
         : standardQuery;
 
-    const deals = dealsResponse?.data || [];
+    const rawDeals = dealsResponse?.data;
+    const deals = useMemo(() => rawDeals || [], [rawDeals]);
     const totalItems = dealsResponse?.pagination?.totalRecords || 0;
     const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -199,19 +212,20 @@ export default function DealList({
     >({
         name: true,
         stage: true,
-        product: true,
+        product: false, // Default hidden as per design
         customerName: true,
         orderValue: true,
         assignees: true,
+        tags: false, // Default hidden as tags are shown under name
     });
     const [columnLabels, setColumnLabels] = useState<Record<string, string>>({
-        name: "Tên giao dịch",
-        stage: "Giai đoạn",
-        product: "Sản phẩm",
-        customerName: "Khách hàng",
-        orderValue: "Giá trị đơn hàng",
-        assignees: "Người phụ trách",
-        tags: "Nhãn",
+        name: "TÊN GIAO DỊCH",
+        stage: "TRẠNG THÁI",
+        product: "SẢN PHẨM",
+        customerName: "KHÁCH HÀNG",
+        orderValue: "GIÁ TRỊ",
+        assignees: "PHỤ TRÁCH",
+        tags: "NHÃN",
     });
 
     // Column configuration hooks
@@ -234,8 +248,11 @@ export default function DealList({
                 labels[col.columnKey] = col.label;
             });
 
-            setColumnVisibility(visibility);
-            setColumnLabels(labels);
+            // Merge with local defaults to ensure we don't lose keys if API missing them
+            setColumnVisibility((prev) => ({ ...prev, ...visibility }));
+            // We might want to keep API labels if they exist, or enforce uppercase.
+            // For now let's assume API config should take precedence if user saved it.
+            setColumnLabels((prev) => ({ ...prev, ...labels }));
         }
     }, [taskColumnConfig]);
 
@@ -263,7 +280,7 @@ export default function DealList({
     };
 
     const handleRowSelectionChange: OnChangeFn<RowSelectionState> = (
-        updaterOrValue
+        updaterOrValue,
     ) => {
         if (typeof updaterOrValue === "function") {
             setRowSelection(updaterOrValue);
@@ -281,7 +298,7 @@ export default function DealList({
 
             const response: any = await getOrderDetailWithProduct(
                 orgId,
-                orderId
+                orderId,
             );
 
             // Đảm bảo response có data
@@ -339,7 +356,7 @@ export default function DealList({
                 setIsDealDetailOpen(true);
             }
         },
-        [orderDetails, workspaceId, stagesMap]
+        [orderDetails, workspaceId, stagesMap],
     );
     // Handle close deal detail
     const handleCloseDealDetail = useCallback(() => {
@@ -361,6 +378,9 @@ export default function DealList({
                 workspaceName: deal.workspaceName,
                 assignees: deal.assignedTo,
                 orderDetail: orderDetails[deal.id],
+                totalCalls: deal.activity?.totalCalls || 0,
+                totalReminders: deal.activity?.totalReminders || 0,
+                totalNotes: deal.activity?.totalNotes || 0,
             }));
             setAllDealsInCurrentPage(formattedDeals);
         } else {
@@ -377,17 +397,17 @@ export default function DealList({
     // Get selected deals - memoized to prevent recalculation
     const selectedRowIds = useMemo(
         () => Object.keys(rowSelection).filter((id) => rowSelection[id]),
-        [rowSelection]
+        [rowSelection],
     );
 
     const selectedDeals = useMemo(
         () => tableData.filter((deal) => selectedRowIds.includes(deal.id)),
-        [tableData, selectedRowIds]
+        [tableData, selectedRowIds],
     );
 
     const hasSelectedRows = useMemo(
         () => selectedRowIds.length > 0,
-        [selectedRowIds]
+        [selectedRowIds],
     );
 
     // Handle bulk delete
@@ -446,7 +466,7 @@ export default function DealList({
             setSelectedNewStageId(stageId);
             setSelectedNewStageName(stageName);
         },
-        []
+        [],
     );
 
     // Handle save stage change
@@ -506,7 +526,7 @@ export default function DealList({
                 orderDetail: orderDetails[newDeal.id] || null,
             });
         },
-        [orderDetails, fetchOrderDetail]
+        [orderDetails, fetchOrderDetail],
     );
 
     // Handle next navigation
@@ -514,7 +534,7 @@ export default function DealList({
         if (!selectedDealItem) return;
 
         const currentIndex = allDealsInCurrentPage.findIndex(
-            (d) => d.id === selectedDealItem.id
+            (d) => d.id === selectedDealItem.id,
         );
 
         if (currentIndex < allDealsInCurrentPage.length - 1) {
@@ -545,7 +565,7 @@ export default function DealList({
         if (!selectedDealItem) return;
 
         const currentIndex = allDealsInCurrentPage.findIndex(
-            (d) => d.id === selectedDealItem.id
+            (d) => d.id === selectedDealItem.id,
         );
 
         if (currentIndex > 0) {
@@ -575,7 +595,7 @@ export default function DealList({
     const canNavigatePrevious = useMemo(() => {
         if (!selectedDealItem) return false;
         const currentIndex = allDealsInCurrentPage.findIndex(
-            (d) => d.id === selectedDealItem.id
+            (d) => d.id === selectedDealItem.id,
         );
         // Can navigate if not first deal in current page, or if there are previous pages
         return currentIndex > 0 || currentPage > 0;
@@ -584,7 +604,7 @@ export default function DealList({
     const canNavigateNext = useMemo(() => {
         if (!selectedDealItem) return false;
         const currentIndex = allDealsInCurrentPage.findIndex(
-            (d) => d.id === selectedDealItem.id
+            (d) => d.id === selectedDealItem.id,
         );
         const hasMoreInCurrent =
             currentIndex < allDealsInCurrentPage.length - 1;
@@ -595,8 +615,11 @@ export default function DealList({
 
     // Create columns - memoized to prevent re-creation
     const columns = useMemo(
-        () => createColumns(columnVisibility, columnLabels),
-        [columnVisibility, columnLabels]
+        () =>
+            createColumns(columnVisibility, columnLabels, (deal) =>
+                handleDealClick(deal as any),
+            ),
+        [columnVisibility, columnLabels, handleDealClick],
     );
 
     // Callback for select all in bulk header
@@ -614,7 +637,7 @@ export default function DealList({
                 setRowSelection({});
             }
         },
-        [tableData]
+        [tableData],
     );
 
     // Custom header content for bulk actions - memoized
@@ -630,8 +653,8 @@ export default function DealList({
                                     tableData.length && tableData.length > 0
                                     ? true
                                     : Object.keys(rowSelection).length > 0
-                                    ? "indeterminate"
-                                    : false
+                                      ? "indeterminate"
+                                      : false
                             }
                             onCheckedChange={handleSelectAllInBulkHeader}
                             aria-label="Select all"
@@ -659,13 +682,8 @@ export default function DealList({
                         onClick={handleBulkStageChange}
                         className="text-[#532AE7] hover:text-[#532AE7] h-auto font-normal"
                     >
-                        <Image
-                            src="/icons/sync.svg"
-                            alt="refresh"
-                            width={16}
-                            height={16}
-                        />
-                        Đổi giai đoạn
+                        <ArrowRight size={16} className="mr-2" />
+                        Chuyển giai đoạn
                     </Button>
 
                     <Button
@@ -702,7 +720,7 @@ export default function DealList({
             handleBulkDelete,
             batchDeleteMutation.isPending,
             selectedRowIds,
-        ]
+        ],
     );
 
     useEffect(() => {
@@ -744,11 +762,14 @@ export default function DealList({
                                     tags: deal.tags,
                                     // Store the original deal object for later use
                                     originalDeal: deal,
+                                    totalCalls: deal.activity?.totalCalls || 0,
+                                    totalReminders:
+                                        deal.activity?.totalReminders || 0,
                                 };
                             }
                             const orderInfo = (await getOrderDetailWithProduct(
                                 orgId,
-                                deal.orderId
+                                deal.orderId,
                             )) as any;
 
                             const productNames =
@@ -761,7 +782,7 @@ export default function DealList({
 
                             const totalValue = orderInfo?.data?.totalPrice
                                 ? Number(
-                                      orderInfo.data.totalPrice
+                                      orderInfo.data.totalPrice,
                                   ).toLocaleString("vi-VN") + " đ"
                                 : "-";
 
@@ -779,8 +800,12 @@ export default function DealList({
                                 assignees: deal.assignedTo,
                                 assigneeAvatar: undefined,
                                 tags: deal.tags,
+                                orderId: deal.orderId,
                                 // Store the original deal object for later use
                                 originalDeal: deal,
+                                totalCalls: deal.activity?.totalCalls || 0,
+                                totalReminders:
+                                    deal.activity?.totalReminders || 0,
                             };
                         } catch (error) {
                             // Trả về object fallback khi lỗi
@@ -795,11 +820,15 @@ export default function DealList({
                                 assignees: deal.assignedTo,
                                 assigneeAvatar: undefined,
                                 tags: deal.tags,
+                                orderId: deal.orderId,
                                 // Store the original deal object for later use
                                 originalDeal: deal,
+                                totalCalls: deal.activity?.totalCalls || 0,
+                                totalReminders:
+                                    deal.activity?.totalReminders || 0,
                             };
                         }
-                    })
+                    }),
                 );
 
                 if (isMounted) {
@@ -808,7 +837,7 @@ export default function DealList({
             } catch (err) {
                 console.error(
                     "❌ Lỗi tổng thể khi fetch danh sách deals:",
-                    err
+                    err,
                 );
                 // Set fallback data on error
                 if (isMounted) {
@@ -867,7 +896,7 @@ export default function DealList({
                 onStatsUpdate(stats);
             }
         },
-        [onStatsUpdate]
+        [onStatsUpdate],
     );
 
     // Update parent with stats when they change
@@ -927,15 +956,20 @@ export default function DealList({
                 enableRowSelection={true}
                 rowSelection={rowSelection}
                 setRowSelection={handleRowSelectionChange}
-                showCustomHeader={hasSelectedRows}
-                customHeaderContent={bulkActionsHeader}
+                rowClassName="h-16 hover:shadow-lg transition-all duration-200 bg-white border-b border-gray-100 last:border-none hover:z-10 relative hover:border-transparent"
+                headerClassName="bg-transparent text-gray-500 font-medium"
+                // showCustomHeader={hasSelectedRows}
+                // customHeaderContent={bulkActionsHeader}
+                className="bg-white rounded-2xl  shadow-sm border-none overflow-hidden"
+                // headerClassName="bg-white text-gray-500 font-bold border-b border-gray-100/50"
+                // rowClassName="hover:bg-gray-50/50 transition-colors h-16"
                 onRowClick={useCallback(
                     (row: DealRowWithOriginal) => {
                         if (row.originalDeal) {
                             handleDealClick(row.originalDeal);
                         }
                     },
-                    [handleDealClick]
+                    [handleDealClick],
                 )}
             />
 
@@ -1123,7 +1157,84 @@ export default function DealList({
                     },
                     { columnKey: "tags", label: "Nhãn", visible: false },
                 ]}
+                ]}
             /> */}
+
+            {/* Floating Bulk Action Bar */}
+            {hasSelectedRows && (
+                <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+                    <div className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 rounded-full pl-6 pr-2 py-2 flex items-center gap-6">
+                        <div className="flex items-center gap-2 pr-6 border-r border-gray-200">
+                            <span className="font-bold text-gray-800 text-sm">
+                                Đã chọn{" "}
+                                <span className="text-blue-600">
+                                    {selectedRowIds.length}
+                                </span>{" "}
+                                giao dịch
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleBulkDelete}
+                                className="text-gray-700 hover:text-red-600 hover:bg-red-50 gap-2 h-9 px-3 rounded-lg font-medium transition-colors"
+                            >
+                                <Image
+                                    src="/icons/garbage.svg"
+                                    alt="delete"
+                                    width={16}
+                                    height={16}
+                                    className="w-4 h-4 opacity-70"
+                                />
+                                Xoá
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleBulkStageChange}
+                                className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 gap-2 h-9 px-3 rounded-lg font-medium transition-colors"
+                            >
+                                <Pencil
+                                    size={16}
+                                    className="w-4 h-4 opacity-70"
+                                />
+                                Sửa
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                    toast.success(
+                                        "Tính năng gửi email đang phát triển",
+                                    )
+                                }
+                                className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 gap-2 h-9 px-3 rounded-lg font-medium transition-colors"
+                            >
+                                <Mail
+                                    size={16}
+                                    className="w-4 h-4 opacity-70"
+                                />
+                                Gửi Email
+                            </Button>
+                        </div>
+
+                        <div className="pl-4 border-l border-gray-200">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={clearSelection}
+                                className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -58,7 +58,7 @@ export default function PermissionGroupDetail({
     const [memberToRemove, setMemberToRemove] = useState<any>(null);
     const [rolesData, setRolesData] = useState<any[]>(groupRolesContent);
     const [checkedPermissions, setCheckedPermissions] = useState<Set<string>>(
-        new Set()
+        new Set(),
     );
     const [isEditMode, setIsEditMode] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
@@ -98,7 +98,8 @@ export default function PermissionGroupDetail({
         enabled: !!orgId && !!group?.id && group?.scope === "WORKSPACE",
     });
 
-    const queryWorkspaceId = group?.scope === "ORGANIZATION" ? null : selectedWorkspaceId;
+    const queryWorkspaceId =
+        group?.scope === "ORGANIZATION" ? null : selectedWorkspaceId;
 
     // Lấy danh sách thành viên (chỉ load khi có selectedWorkspaceId hoặc scope là ORGANIZATION)
     const { data: membersData, isLoading: isMembersLoading } = useQuery({
@@ -123,8 +124,8 @@ export default function PermissionGroupDetail({
             cat.module.forEach((mod: any) =>
                 mod.permission.forEach((p: any) => {
                     if (p.status === 0) init.add(p.id);
-                })
-            )
+                }),
+            ),
         );
         setCheckedPermissions(init);
     }, [groupRolesContent]);
@@ -172,8 +173,8 @@ export default function PermissionGroupDetail({
             cat.module.forEach((mod: any) =>
                 mod.permission.forEach((p: any) => {
                     allPermissionIds.add(p.id);
-                })
-            )
+                }),
+            ),
         );
         setCheckedPermissions(allPermissionIds);
 
@@ -270,7 +271,7 @@ export default function PermissionGroupDetail({
                         module: cat.module.map((mod: any) => ({
                             ...mod,
                             permission: mod.permission.map((perm: any) =>
-                                perm.id === id ? { ...perm, status: 0 } : perm
+                                perm.id === id ? { ...perm, status: 0 } : perm,
                             ),
                         })),
                     }));
@@ -284,7 +285,7 @@ export default function PermissionGroupDetail({
                         permission: mod.permission.map((perm: any) =>
                             perm.id === id
                                 ? { ...perm, status: perm.status === 1 ? 0 : 1 }
-                                : perm
+                                : perm,
                         ),
                     })),
                 }));
@@ -413,7 +414,7 @@ export default function PermissionGroupDetail({
                 if (selectAllPermissionId) {
                     // Kiểm tra xem tất cả permissions khác có được check không
                     const allOtherChecked = Array.from(
-                        allOtherPermissionIds
+                        allOtherPermissionIds,
                     ).every((permId) => next.has(permId));
                     const hasOtherPermissions = allOtherPermissionIds.size > 0;
 
@@ -439,8 +440,8 @@ export default function PermissionGroupDetail({
                 cat.module.forEach((mod: any) =>
                     mod.permission.forEach((p: any) => {
                         if (p.status === 0) init.add(p.id);
-                    })
-                )
+                    }),
+                ),
             );
             setCheckedPermissions(init);
         }
@@ -456,8 +457,8 @@ export default function PermissionGroupDetail({
                             permissionId: perm.id,
                             status: perm.status as 0 | 1,
                         });
-                    })
-                )
+                    }),
+                ),
             );
             return grantGroupRolesMultiple(orgId, group.id, roles);
         },
@@ -527,7 +528,7 @@ export default function PermissionGroupDetail({
     const removeMemberFromGroupMutation = useRemoveMemberFromGroup(
         orgId,
         group.id,
-        selectedWorkspaceId
+        selectedWorkspaceId,
     );
 
     const deleteGroupMutation = useDeletePermissionGroup(orgId, group.id);
@@ -550,8 +551,8 @@ export default function PermissionGroupDetail({
                     if (p.id !== "00000000-0000-0000-0000-000000000000")
                         total++;
                     if (p.status === 1) granted++;
-                })
-            )
+                }),
+            ),
         );
         return { total, granted };
     };
@@ -565,8 +566,8 @@ export default function PermissionGroupDetail({
                     if (p.name === "Quản trị viên" && p.status === 1) {
                         isChecked = true;
                     }
-                })
-            )
+                }),
+            ),
         );
         return isChecked;
     };
@@ -764,7 +765,7 @@ export default function PermissionGroupDetail({
                                                 size="sm"
                                                 onClick={() =>
                                                     setIsOpenConfirmDeleteGroup(
-                                                        true
+                                                        true,
                                                     )
                                                 }
                                                 className="text-white bg-red-500 hover:bg-red-600 hover:text-white"
@@ -780,9 +781,9 @@ export default function PermissionGroupDetail({
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto ">
+            <div className="flex-1 overflow-y-auto lg:overflow-hidden flex flex-col">
                 <div
-                    className={`grid gap-6 p-2 ${
+                    className={`grid gap-6 p-2 lg:h-full ${
                         group.scope === "WORKSPACE"
                             ? selectedWorkspaceId
                                 ? "grid-cols-1 xl:grid-cols-3 lg:grid-cols-2"
@@ -791,7 +792,7 @@ export default function PermissionGroupDetail({
                     }`}
                 >
                     {/* Permissions Section */}
-                    <div className="bg-white rounded-lg border border-gray-200 flex flex-col">
+                    <div className="bg-white rounded-lg border border-gray-200 flex flex-col lg:h-full lg:overflow-hidden">
                         <div className="p-2 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-lg font-semibold text-gray-900">
@@ -809,7 +810,7 @@ export default function PermissionGroupDetail({
                         </div>
 
                         {/* ScrollArea fix */}
-                        <ScrollArea className="max-h-[calc(100vh-280px)] md:max-h-[calc(100vh-240px)] lg: overflow-y-auto divide-y divide-gray-200">
+                        <ScrollArea className="flex-1 min-h-0 overflow-y-auto divide-y divide-gray-200">
                             {rolesData.length === 0 ? (
                                 <div className="text-center py-8">
                                     <div className="w-12 h-12 bg-gray-100 flex items-center justify-center mx-auto mb-3 rounded-full">
@@ -820,7 +821,7 @@ export default function PermissionGroupDetail({
                                     </h4>
                                     <p className="text-xs text-gray-500">
                                         {t(
-                                            "permission.noPermissionsDescription"
+                                            "permission.noPermissionsDescription",
                                         )}
                                     </p>
                                 </div>
@@ -841,7 +842,7 @@ export default function PermissionGroupDetail({
                                                                 (perm: any) =>
                                                                     isEditMode ||
                                                                     perm.status ===
-                                                                        1
+                                                                        1,
                                                             ).length > 0 && (
                                                                 <div className="px-2 py-2 bg-blue-50 border-b border-blue-200">
                                                                     <h5 className="font-medium text-blue-900 text-sm">
@@ -856,7 +857,7 @@ export default function PermissionGroupDetail({
                                                                 (perm: any) =>
                                                                     isEditMode ||
                                                                     perm.status ===
-                                                                        1
+                                                                        1,
                                                             )
                                                             .map(
                                                                 (perm: any) => (
@@ -873,7 +874,7 @@ export default function PermissionGroupDetail({
                                                                             isEditMode
                                                                                 ? isAdminPermissionChecked() &&
                                                                                   !isAdminPermission(
-                                                                                      perm.name
+                                                                                      perm.name,
                                                                                   )
                                                                                     ? "cursor-not-allowed opacity-60"
                                                                                     : "hover:bg-blue-50 cursor-pointer"
@@ -887,12 +888,12 @@ export default function PermissionGroupDetail({
                                                                             if (
                                                                                 isAdminPermissionChecked() &&
                                                                                 !isAdminPermission(
-                                                                                    perm.name
+                                                                                    perm.name,
                                                                                 )
                                                                             )
                                                                                 return;
                                                                             togglePermission(
-                                                                                perm.id
+                                                                                perm.id,
                                                                             );
                                                                         }}
                                                                     >
@@ -907,33 +908,33 @@ export default function PermissionGroupDetail({
                                                                                     disabled={
                                                                                         isAdminPermissionChecked() &&
                                                                                         !isAdminPermission(
-                                                                                            perm.name
+                                                                                            perm.name,
                                                                                         )
                                                                                     }
                                                                                     onChange={(
-                                                                                        e
+                                                                                        e,
                                                                                     ) => {
                                                                                         e.stopPropagation();
                                                                                         if (
                                                                                             isAdminPermissionChecked() &&
                                                                                             !isAdminPermission(
-                                                                                                perm.name
+                                                                                                perm.name,
                                                                                             )
                                                                                         )
                                                                                             return;
                                                                                         togglePermission(
-                                                                                            perm.id
+                                                                                            perm.id,
                                                                                         );
                                                                                     }}
                                                                                     onClick={(
-                                                                                        e
+                                                                                        e,
                                                                                     ) =>
                                                                                         e.stopPropagation()
                                                                                     }
                                                                                     className={`h-4 w-4 rounded focus:ring-blue-500 flex-shrink-0 ${
                                                                                         isAdminPermissionChecked() &&
                                                                                         !isAdminPermission(
-                                                                                            perm.name
+                                                                                            perm.name,
                                                                                         )
                                                                                             ? "text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed"
                                                                                             : "text-blue-600 border-gray-300"
@@ -962,13 +963,13 @@ export default function PermissionGroupDetail({
                                                                             </span>
                                                                         </div>
                                                                     </div>
-                                                                )
+                                                                ),
                                                             )}
                                                     </div>
-                                                )
+                                                ),
                                             )}
                                         </div>
-                                    )
+                                    ),
                                 )
                             )}
                         </ScrollArea>
@@ -976,7 +977,7 @@ export default function PermissionGroupDetail({
 
                     {/* Workspaces Section */}
                     {group.scope === "WORKSPACE" && (
-                        <div className="bg-white rounded-lg border border-gray-200 flex flex-col">
+                        <div className="bg-white rounded-lg border border-gray-200 flex flex-col lg:h-full lg:overflow-hidden">
                             <div className="p-2 border-b border-gray-200">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -992,7 +993,7 @@ export default function PermissionGroupDetail({
                                     )}
                                 </div>
                             </div>
-                            <ScrollArea className="max-h-[calc(100vh-280px)] md:max-h-[calc(100vh-240px)] lg: overflow-y-auto divide-y divide-gray-200">
+                            <ScrollArea className="flex-1 min-h-0 overflow-y-auto divide-y divide-gray-200">
                                 {isWorkspacesLoading ? (
                                     <Loading />
                                 ) : workspacesData?.content?.length === 0 ? (
@@ -1005,7 +1006,7 @@ export default function PermissionGroupDetail({
                                         </h4>
                                         <p className="text-xs text-gray-500">
                                             {t(
-                                                "permission.noWorkspacesDescription"
+                                                "permission.noWorkspacesDescription",
                                             )}
                                         </p>
                                     </div>
@@ -1014,7 +1015,7 @@ export default function PermissionGroupDetail({
                                         (workspace: any) => (
                                             <div
                                                 key={workspace.workspaceId}
-                                                className={`p-2 flex items-center justify-between cursor-pointer transition-colors ${
+                                                className={`p-2 flex items-center justify-between cursor-pointer transition-colors rounded-md ${
                                                     selectedWorkspaceId ===
                                                     workspace.workspaceId
                                                         ? "bg-blue-50 border-r-2 border-blue-500"
@@ -1025,7 +1026,7 @@ export default function PermissionGroupDetail({
                                                         selectedWorkspaceId ===
                                                             workspace.workspaceId
                                                             ? null
-                                                            : workspace.workspaceId
+                                                            : workspace.workspaceId,
                                                     )
                                                 }
                                             >
@@ -1043,13 +1044,13 @@ export default function PermissionGroupDetail({
                                                             {workspace.totalMember +
                                                                 " " +
                                                                 t(
-                                                                    "common.members"
+                                                                    "common.members",
                                                                 ).toLowerCase()}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )
+                                        ),
                                     )
                                 )}
                             </ScrollArea>
@@ -1058,7 +1059,7 @@ export default function PermissionGroupDetail({
                     {(group.scope === "ORGANIZATION" ||
                         (group.scope === "WORKSPACE" &&
                             selectedWorkspaceId)) && (
-                        <div className="bg-white rounded-lg border border-gray-200 flex flex-col">
+                        <div className="bg-white rounded-lg border border-gray-200 flex flex-col lg:h-full lg:overflow-hidden">
                             <div className="p-2 border-b border-gray-200">
                                 <div className="flex items-center justify-between">
                                     <div className="w-full flex items-center gap-2 justify-between">
@@ -1072,7 +1073,7 @@ export default function PermissionGroupDetail({
                                         <div className="relative assign-dropdown">
                                             <Tooltip
                                                 content={t(
-                                                    "permission.grantPermission"
+                                                    "permission.grantPermission",
                                                 )}
                                             >
                                                 <Button
@@ -1080,7 +1081,7 @@ export default function PermissionGroupDetail({
                                                     className="text-white text-xs h-7 px-2"
                                                     onClick={() =>
                                                         setShowUnassignedMembers(
-                                                            !showUnassignedMembers
+                                                            !showUnassignedMembers,
                                                         )
                                                     }
                                                 >
@@ -1100,12 +1101,12 @@ export default function PermissionGroupDetail({
                                                         <h5 className="text-xs font-medium text-blue-900 flex items-center gap-1">
                                                             <Plus className="w-3 h-3" />
                                                             {t(
-                                                                "permission.availableToAssign"
+                                                                "permission.availableToAssign",
                                                             )}{" "}
                                                             (
                                                             {membersData?.content?.filter(
                                                                 (member: any) =>
-                                                                    !member.hasRole
+                                                                    !member.hasRole,
                                                             )?.length || 0}
                                                             )
                                                         </h5>
@@ -1117,24 +1118,24 @@ export default function PermissionGroupDetail({
                                                             </div>
                                                         ) : membersData?.content?.filter(
                                                               (member: any) =>
-                                                                  !member.hasRole
+                                                                  !member.hasRole,
                                                           )?.length === 0 ? (
                                                             <div className="p-4 text-center text-xs text-gray-500">
                                                                 {t(
-                                                                    "permission.allMembersHavePermission"
+                                                                    "permission.allMembersHavePermission",
                                                                 )}
                                                             </div>
                                                         ) : (
                                                             membersData?.content
                                                                 ?.filter(
                                                                     (
-                                                                        member: any
+                                                                        member: any,
                                                                     ) =>
-                                                                        !member.hasRole
+                                                                        !member.hasRole,
                                                                 )
                                                                 .map(
                                                                     (
-                                                                        member: any
+                                                                        member: any,
                                                                     ) => (
                                                                         <div
                                                                             key={
@@ -1166,7 +1167,7 @@ export default function PermissionGroupDetail({
                                                                                     </h4>
                                                                                     <p className="text-xs text-gray-500">
                                                                                         {t(
-                                                                                            "permission.noPermissionStatus"
+                                                                                            "permission.noPermissionStatus",
                                                                                         )}
                                                                                     </p>
                                                                                 </div>
@@ -1176,10 +1177,10 @@ export default function PermissionGroupDetail({
                                                                                 variant="outline"
                                                                                 onClick={() => {
                                                                                     handleAssignMember(
-                                                                                        member.profileId
+                                                                                        member.profileId,
                                                                                     );
                                                                                     setShowUnassignedMembers(
-                                                                                        false
+                                                                                        false,
                                                                                     );
                                                                                 }}
                                                                                 disabled={
@@ -1193,13 +1194,13 @@ export default function PermissionGroupDetail({
                                                                                     <>
                                                                                         <UserPlus className="w-3 h-3 mr-1" />
                                                                                         {t(
-                                                                                            "permission.grantPermission"
+                                                                                            "permission.grantPermission",
                                                                                         )}
                                                                                     </>
                                                                                 )}
                                                                             </Button>
                                                                         </div>
-                                                                    )
+                                                                    ),
                                                                 )
                                                         )}
                                                     </div>
@@ -1211,7 +1212,7 @@ export default function PermissionGroupDetail({
                             </div>
 
                             {/* Scrollable Members List */}
-                            <ScrollArea className="max-h-[calc(100vh-280px)] md:max-h-[calc(100vh-240px)] lg: overflow-y-auto divide-y divide-gray-200">
+                            <ScrollArea className="flex-1 min-h-0 overflow-y-auto divide-y divide-gray-200">
                                 {isMembersLoading ? (
                                     <Loading />
                                 ) : membersData?.content?.length === 0 ? (
@@ -1224,14 +1225,14 @@ export default function PermissionGroupDetail({
                                         </h4>
                                         <p className="text-xs text-gray-500">
                                             {t(
-                                                "permission.noMembersDescription"
+                                                "permission.noMembersDescription",
                                             )}
                                         </p>
                                     </div>
                                 ) : (
                                     membersData?.content
                                         ?.filter(
-                                            (member: any) => member.hasRole
+                                            (member: any) => member.hasRole,
                                         )
                                         ?.map((member: any) => (
                                             <div
@@ -1246,7 +1247,7 @@ export default function PermissionGroupDetail({
                                                             }
                                                             src={
                                                                 getAvatarUrl(
-                                                                    member.avatar
+                                                                    member.avatar,
                                                                 ) || undefined
                                                             }
                                                             size="32"
@@ -1262,17 +1263,17 @@ export default function PermissionGroupDetail({
                                                             <p className="text-xs text-gray-500">
                                                                 {member.hasRole
                                                                     ? t(
-                                                                          "permission.hasPermission"
+                                                                          "permission.hasPermission",
                                                                       )
                                                                     : t(
-                                                                          "permission.noPermissionStatus"
+                                                                          "permission.noPermissionStatus",
                                                                       )}
                                                             </p>
                                                         </div>
                                                     </div>
                                                     <Tooltip
                                                         content={t(
-                                                            "permission.removeFromGroup"
+                                                            "permission.removeFromGroup",
                                                         )}
                                                     >
                                                         <Button
@@ -1280,10 +1281,10 @@ export default function PermissionGroupDetail({
                                                             className="text-white bg-red-500 hover:bg-red-600 hover:text-white"
                                                             onClick={() => {
                                                                 setMemberToRemove(
-                                                                    member
+                                                                    member,
                                                                 );
                                                                 setIsOpenConfirmDialog(
-                                                                    true
+                                                                    true,
                                                                 );
                                                             }}
                                                         >
@@ -1303,18 +1304,18 @@ export default function PermissionGroupDetail({
                                     }
                                     onConfirm={() => {
                                         handleRemoveMemberFromGroup(
-                                            memberToRemove.profileId
+                                            memberToRemove.profileId,
                                         );
                                     }}
                                     title={t(
-                                        "permission.removeFromGroupConfirm"
+                                        "permission.removeFromGroupConfirm",
                                     )}
                                     description={t(
                                         "permission.removeFromGroupDescription",
                                         {
                                             name: memberToRemove.fullName,
                                             groupName: group.name,
-                                        }
+                                        },
                                     )}
                                 />
                             )}

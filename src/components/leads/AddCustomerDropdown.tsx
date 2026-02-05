@@ -45,15 +45,13 @@ export default function AddCustomerDropdown({
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, []);
+    }, []); 
 
     const handleAddNew = () => {
-        setIsOpen(false);
         onAddNew();
     };
 
     const handleImport = () => {
-        setIsOpen(false);
         onImport();
     };
 
@@ -131,7 +129,7 @@ export default function AddCustomerDropdown({
     };
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative">
             {/* Main Button */}
             <div className="flex">
                 {/* Thêm mới button */}

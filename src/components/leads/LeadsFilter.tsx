@@ -1,11 +1,7 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMultiSelect } from "@/contexts/MultiSelectContext";
 import { useLeadsFilter } from "@/hooks/leads_data";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useQueryClient } from "@tanstack/react-query";
 import { addDays, endOfDay, format, startOfDay } from "date-fns";
 import { Archive, RotateCcw, Trash2 } from "lucide-react";
@@ -51,7 +47,7 @@ export default function LeadsFilter({
         to: currentFilter.to || endOfDay(new Date()),
     });
     const [dateSelected, setDateSelected] = useState<string>(
-        currentFilter.dateSelected || "-9999"
+        currentFilter.dateSelected || "-9999",
     );
 
     // State for active tab
@@ -59,16 +55,16 @@ export default function LeadsFilter({
 
     // State for filter values - khởi tạo từ global state
     const [selectedTags, setSelectedTags] = useState<string[]>(
-        currentFilter.tagSelected || []
+        currentFilter.tagSelected || [],
     );
     const [selectedCategories, setSelectedCategories] = useState<string[]>(
-        currentFilter.categorySelected || []
+        currentFilter.categorySelected || [],
     );
     const [selectedUtmSources, setSelectedUtmSources] = useState<string[]>(
-        currentFilter.sourceSelected || []
+        currentFilter.sourceSelected || [],
     );
     const [selectedAssignees, setSelectedAssignees] = useState<string[]>(
-        currentFilter.assignTo || []
+        currentFilter.assignTo || [],
     );
 
     // State for system filters - khởi tạo từ global state
@@ -205,7 +201,7 @@ export default function LeadsFilter({
             setSelectedSystemFilters((prev) => [...prev, value]);
         } else {
             setSelectedSystemFilters((prev) =>
-                prev.filter((item) => item !== value)
+                prev.filter((item) => item !== value),
             );
         }
     };
@@ -265,13 +261,13 @@ export default function LeadsFilter({
                 const customConditions = selectedSystemFilters.map(
                     (filterValue) => {
                         const filterOption = systemFilterOptions.find(
-                            (option) => option.value === filterValue
+                            (option) => option.value === filterValue,
                         );
                         return {
                             field: filterOption?.field,
                             operator: filterOption?.operator,
                         };
-                    }
+                    },
                 );
                 filterBody.customConditions = customConditions;
             }
@@ -303,13 +299,13 @@ export default function LeadsFilter({
                 const customConditions = selectedSystemFilters.map(
                     (filterValue) => {
                         const filterOption = systemFilterOptions.find(
-                            (option) => option.value === filterValue
+                            (option) => option.value === filterValue,
                         );
                         return {
                             field: filterOption?.field,
                             operator: filterOption?.operator,
                         };
-                    }
+                    },
                 );
                 filterBody.customConditions = customConditions;
             }
@@ -401,7 +397,7 @@ export default function LeadsFilter({
                 onSuccess: () => {
                     clearSelection();
                 },
-            }
+            },
         );
     };
 
@@ -417,7 +413,7 @@ export default function LeadsFilter({
                 onSuccess: () => {
                     clearSelection();
                 },
-            }
+            },
         );
     };
 
@@ -433,7 +429,7 @@ export default function LeadsFilter({
                 onSuccess: () => {
                     clearSelection();
                 },
-            }
+            },
         );
     };
 
@@ -530,7 +526,7 @@ export default function LeadsFilter({
                 )}
             </PopoverTrigger>
 
-            <PopoverContent className="rounded-xl flex flex-col w-[350px] px-0 z-50 bg-white shadow-lg">
+            <PopoverContent className="rounded-xl flex flex-col w-[350px] p-0 z-50 bg-white shadow-lg border-none overflow-hidden">
                 <Tabs defaultValue="manual" onValueChange={handleTabChange}>
                     <TabsList className="w-full grid grid-cols-2">
                         <TabsTrigger value="manual">Thủ công</TabsTrigger>
@@ -554,7 +550,7 @@ export default function LeadsFilter({
                                             setDate={setDate}
                                             dateSelect={dateSelected}
                                             setDateSelect={setDateSelected}
-                                            className={"bg-[var(--bg2)]"}
+                                            className={"bg-(--bg2)"}
                                             variant="none"
                                             align="start"
                                         />
@@ -649,12 +645,12 @@ export default function LeadsFilter({
                                         <Checkbox
                                             id={option.value}
                                             checked={selectedSystemFilters.includes(
-                                                option.value
+                                                option.value,
                                             )}
                                             onCheckedChange={(checked) =>
                                                 handleSystemFilterChange(
                                                     option.value,
-                                                    checked as boolean
+                                                    checked as boolean,
                                                 )
                                             }
                                         />

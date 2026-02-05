@@ -35,7 +35,7 @@ export default function CalendarView({
 
     // State cho việc lọc theo loại lịch hẹn - mặc định chọn tất cả
     const [selectedScheduleTypes, setSelectedScheduleTypes] = useState(
-        scheduleTypes.map((type) => type.id)
+        scheduleTypes.map((type) => type.id),
     );
 
     const days = getDaysInMonth();
@@ -67,7 +67,7 @@ export default function CalendarView({
         return dayReminders.filter((reminder) => {
             // Filter theo loại lịch hẹn
             const typeMatch = selectedScheduleTypes.includes(
-                reminder.SchedulesType || "reminder"
+                reminder.SchedulesType || "reminder",
             );
 
             return typeMatch;
@@ -93,7 +93,7 @@ export default function CalendarView({
     };
 
     return (
-        <div className="bg-white rounded-lg flex flex-col h-full w-full">
+        <div className="rounded-2xl flex flex-col h-full w-full">
             {/* Filter & Calendar Navigation */}
             <div className="flex-shrink-0 pb-4 border-gray-200">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -148,13 +148,13 @@ export default function CalendarView({
             </div>
 
             {/* Calendar Container với scroll */}
-            <div className="flex flex-col border border-gray-200 rounded-lg overflow-hidden">
+            <div className="flex flex-col border border-white/20 rounded-2xl overflow-hidden">
                 {/* Weekday Headers - Fixed Position */}
-                <div className="sticky top-0 z-10 grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                <div className="sticky top-0 z-10 grid grid-cols-7 border-b border-indigo-200/30 bg-indigo-100/40">
                     {weekdayNames.map((day, index) => (
                         <div
                             key={index}
-                            className="text-center font-medium text-xs md:text-sm text-gray-600 py-2 px-1 border-r last:border-r-0 border-gray-200"
+                            className="text-center font-medium text-xs md:text-sm text-gray-600 py-2 px-1 border-r last:border-r-0 border-indigo-200/30"
                         >
                             <span className="truncate">{day}</span>
                         </div>
@@ -169,7 +169,7 @@ export default function CalendarView({
                                 getFilteredRemindersForDay(day);
                             const isCurrentMonth = isSameMonth(
                                 day,
-                                currentMonth
+                                currentMonth,
                             );
                             const isDayToday = isToday(day);
                             const isLastColumn = index % 7 === 6; // Cột cuối cùng (Chủ nhật)
@@ -187,9 +187,9 @@ export default function CalendarView({
                                 <div
                                     key={index}
                                     className={cn(
-                                        "relative border-b border-r border-gray-200 flex flex-col",
+                                        "relative border-b border-r border-white/20 flex flex-col",
                                         !isCurrentMonth &&
-                                            "bg-gray-50 text-gray-400"
+                                            "bg-white/10 text-gray-400",
                                     )}
                                     style={{
                                         // Đảm bảo chiều cao tối thiểu cho mỗi ô ngày
@@ -210,7 +210,7 @@ export default function CalendarView({
                                                 className={cn(
                                                     "inline-flex items-center justify-center h-5 w-5 md:h-6 md:w-6 text-xs md:text-sm rounded-full",
                                                     isDayToday &&
-                                                        "bg-red-500 text-white font-medium"
+                                                        "bg-red-500 text-white font-medium",
                                                 )}
                                             >
                                                 {format(day, "d")}
@@ -225,7 +225,7 @@ export default function CalendarView({
                                                 (reminder, idx) => {
                                                     const contact =
                                                         parseContact(
-                                                            reminder.Contact
+                                                            reminder.Contact,
                                                         );
                                                     const isDone =
                                                         reminder.IsDone ||
@@ -234,12 +234,12 @@ export default function CalendarView({
                                                         !isDone &&
                                                         reminder.EndTime
                                                             ? tableViewUtils.isOverdue(
-                                                                  reminder.EndTime
+                                                                  reminder.EndTime,
                                                               )
                                                             : false;
                                                     const scheduleTypeIcon =
                                                         getScheduleTypeIcon(
-                                                            reminder.SchedulesType
+                                                            reminder.SchedulesType,
                                                         );
 
                                                     return (
@@ -252,9 +252,9 @@ export default function CalendarView({
                                                                     isLastRow
                                                                         ? "top"
                                                                         : isLastColumn ||
-                                                                          isSecondLastColumn
-                                                                        ? "left"
-                                                                        : "right"
+                                                                            isSecondLastColumn
+                                                                          ? "left"
+                                                                          : "right"
                                                                 }
                                                                 content={
                                                                     <div className="p-0 overflow-hidden w-[280px] md:w-[320px] bg-white border shadow-lg rounded-md">
@@ -264,8 +264,8 @@ export default function CalendarView({
                                                                                 isDone
                                                                                     ? "border-green-500"
                                                                                     : isOverdue
-                                                                                    ? "border-red-500"
-                                                                                    : "border-indigo-500"
+                                                                                      ? "border-red-500"
+                                                                                      : "border-indigo-500",
                                                                             )}
                                                                         >
                                                                             {/* Header chính - Icon Type + Title */}
@@ -277,8 +277,8 @@ export default function CalendarView({
                                                                                             isDone
                                                                                                 ? "bg-green-100 text-green-600"
                                                                                                 : isOverdue
-                                                                                                ? "bg-red-100 text-red-600"
-                                                                                                : "bg-indigo-100 text-indigo-600"
+                                                                                                  ? "bg-red-100 text-red-600"
+                                                                                                  : "bg-indigo-100 text-indigo-600",
                                                                                         )}
                                                                                     >
                                                                                         {
@@ -290,7 +290,7 @@ export default function CalendarView({
                                                                                             className={cn(
                                                                                                 "font-bold text-lg text-gray-900 leading-tight",
                                                                                                 isDone &&
-                                                                                                    "line-through text-gray-500"
+                                                                                                    "line-through text-gray-500",
                                                                                             )}
                                                                                         >
                                                                                             {reminder.Title ||
@@ -303,7 +303,7 @@ export default function CalendarView({
                                                                                         className="text-gray-400 hover:text-indigo-600 p-1 rounded transition-colors"
                                                                                         onClick={() =>
                                                                                             onEdit(
-                                                                                                reminder
+                                                                                                reminder,
                                                                                             )
                                                                                         }
                                                                                         title="Chỉnh sửa"
@@ -314,7 +314,7 @@ export default function CalendarView({
                                                                                         className="text-gray-400 hover:text-red-600 p-1 rounded transition-colors"
                                                                                         onClick={() =>
                                                                                             onDelete(
-                                                                                                reminder
+                                                                                                reminder,
                                                                                             )
                                                                                         }
                                                                                         title="Xóa"
@@ -334,7 +334,7 @@ export default function CalendarView({
                                                                                 <div className="text-sm text-gray-600">
                                                                                     {tableViewUtils.formatDateTimeRange(
                                                                                         reminder.StartTime,
-                                                                                        reminder.EndTime
+                                                                                        reminder.EndTime,
                                                                                     )}
                                                                                 </div>
                                                                             </div>
@@ -366,7 +366,7 @@ export default function CalendarView({
                                                                                     className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-md p-1 -m-1 transition-colors"
                                                                                     onClick={() =>
                                                                                         handleCustomerClick(
-                                                                                            reminder
+                                                                                            reminder,
                                                                                         )
                                                                                     }
                                                                                     title="Click để xem chi tiết khách hàng"
@@ -375,7 +375,7 @@ export default function CalendarView({
                                                                                         name={
                                                                                             contact
                                                                                                 ? getFirstAndLastWord(
-                                                                                                      contact.fullName
+                                                                                                      contact.fullName,
                                                                                                   )
                                                                                                 : "HT"
                                                                                         }
@@ -384,7 +384,7 @@ export default function CalendarView({
                                                                                         src={
                                                                                             contact
                                                                                                 ? getAvatarUrl(
-                                                                                                      contact.Avatar
+                                                                                                      contact.Avatar,
                                                                                                   )
                                                                                                 : undefined
                                                                                         }
@@ -426,19 +426,19 @@ export default function CalendarView({
                                                                                             isDone
                                                                                                 ? "text-green-600"
                                                                                                 : isOverdue
-                                                                                                ? "text-red-600"
-                                                                                                : "text-blue-600"
+                                                                                                  ? "text-red-600"
+                                                                                                  : "text-blue-600",
                                                                                         )}
                                                                                     >
                                                                                         {isDone
                                                                                             ? "Đã hoàn thành"
                                                                                             : isOverdue
-                                                                                            ? `Quá hạn ${tableViewUtils.getOverdueTime(
-                                                                                                  reminder.EndTime
-                                                                                              )}`
-                                                                                            : tableViewUtils.getTimeRemaining(
-                                                                                                  reminder.StartTime
-                                                                                              )}
+                                                                                              ? `Quá hạn ${tableViewUtils.getOverdueTime(
+                                                                                                    reminder.EndTime,
+                                                                                                )}`
+                                                                                              : tableViewUtils.getTimeRemaining(
+                                                                                                    reminder.StartTime,
+                                                                                                )}
                                                                                     </span>
                                                                                 </div>
 
@@ -448,8 +448,8 @@ export default function CalendarView({
                                                                                         className={cn(
                                                                                             "w-3 h-3 rounded-full mr-2",
                                                                                             tableViewUtils.getPriorityColor(
-                                                                                                reminder.Priority
-                                                                                            )
+                                                                                                reminder.Priority,
+                                                                                            ),
                                                                                         )}
                                                                                     ></div>
                                                                                     <span
@@ -459,13 +459,13 @@ export default function CalendarView({
                                                                                                 2
                                                                                                 ? "text-red-600 font-medium"
                                                                                                 : reminder.Priority ===
-                                                                                                  1
-                                                                                                ? "text-amber-600 font-medium"
-                                                                                                : "text-gray-600"
+                                                                                                    1
+                                                                                                  ? "text-amber-600 font-medium"
+                                                                                                  : "text-gray-600",
                                                                                         )}
                                                                                     >
                                                                                         {tableViewUtils.getPriorityText(
-                                                                                            reminder.Priority
+                                                                                            reminder.Priority,
                                                                                         )}
                                                                                     </span>
                                                                                 </div>
@@ -486,16 +486,16 @@ export default function CalendarView({
                                                                                             </div>
                                                                                             <div className="text-sm bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
                                                                                                 {isEveryDayOfWeek(
-                                                                                                    reminder.RepeatRule
+                                                                                                    reminder.RepeatRule,
                                                                                                 )
                                                                                                     ? "Mỗi ngày"
                                                                                                     : reminder.RepeatRule.map(
                                                                                                           (
-                                                                                                              r
+                                                                                                              r,
                                                                                                           ) =>
-                                                                                                              r.day
+                                                                                                              r.day,
                                                                                                       ).join(
-                                                                                                          ", "
+                                                                                                          ", ",
                                                                                                       )}
                                                                                             </div>
                                                                                         </div>
@@ -509,8 +509,8 @@ export default function CalendarView({
                                                                     className={cn(
                                                                         "group relative border-l-[3px] hover:bg-opacity-80 rounded-l-[3px] pl-1 md:pl-1.5 py-[2px] flex items-center justify-between cursor-pointer min-w-0",
                                                                         getReminderStatusColor(
-                                                                            reminder
-                                                                        )
+                                                                            reminder,
+                                                                        ),
                                                                     )}
                                                                 >
                                                                     <div className="flex items-center gap-1 truncate min-w-0 flex-1">
@@ -520,8 +520,8 @@ export default function CalendarView({
                                                                                 isDone
                                                                                     ? "text-green-600/70"
                                                                                     : isOverdue
-                                                                                    ? "text-red-600/70"
-                                                                                    : "text-indigo-500"
+                                                                                      ? "text-red-600/70"
+                                                                                      : "text-indigo-500",
                                                                             )}
                                                                         >
                                                                             {
@@ -535,8 +535,8 @@ export default function CalendarView({
                                                                                     isDone
                                                                                         ? "text-gray-600"
                                                                                         : isOverdue
-                                                                                        ? "text-red-700"
-                                                                                        : "text-gray-800"
+                                                                                          ? "text-red-700"
+                                                                                          : "text-gray-800",
                                                                                 )}
                                                                                 title={
                                                                                     reminder.Title ||
@@ -561,7 +561,7 @@ export default function CalendarView({
                                                             </Tooltip>
                                                         </TooltipProvider>
                                                     );
-                                                }
+                                                },
                                             )}
                                         </div>
                                     </div>

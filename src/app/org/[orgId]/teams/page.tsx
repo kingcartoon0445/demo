@@ -1,5 +1,6 @@
 "use client";
-import { getTeamList } from "@/api/teamV2";
+import { Glass } from "@/components/Glass";
+import { getTeamListV2 } from "@/api/teamV2";
 import { CustomTooltip } from "@/components/custom_tooltip";
 import TeamAddMember from "@/components/deals/team_add_member";
 import TeamCreateDialog from "@/components/deals/team_create";
@@ -45,7 +46,7 @@ export default function TeamsPage() {
     const [filteredTeamList, setFilteredTeamList] = useState([]);
     const searchParams = useSearchParams();
     const teamId = searchParams.get("teamId");
-
+    const { orgId } = useParams();
     const {
         updateTeamData,
         openTeamUpdate,
@@ -60,9 +61,7 @@ export default function TeamsPage() {
     const { openTeamCreate, setOpenTeamCreate, parentId, setParentId } =
         useTeamCreate();
     const { openAddMembers, setOpenAddMembers } = useAddMembersToTeamList();
-    const { refreshList, setRefreshList } = useTeamListRefresh();
-
-    // Permission checks
+    const { refreshList, setRefreshList } = useTeamListRefresh(); // Permission checks
     const canCreateTeam = useMemo(() => {
         return isManager || permissions.has("TEAM.CREATE");
     }, [isManager, permissions]);
@@ -95,14 +94,6 @@ export default function TeamsPage() {
 
         return isOrgManager || isTeamLeader;
     }, [isManager, selectedTeam, currentUser]);
-
-    console.log("permissions", permissions);
-    console.log("isManager", isManager);
-    console.log("currentUser?.id", currentUser?.id);
-    console.log("selectedTeam?.managers", selectedTeam?.managers);
-    console.log("canDeleteTeam", canDeleteTeam);
-    console.log("canAddMember", canAddMember);
-
     useEffect(() => {
         setTeamList([]);
         setSelectedTeam(undefined);
@@ -121,7 +112,7 @@ export default function TeamsPage() {
         setFilteredTeamList(searchTeam(teamList, debouncedSearchTeam));
     }, [debouncedSearchTeam, teamList]);
     useEffect(() => {
-        getTeamList(orgId as string, {
+        getTeamListV2(orgId as string, {
             offset: 0,
             limit: 1000,
             search: debouncedSearchTeam,
@@ -137,7 +128,7 @@ export default function TeamsPage() {
         }
     }, [teamList, teamId]);
     return (
-        <div className="flex flex-col h-full flex-1 border-[#E4E7EC]">
+        <div className="flex h-full w-full p-1 gap-6  ">
             {openTeamCreate && (
                 <TeamCreateDialog
                     teamId={parentId}
@@ -173,60 +164,49 @@ export default function TeamsPage() {
                     orgId={orgId}
                 />
             )}
-            <div className="w-full h-full overflow-hidden flex border-t-[1px] ">
-                <div className="border-r-[1px] flex flex-col">
-                    <div className="w-[380px] 2xl:w-[470px] min-h-[72px] border-b-[1px]">
-                        <div className="flex items-center justify-between p-4 w-full">
-                            <div className="font-medium px-3 py-2">
-                                Đội sale
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {canCreateTeam && (
-                                    <CustomTooltip label={"Thêm đội sale"}>
-                                        <Button
-                                            onClick={() => {
-                                                setParentId("");
-                                                setOpenTeamCreate(true);
-                                            }}
-                                            className={
-                                                "flex items-center gap-1 h-[35px] px-[10px]"
-                                            }
-                                        >
-                                            <MdAdd className="text-xl" />
-                                            Thêm mới
-                                        </Button>
-                                    </CustomTooltip>
-                                )}
-                                {/* <CustomTooltip
-                                            label={"Cấu hình định tuyến"}
-                                        >
-                                            <CustomButton
-                                                onClick={() => {
-                                                    setUpdateTeam(undefined);
-                                                    setOpenTeamRouteConfig(
-                                                        true
-                                                    );
-                                                }}
-                                                isActive={true}
-                                            >
-                                                <MdRoute className="text-2xl" />
-                                            </CustomButton>
-                                        </CustomTooltip> */}
-                            </div>
+
+            <Glass
+                intensity="high"
+                className="w-[380px] 2xl:w-[470px] h-full flex flex-col overflow-hidden rounded-2xl"
+            >
+                <div className="w-full min-h-[72px] border-b border-white/20">
+                    <div className="flex items-center justify-between p-4 w-full">
+                        <div className="font-medium px-3 py-2 text-lg">
+                            Đội sale
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {canCreateTeam && (
+                                <CustomTooltip label={"Thêm đội sale"}>
+                                    <Button
+                                        onClick={() => {
+                                            setParentId("");
+                                            setOpenTeamCreate(true);
+                                        }}
+                                        className={
+                                            "flex items-center gap-1 h-[35px] px-[10px]"
+                                        }
+                                    >
+                                        <MdAdd className="text-xl" />
+                                        Thêm mới
+                                    </Button>
+                                </CustomTooltip>
+                            )}
                         </div>
                     </div>
-                    <div className="overflow-y-scroll h-[calc(100vh-100px)] pb-20">
-                        <ExpansionTileList
-                            childs={teamList}
-                            onTap={(e: any) => {
-                                router.push(pathname + `?teamId=${e.id}`);
-                            }}
-                            index={0}
-                            style={{}}
-                        />
-                    </div>
-                    {/* <CustomerList /> */}
                 </div>
+                <div className="flex-1 pb-20">
+                    <ExpansionTileList
+                        childs={teamList}
+                        onTap={(e: any) => {
+                            router.push(pathname + `?teamId=${e.id}`);
+                        }}
+                        index={0}
+                        style={{}}
+                    />
+                </div>
+            </Glass>
+
+            <div className="flex-1 h-full overflow-hidden rounded-2xl">
                 <TeamDetail
                     setSelectedTeam={setSelectedTeam}
                     selectedTeam={selectedTeam}

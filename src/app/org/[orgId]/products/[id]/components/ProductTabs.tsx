@@ -50,18 +50,18 @@ export default function ProductTabs({
             <Tabs
                 value={activeTab}
                 onValueChange={setActiveTab}
-                className="w-full"
+                className="w-full bg-white"
             >
-                <TabsList className="w-full border-b border-gray-200 p-0 bg-white flex justify-start">
+                <TabsList className="w-fit border border-gray-100 p-1 bg-gray-50 rounded-lg flex items-center gap-1 mx-4 mt-0">
                     <TabsTrigger
                         value="prices"
-                        className="w-1/2 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+                        className="flex-1 min-w-[120px] rounded-md px-4 py-2 text-sm font-bold text-gray-500 transition-all data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm hover:text-gray-900"
                     >
                         {t("common.price")}
                     </TabsTrigger>
                     <TabsTrigger
                         value="deals"
-                        className="w-1/2 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+                        className="flex-1 min-w-[120px] rounded-md px-4 py-2 text-sm font-bold text-gray-500 transition-all data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm hover:text-gray-900"
                     >
                         {t("product.deals")}
                     </TabsTrigger>

@@ -1,4 +1,5 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Tabs, TabsContent } from "../ui/tabs";
+import { GlassTabs } from "./GlassTabs";
 import CustomerJourney from "./CustomerJourney";
 import { ScrollArea } from "../ui/scroll-area";
 import { DetailDeal, Lead } from "@/lib/interface";
@@ -43,7 +44,7 @@ export default function TabsUserDetail({
                 ((customer as CustomerInfo).conversation as Record<
                     string,
                     unknown
-                >) || {}
+                >) || {},
             ).length > 0;
         const hasConversationArray =
             Array.isArray((customer as any).conversations) &&
@@ -63,9 +64,30 @@ export default function TabsUserDetail({
 
     const [activeTab, setActiveTab] = useState("timeline");
     const { t } = useLanguage();
+
+    const tabItems = [
+        { id: "timeline", label: t("common.activity") },
+        { id: "note", label: t("common.note") },
+        { id: "mail", label: t("common.email") || "Email" },
+    ];
+
+    if (provider === "lead" || provider === "customer") {
+        tabItems.push({
+            id: "attachment",
+            label: t("common.attachments"),
+        });
+    }
+
+    if (isCustomerInfo) {
+        tabItems.push({
+            id: "conversation",
+            label: t("common.conversation"),
+        });
+    }
+
     return (
         <Tabs
-            defaultValue="timeline"
+            value={activeTab}
             className="h-full w-full flex flex-col overflow-hidden"
             onValueChange={(value) => {
                 setActiveTab(value);
@@ -74,79 +96,31 @@ export default function TabsUserDetail({
                 }
             }}
         >
-            <TabsList className="w-full border-b border-gray-200 p-0 bg-white flex justify-between flex-shrink-0">
-                <>
-                    <TabsTrigger
-                        className={`${
-                            provider === "lead" && handleShowCustomerDetail
-                                ? "w-1/5"
-                                : "w-1/4"
-                        } data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none`}
-                        value="timeline"
+            <div className="w-full flex justify-between items-center bg-transparent flex-shrink-0 mb-2">
+                <GlassTabs
+                    tabs={tabItems}
+                    activeTab={activeTab}
+                    onChange={(value) => {
+                        setActiveTab(value);
+                        if (onTabChange) {
+                            onTabChange(value);
+                        }
+                    }}
+                    size="sm"
+                    fullWidth={true}
+                />
+                {customer?.id && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-2 h-8 w-8 text-muted-foreground hover:text-foreground"
+                        title={t("common.customerDetail") || "Xem chi tiết"}
+                        onClick={handleShowCustomerDetail}
                     >
-                        {t("common.activity")}
-                    </TabsTrigger>
-                    <TabsTrigger
-                        className={`${
-                            provider === "lead" && handleShowCustomerDetail
-                                ? "w-1/5"
-                                : "w-1/4"
-                        } data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none`}
-                        value="note"
-                    >
-                        {t("common.note")}
-                    </TabsTrigger>
-
-                    <TabsTrigger
-                        className={`${
-                            provider === "lead" && handleShowCustomerDetail
-                                ? "w-1/5"
-                                : "w-1/4"
-                        } data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none`}
-                        value="mail"
-                    >
-                        {t("common.email") || "Email"}
-                    </TabsTrigger>
-
-                    {(provider === "lead" || provider === "customer") && (
-                        <TabsTrigger
-                            className={`${
-                                provider === "lead" && handleShowCustomerDetail
-                                    ? "w-1/5"
-                                    : "w-1/4"
-                            } data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none`}
-                            value="attachment"
-                        >
-                            {t("common.attachments")}
-                        </TabsTrigger>
-                    )}
-
-                    {isCustomerInfo && (
-                        <TabsTrigger
-                            className={`${
-                                provider === "lead" && handleShowCustomerDetail
-                                    ? "w-1/5"
-                                    : "w-1/4"
-                            } data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none`}
-                            value="conversation"
-                        >
-                            {t("common.conversation")}
-                        </TabsTrigger>
-                    )}
-                </>
-                <>
-                    {handleShowCustomerDetail && (
-                        <Button
-                            variant="outline"
-                            onClick={handleShowCustomerDetail}
-                            className="p-2 hover:bg-muted rounded-lg transition-colors 2xl:hidden border-none shadow-none"
-                            title="Xem chi tiết khách hàng"
-                        >
-                            <PanelRight className="size-4" />
-                        </Button>
-                    )}
-                </>
-            </TabsList>
+                        <PanelRight className="size-4" />
+                    </Button>
+                )}
+            </div>
             <TabsContent
                 value="timeline"
                 className="flex-1 flex flex-col w-full min-h-0 overflow-hidden"
@@ -195,7 +169,7 @@ export default function TabsUserDetail({
                                     (single as unknown as Record<
                                         string,
                                         unknown
-                                    >) || {}
+                                    >) || {},
                                 ).length > 0
                             ) {
                                 return single;
